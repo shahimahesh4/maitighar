@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://maitighar.com/sitemap.xml
