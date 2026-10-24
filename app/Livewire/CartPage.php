@@ -21,19 +21,19 @@ class CartPage extends Component
         $this->refreshCart(CartManagement::getCartItemsFromCookie());
     }
 
-    public function incrementQty(int $product_id): void
+    public function incrementQty(string|int $item_id): void
     {
-        $this->refreshCart(CartManagement::incrementQuantityToCartItem($product_id), true);
+        $this->refreshCart(CartManagement::incrementQuantityToCartItem($item_id), true);
     }
 
-    public function decrementQty(int $product_id): void
+    public function decrementQty(string|int $item_id): void
     {
-        $this->refreshCart(CartManagement::decrementQuantityToCartItem($product_id), true);
+        $this->refreshCart(CartManagement::decrementQuantityToCartItem($item_id), true);
     }
 
-    public function removeItem(int $product_id): void
+    public function removeItem(string|int $item_id): void
     {
-        $this->refreshCart(CartManagement::removeCartItems($product_id), true);
+        $this->refreshCart(CartManagement::removeCartItems($item_id), true);
     }
 
     public function render(): View

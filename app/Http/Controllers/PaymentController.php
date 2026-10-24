@@ -21,39 +21,13 @@ class PaymentController extends Controller
     }
 
     /**
-     * Render the signed eSewa form and submit it to the official gateway.
-     */
-    public function esewaCheckout()
-    {
-        $checkout = session()->pull('esewa_checkout');
-
-        abort_unless(
-            is_array($checkout)
-            && is_string($checkout['action'] ?? null)
-            && is_array($checkout['fields'] ?? null),
-            419,
-            'The eSewa checkout session has expired. Please place the order again.'
-        );
-
-        $gatewayHost = parse_url($checkout['action'], PHP_URL_HOST);
-        abort_unless(
-            in_array($gatewayHost, ['epay.esewa.com.np', 'rc-epay.esewa.com.np'], true),
-            400,
-            'Invalid eSewa payment endpoint.'
-        );
-
-        return view('payments.esewa-redirect', [
-            'action' => $checkout['action'],
-            'fields' => $checkout['fields'],
-        ]);
-    }
-
-    /**
      * Handle payment redirect callbacks.
      */
     public function callback(Request $request, string $gateway)
     {
-        abort_unless(in_array($gateway, ['khalti', 'esewa'], true), 404);
+        $drivers = config('payment.drivers', []);
+        abort_unless(array_key_exists($gateway, $drivers), 404);
+
         Log::info('Payment callback received.', [
             'gateway' => $gateway,
             'method' => $request->method(),
@@ -85,7 +59,9 @@ class PaymentController extends Controller
      */
     public function webhook(Request $request, string $gateway)
     {
-        abort_unless(in_array($gateway, ['khalti', 'esewa'], true), 404);
+        $drivers = config('payment.drivers', []);
+        abort_unless(array_key_exists($gateway, $drivers), 404);
+
         Log::info("Webhook received for gateway: {$gateway}");
 
         try {

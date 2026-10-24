@@ -1,18 +1,19 @@
-<main class="mx-auto w-[calc(100%-32px)] max-w-[1150px] py-8 sm:py-10 lg:py-12">
+<main class="bg-[#f5f6f8]">
+<div class="mx-auto w-[calc(100%-32px)] max-w-[1320px] py-4 sm:py-6 lg:py-8">
     <nav class="mb-5 flex items-center gap-2 text-xs font-medium text-stone-500 sm:mb-7" aria-label="Breadcrumb">
         <a wire:navigate href="{{ route('index') }}" class="inline-flex items-center gap-1.5 transition hover:text-[#EC0205]"><i class="bi bi-house-door" aria-hidden="true"></i> Home</a>
         <i class="bi bi-chevron-right text-[9px] text-stone-400" aria-hidden="true"></i>
         <span class="font-semibold text-stone-800" aria-current="page">My Orders</span>
     </nav>
 
-    <section class="relative mb-6 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#091b38] via-[#0C1E8C] to-[#071355] px-5 py-7 text-white shadow-[0_20px_50px_rgba(12,30,140,.18)] sm:px-8 sm:py-9 lg:px-10">
-        <div class="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full border border-white/10"></div>
-        <div class="pointer-events-none absolute -bottom-28 right-20 h-56 w-56 rounded-full border border-white/10"></div>
+    <section class="relative mb-6 overflow-hidden rounded-[28px] border border-slate-200 bg-[#eef1f5] px-5 py-7 text-slate-900 shadow-[0_16px_40px_rgba(15,23,42,.07)] sm:px-8 sm:py-9 lg:px-10">
+        <div class="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full border border-slate-300/70"></div>
+        <div class="pointer-events-none absolute -bottom-28 right-20 h-56 w-56 rounded-full border border-slate-300/70"></div>
         <div class="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <p class="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.22em] text-red-400"><i class="bi bi-bag-check" aria-hidden="true"></i> Your purchase history</p>
-                <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">My Orders</h1>
-                <p class="mt-2 max-w-xl text-sm leading-6 text-white/70 sm:text-base">Review your purchases, follow delivery progress and open any order for complete details.</p>
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">My Orders</h1>
+                <p class="mt-2 max-w-xl text-sm leading-6 text-slate-600 sm:text-base">Review your purchases, follow delivery progress and open any order for complete details.</p>
             </div>
             <a wire:navigate href="{{ route('all-products') }}" class="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-[#EC0205] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#C90204] focus:outline-none focus:ring-2 focus:ring-white/70">Continue shopping <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
         </div>
@@ -68,4 +69,5 @@
             @endif
         </section>
     @endif
+</div>
 </main>

@@ -4,18 +4,20 @@ namespace Tests\Feature;
 
 use App\Livewire\ContactPage;
 use App\Models\ContactMessage;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class ContactPageTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_contact_page_stores_a_valid_enquiry(): void
     {
         Mail::fake();
+
+        $initialCount = ContactMessage::count();
 
         Livewire::test(ContactPage::class)
             ->set('full_name', 'Sita Sharma')
@@ -34,7 +36,7 @@ class ContactPageTest extends TestCase
             'status' => 'new',
         ]);
 
-        $this->assertSame(1, ContactMessage::count());
+        $this->assertSame($initialCount + 1, ContactMessage::count());
     }
 
     public function test_contact_page_rejects_invalid_nepal_phone_number(): void

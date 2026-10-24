@@ -51,10 +51,8 @@ class OrderResource extends Resource
                             ->required(),
                         Select::make('payment_method')
                             ->options([
-                                'khalti' => 'Khalti',
-                                'esewa' => 'eSewa',
-                                'fonepay' => 'Fonepay',
-                                'code' => 'Cash on Delivery',
+                                'cod' => 'Cash on Delivery',
+                                'bank_transfer' => 'Bank Transfer',
                             ])
                             ->required(),
 
@@ -95,12 +93,13 @@ class OrderResource extends Resource
 
                         Select::make('currency')
                             ->options([
-                                'npr' => 'Rs.',
-                                'usd' => 'USD',
-                                'EUR' => 'EUR',
-                                'GBP' => 'GBP',
+                                'AUD' => 'AUD ($)',
+                                'USD' => 'USD ($)',
+                                'EUR' => 'EUR (€)',
+                                'GBP' => 'GBP (£)',
+                                'NPR' => 'NPR (Rs.)',
                             ])
-                            ->default('npr')
+                            ->default('AUD')
                             ->required(),
 
                         Select::make('shipping_method')
@@ -120,10 +119,11 @@ class OrderResource extends Resource
                             ]),
 
                         TextInput::make('shipping_amount')
+                            ->label('Shipping Cost (AUD)')
+                            ->prefix('$')
                             ->numeric()
                             ->default(0.00)
-                            ->reactive()
-                            ->label('Shipping Cost'),
+                            ->reactive(),
 
                         TextInput::make('coupon_code')
                             ->maxLength(255)
@@ -155,10 +155,11 @@ class OrderResource extends Resource
                             }),
 
                         TextInput::make('discount_amount')
+                            ->label('Discount Amount (AUD)')
+                            ->prefix('$')
                             ->numeric()
                             ->default(0.00)
-                            ->reactive()
-                            ->label('Discount Amount'),
+                            ->reactive(),
 
                         Textarea::make('notes')
                             ->columnSpanFull()
@@ -175,44 +176,52 @@ class OrderResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->required()
-                                    ->distinct()
-                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                     ->columnSpan(4)
                                     ->reactive()
                                     ->afterStateUpdated(fn ($state, Set $set) => $set('unit_amount', optional(Product::find($state))->sale_price ?? 0))
-
                                     ->afterStateUpdated(fn ($state, Set $set) => $set('total_amount', optional(Product::find($state))->sale_price ?? 0)),
+
+                                TextInput::make('options_text')
+                                    ->label('Variation Options')
+                                    ->disabled()
+                                    ->dehydrated()
+                                    ->placeholder('Simple Product')
+                                    ->columnSpan(3),
 
                                 TextInput::make('quantity')
                                     ->numeric()
                                     ->required()
                                     ->default(1)
                                     ->minValue(1)
-                                    ->columnSpan(2)
+                                    ->columnSpan(1)
                                     ->reactive()
                                     ->afterStateUpdated(fn ($state, Set $set, Get $get) => $set('total_amount', $state * $get('unit_amount'))),
 
                                 TextInput::make('unit_amount')
+                                    ->label('Unit Price (AUD)')
+                                    ->prefix('$')
                                     ->numeric()
                                     ->required()
                                     ->disabled()
                                     ->dehydrated()
-                                    ->columnSpan(3),
+                                    ->columnSpan(2),
 
                                 TextInput::make('total_amount')
+                                    ->label('Total Amount (AUD)')
+                                    ->prefix('$')
                                     ->numeric()
                                     ->required()
                                     ->dehydrated()
-                                    ->columnSpan(3),
+                                    ->columnSpan(2),
 
                             ])->columns(12),
 
                         Placeholder::make('grand_total_placeholder')
-                            ->label('Grand Total')
+                            ->label('Grand Total (AUD)')
                             ->content(function (Get $get, Set $set) {
                                 $total = 0;
                                 if (! $repeaters = $get('items')) {
-                                    return Money::format($total);
+                                    return Money::format($total, 'AUD');
                                 }
 
                                 foreach ($repeaters as $key => $reapeater) {
@@ -225,7 +234,7 @@ class OrderResource extends Resource
 
                                 $set('grand_total', $grand_total);
 
-                                return Money::format($grand_total);
+                                return Money::format($grand_total, 'AUD');
                             }),
 
                         Hidden::make('grand_total')
@@ -247,10 +256,9 @@ class OrderResource extends Resource
                     ->searchable(),
 
                 TextColumn::make('grand_total')
-                    ->label('Grand Total')
-                    ->numeric()
+                    ->label('Grand Total (AUD)')
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => Money::format($state)),
+                    ->formatStateUsing(fn ($state, $record) => Money::format($state, $record?->currency ?? 'AUD')),
 
                 TextColumn::make('payment_method')
                     ->label('Payment Method')
@@ -283,9 +291,9 @@ class OrderResource extends Resource
                     ->sortable(),
 
                 TextColumn::make('shipping_amount')
-                    ->label('Shipping Cost')
+                    ->label('Shipping Cost (AUD)')
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => Money::format($state))
+                    ->formatStateUsing(fn ($state, $record) => Money::format($state, $record?->currency ?? 'AUD'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('coupon_code')
@@ -295,9 +303,9 @@ class OrderResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('discount_amount')
-                    ->label('Discount Amount')
+                    ->label('Discount Amount (AUD)')
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => Money::format($state))
+                    ->formatStateUsing(fn ($state, $record) => Money::format($state, $record?->currency ?? 'AUD'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')

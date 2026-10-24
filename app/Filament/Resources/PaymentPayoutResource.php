@@ -88,9 +88,7 @@ class PaymentPayoutResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('gateway_code')
                     ->options([
-                        'khalti' => 'Khalti',
-                        'esewa' => 'eSewa',
-                        'fonepay' => 'Fonepay',
+                        'bank_transfer' => 'Bank Transfer',
                     ]),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([

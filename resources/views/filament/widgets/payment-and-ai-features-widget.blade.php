@@ -10,7 +10,7 @@
             </x-slot>
             
             <x-slot name="description">
-                Configure payment gateways including Khalti, eSewa, Fonepay, and Cash on Delivery. Adjust priority ordering, toggles, verify webhook logs, handle payouts, and run diagnostic health connections.
+                Configure payment gateways including Cash on Delivery and Bank Transfer. Adjust priority ordering, toggles, and manage transaction records.
             </x-slot>
             
             <div class="flex items-center gap-x-2 pt-2">

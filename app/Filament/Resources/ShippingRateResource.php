@@ -39,8 +39,8 @@ class ShippingRateResource extends Resource
                         Forms\Components\TextInput::make('cost')
                             ->required()
                             ->numeric()
-                            ->prefix('Rs.')
-                            ->label('Shipping Cost'),
+                            ->prefix('$')
+                            ->label('Shipping Cost (AUD)'),
                         Forms\Components\Toggle::make('is_active')
                             ->default(true)
                             ->label('Is Active')
@@ -75,6 +75,7 @@ class ShippingRateResource extends Resource
                     ->badge()
                     ->color('info'),
                 Tables\Columns\TextColumn::make('cost')
+                    ->label('Shipping Cost (AUD)')
                     ->formatStateUsing(fn ($state) => Money::format($state))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('delivery_range')

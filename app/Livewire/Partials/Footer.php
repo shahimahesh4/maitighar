@@ -101,7 +101,8 @@ class Footer extends Component
         return [
             ['label' => 'Facebook', 'icon' => 'bi-facebook', 'url' => Setting::get('facebook_url', 'https://www.facebook.com/maitigharaustralia')],
             ['label' => 'Instagram', 'icon' => 'bi-instagram', 'url' => Setting::get('instagram_url', 'https://www.instagram.com/maitighar')],
-            ['label' => 'TikTok', 'icon' => 'bi-tiktok', 'url' => 'https://www.tiktok.com'],
+            ['label' => 'TikTok', 'icon' => 'bi-tiktok', 'url' => Setting::get('tiktok_url', 'https://www.tiktok.com')],
+            ['label' => 'YouTube', 'icon' => 'bi-youtube', 'url' => Setting::get('youtube_url', 'https://www.youtube.com')],
         ];
     }
 }

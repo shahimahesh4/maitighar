@@ -1,5 +1,5 @@
-<div class="min-h-screen bg-slate-50 py-8 sm:py-12">
-    <div class="mx-auto w-[calc(100%-32px)] max-w-[1150px]">
+<div class="min-h-screen bg-slate-50 py-4 sm:py-6">
+    <div class="mx-auto w-[calc(100%-32px)] max-w-[1320px]">
         <nav class="mb-5 flex items-center gap-2 text-xs text-slate-500" aria-label="Breadcrumb">
             <a wire:navigate href="{{ route('dashboard') }}" class="font-semibold hover:text-[#EC0205]">Dashboard</a>
             <i class="bi bi-chevron-right text-[9px]"></i><span class="font-bold text-slate-800">Support tickets</span>

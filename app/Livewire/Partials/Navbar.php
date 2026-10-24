@@ -22,11 +22,26 @@ class Navbar extends Component
 
     public string $selectedCategory = '';
 
+    public string $currentCurrency = 'AUD';
+
     public function mount(): void
     {
         $this->total_count = CartManagement::getTotalQuantity();
         $this->refreshWishlistCount();
         $this->search = (string) request('search', '');
+        $this->currentCurrency = \App\Support\Money::currentCurrency();
+    }
+
+    public function setCurrency(string $code): void
+    {
+        $code = strtoupper(trim($code));
+        if (in_array($code, ['AUD', 'USD', 'NPR'], true)) {
+            session(['currency' => $code]);
+            cookie()->queue('currency', $code, 60 * 24 * 30);
+            $this->currentCurrency = $code;
+            $this->dispatch('currency-changed', currency: $code);
+            $this->redirect(request()->header('Referer', route('index')), navigate: true);
+        }
     }
 
     #[Computed]

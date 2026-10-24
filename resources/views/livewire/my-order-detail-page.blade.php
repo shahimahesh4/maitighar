@@ -1,5 +1,5 @@
-<div class="min-h-[70vh] bg-slate-50 py-8 sm:py-11">
-    <div class="mx-auto w-[calc(100%-32px)] max-w-[1150px]">
+<div class="min-h-[70vh] bg-slate-50 py-4 sm:py-6">
+    <div class="mx-auto w-[calc(100%-32px)] max-w-[1320px]">
         <nav class="mb-5 flex items-center gap-2 text-[11px] text-slate-500" aria-label="Breadcrumb">
             <a wire:navigate href="{{ route('index') }}" class="inline-flex items-center gap-1.5 font-semibold transition hover:text-[#EC0205]"><i class="bi bi-house-door"></i>Home</a><i class="bi bi-chevron-right text-[9px] text-slate-300"></i>
             <a wire:navigate href="{{ route('my-orders') }}" class="font-semibold transition hover:text-[#EC0205]">My orders</a><i class="bi bi-chevron-right text-[9px] text-slate-300"></i>
@@ -50,7 +50,13 @@
                         @foreach($order->items as $item)
                             <article wire:key="order-item-{{ $item->id }}" class="flex items-center gap-4 px-4 py-4 sm:px-6">
                                 <span class="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-1.5"><img src="{{ $item->product?->getImageUrl() ?? asset('images/logo.png') }}" alt="{{ $item->product?->name ?? 'Product' }}" class="h-full w-full object-contain"></span>
-                                <div class="min-w-0 flex-1"><h3 class="line-clamp-2 text-xs font-extrabold leading-5 text-slate-900">{{ $item->product?->name ?? 'Product unavailable' }}</h3><p class="mt-1 text-[10px] text-slate-400">{{ \App\Support\Money::format($item->unit_amount) }} × {{ $item->quantity }}</p></div>
+                                <div class="min-w-0 flex-1">
+                                    <h3 class="line-clamp-2 text-xs font-extrabold leading-5 text-slate-900">{{ $item->product?->name ?? 'Product unavailable' }}</h3>
+                                    @if(!empty($item->options_text))
+                                        <p class="text-[10px] text-slate-500 font-medium">{{ $item->options_text }}</p>
+                                    @endif
+                                    <p class="mt-0.5 text-[10px] text-slate-400">{{ \App\Support\Money::format($item->unit_amount) }} × {{ $item->quantity }}</p>
+                                </div>
                                 <strong class="text-right text-xs font-extrabold text-[#EC0205]">{{ \App\Support\Money::format($item->total_amount) }}</strong>
                             </article>
                         @endforeach

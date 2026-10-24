@@ -1,5 +1,5 @@
-<div class="min-h-[70vh] bg-slate-50 py-7 sm:py-10">
-    <div class="kba-cart-container mx-auto w-full max-w-[1150px] px-4 sm:px-6">
+<div class="min-h-[70vh] bg-slate-50 py-4 sm:py-6">
+    <div class="kba-cart-container mx-auto w-full max-w-[1320px] px-4 sm:px-6">
         <nav class="mb-5 flex items-center gap-2 text-[11px] text-slate-500" aria-label="Breadcrumb">
             <a wire:navigate href="{{ route('index') }}" class="inline-flex items-center gap-1.5 font-semibold transition hover:text-[#EC0205]"><i class="bi bi-house-door"></i>Home</a>
             <i class="bi bi-chevron-right text-[9px] text-slate-300"></i><span class="font-bold text-slate-800">Shopping bag</span>
@@ -32,19 +32,31 @@
 
                     <div class="space-y-3">
                         @foreach($cartItems as $item)
-                            <article wire:key="cart-item-{{ $item['product_id'] }}" class="group relative overflow-hidden rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#0C1E8C]/30 hover:shadow-md sm:p-5">
+                            @php
+                                $itemKey = $item['item_key'] ?? ($item['product_id'] . (!empty($item['variation_id']) ? '_' . $item['variation_id'] : ''));
+                            @endphp
+                            <article wire:key="cart-item-{{ $itemKey }}" class="group relative overflow-hidden rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#0C1E8C]/30 hover:shadow-md sm:p-5">
                                 <div class="flex gap-4 sm:gap-5">
                                     <div class="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-[19px] border border-slate-200 bg-slate-50 p-2 sm:h-28 sm:w-28"><img src="{{ $item['image_url'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}'" alt="{{ $item['name'] }}" class="h-full w-full object-contain transition duration-300 group-hover:scale-105"></div>
                                     <div class="min-w-0 flex-1">
                                         <div class="flex items-start justify-between gap-3">
-                                            <div class="min-w-0"><p class="text-[9px] font-extrabold uppercase tracking-[.16em] text-[#0C1E8C]">Authentic Heritage</p><h3 class="mt-1 line-clamp-2 text-sm font-extrabold leading-snug text-slate-900 sm:text-base">{{ $item['name'] }}</h3><p class="mt-1.5 text-[11px] font-semibold text-slate-400">{{ \App\Support\Money::format($item['unit_amount']) }} per item</p></div>
-                                            <button type="button" wire:click="removeItem({{ $item['product_id'] }})" wire:loading.attr="disabled" wire:target="removeItem({{ $item['product_id'] }})" class="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-transparent text-slate-400 transition hover:border-red-100 hover:bg-red-50 hover:text-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400 disabled:opacity-50" aria-label="Remove {{ $item['name'] }} from bag" title="Remove product"><i class="bi bi-trash3"></i></button>
+                                            <div class="min-w-0">
+                                                <p class="text-[9px] font-extrabold uppercase tracking-[.16em] text-[#0C1E8C]">Authentic Heritage</p>
+                                                <h3 class="mt-1 line-clamp-2 text-sm font-extrabold leading-snug text-slate-900 sm:text-base">{{ $item['name'] }}</h3>
+                                                @if(!empty($item['options_text']))
+                                                    <p class="mt-1 inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
+                                                        <i class="bi bi-tag-fill text-[9px] text-slate-400"></i>{{ $item['options_text'] }}
+                                                    </p>
+                                                @endif
+                                                <p class="mt-1.5 text-[11px] font-semibold text-slate-400">{{ \App\Support\Money::format($item['unit_amount']) }} per item</p>
+                                            </div>
+                                            <button type="button" wire:click="removeItem('{{ $itemKey }}')" wire:loading.attr="disabled" wire:target="removeItem('{{ $itemKey }}')" class="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-transparent text-slate-400 transition hover:border-red-100 hover:bg-red-50 hover:text-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400 disabled:opacity-50" aria-label="Remove {{ $item['name'] }} from bag" title="Remove product"><i class="bi bi-trash3"></i></button>
                                         </div>
                                         <div class="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-3 sm:flex-row sm:items-end sm:justify-between">
                                             <div><span class="mb-1.5 block text-[9px] font-bold uppercase tracking-wider text-slate-400">Quantity</span><div class="inline-flex h-9 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-inner">
-                                                <button type="button" wire:click="decrementQty({{ $item['product_id'] }})" wire:loading.attr="disabled" wire:target="decrementQty({{ $item['product_id'] }}),incrementQty({{ $item['product_id'] }})" class="grid h-full w-9 place-items-center text-slate-500 transition hover:bg-slate-200 hover:text-[#0C1E8C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0C1E8C]" aria-label="Decrease {{ $item['name'] }} quantity"><i class="bi bi-dash-lg"></i></button>
+                                                <button type="button" wire:click="decrementQty('{{ $itemKey }}')" wire:loading.attr="disabled" wire:target="decrementQty('{{ $itemKey }}'),incrementQty('{{ $itemKey }}')" class="grid h-full w-9 place-items-center text-slate-500 transition hover:bg-slate-200 hover:text-[#0C1E8C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0C1E8C]" aria-label="Decrease {{ $item['name'] }} quantity"><i class="bi bi-dash-lg"></i></button>
                                                 <span class="min-w-9 border-x border-slate-200 text-center text-xs font-extrabold text-slate-900" aria-live="polite">{{ $item['quantity'] }}</span>
-                                                <button type="button" wire:click="incrementQty({{ $item['product_id'] }})" wire:loading.attr="disabled" wire:target="decrementQty({{ $item['product_id'] }}),incrementQty({{ $item['product_id'] }})" class="grid h-full w-9 place-items-center text-slate-500 transition hover:bg-slate-200 hover:text-[#0C1E8C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0C1E8C]" aria-label="Increase {{ $item['name'] }} quantity"><i class="bi bi-plus-lg"></i></button>
+                                                <button type="button" wire:click="incrementQty('{{ $itemKey }}')" wire:loading.attr="disabled" wire:target="decrementQty('{{ $itemKey }}'),incrementQty('{{ $itemKey }}')" class="grid h-full w-9 place-items-center text-slate-500 transition hover:bg-slate-200 hover:text-[#0C1E8C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0C1E8C]" aria-label="Increase {{ $item['name'] }} quantity"><i class="bi bi-plus-lg"></i></button>
                                             </div></div>
                                             <div class="text-left sm:text-right"><span class="block text-[9px] font-bold uppercase tracking-wider text-slate-400">Item total</span><strong class="mt-1 block text-base font-extrabold text-[#EC0205]">{{ \App\Support\Money::format($item['total_amount']) }}</strong></div>
                                         </div>

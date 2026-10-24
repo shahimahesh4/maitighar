@@ -1,5 +1,5 @@
-<div class="min-h-screen bg-slate-50 py-8 sm:py-12">
-    <div class="mx-auto w-[calc(100%-32px)] max-w-[1150px]">
+<div class="min-h-screen bg-slate-50 py-4 sm:py-6">
+    <div class="mx-auto w-[calc(100%-32px)] max-w-[1320px]">
         <div class="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-[#091b38] via-[#0C1E8C] to-[#071355] px-6 py-8 text-white shadow-xl shadow-slate-900/10 sm:px-9 sm:py-10">
             <div class="absolute -right-16 -top-20 h-64 w-64 rounded-full border border-white/10"></div>
             <div class="absolute -bottom-32 right-20 h-72 w-72 rounded-full border border-white/10"></div>

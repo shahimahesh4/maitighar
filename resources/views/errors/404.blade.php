@@ -1,5 +1,5 @@
 <x-layouts.app title="Page Not Found | Maitighar" meta-description="The requested page could not be found. Explore Maitighar authentic Nepali handicrafts, cultural products, and contact information." robots="noindex, follow">
-    <section class="mx-auto grid min-h-[65vh] w-[calc(100%-32px)] max-w-[1150px] place-items-center py-16 text-center">
+    <section class="mx-auto grid min-h-[65vh] w-[calc(100%-32px)] max-w-[1320px] place-items-center py-16 text-center">
         <div class="max-w-xl rounded-[32px] border border-slate-200 bg-white px-7 py-12 shadow-[0_24px_70px_rgba(12,30,140,.08)] sm:px-12">
             <span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-red-50 text-2xl text-[#EC0205]"><i class="bi bi-compass" aria-hidden="true"></i></span>
             <p class="mt-6 text-xs font-extrabold uppercase tracking-[.22em] text-[#0C1E8C]">Error 404</p>

@@ -34,7 +34,7 @@ class PaymentEventNotification extends Notification implements ShouldQueue
         if ($this->type === 'received') {
             $mail->subject('Payment Received: Order #'.$this->data['order_id'])
                 ->greeting('Hello '.$notifiable->name.'!')
-                ->line('Thank you for your purchase. We have received your payment of '.$this->data['amount'].' '.$this->data['currency'].'.')
+                ->line('Thank you for your purchase. We have received your payment of '.Money::format($this->data['amount'], $this->data['currency'] ?? 'AUD').' '.strtoupper($this->data['currency'] ?? 'AUD').'.')
                 ->line('Your order status has been updated to processing.')
                 ->action('View Order Details', route('my-order-details', ['order' => $this->data['order_id']]))
                 ->line('Thank you for shopping with us!');

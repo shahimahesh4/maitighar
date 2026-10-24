@@ -4,12 +4,11 @@
             <div class="kba-album-hero-inner">
                 <div class="kba-album-hero-copy">
                     <nav class="kba-page-breadcrumbs" aria-label="Breadcrumb"><a wire:navigate href="{{ route('index') }}"><i class="bi bi-house-door" aria-hidden="true"></i>Home</a><i class="bi bi-chevron-right"></i><a wire:navigate href="{{ route('gallery.index') }}">Gallery</a><i class="bi bi-chevron-right"></i><span aria-current="page">{{ $album->title }}</span></nav>
-                    <span class="kba-cms-eyebrow"><i class="bi bi-camera"></i> Photo collection</span>
+                    <span class="kba-cms-eyebrow"><i class="bi bi-images"></i> Photo collection</span>
                     <h1>{{ $album->title }}</h1>
                     @if($album->description)<p>{{ $album->description }}</p>@endif
                     <div class="kba-gallery-summary"><span><strong>{{ $album->image_count }}</strong> {{ Str::plural('photo', $album->image_count) }}</span><i></i><a wire:navigate href="{{ route('gallery.index') }}"><i class="bi bi-arrow-left"></i> All albums</a></div>
                 </div>
-                <img src="{{ $album->cover_url }}" alt="{{ $album->title }} album cover" width="720" height="520">
             </div>
         </section>
 

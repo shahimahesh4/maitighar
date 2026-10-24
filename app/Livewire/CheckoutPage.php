@@ -11,6 +11,8 @@ use App\Models\InventoryLog;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\PaymentTransaction;
+use App\Models\Product;
+use App\Models\ProductVariation;
 use App\Models\ShippingRate;
 use App\Services\Payment\PaymentGatewayManager;
 use App\Services\OrderConfirmationOtpService;
@@ -189,7 +191,7 @@ class CheckoutPage extends Component
             'shipping_rate_id' => ['required', 'integer', 'exists:shipping_rates,id'],
         ];
 
-        if (in_array($this->payment_method, ['bank_transfer', 'qr_payment'], true)) {
+        if ($this->payment_method === 'bank_transfer') {
             $rules['payment_reference'] = 'required|string|max:100';
             $rules['payment_voucher'] = 'required|image|mimes:jpg,jpeg,png,webp|max:5120';
         }
@@ -250,39 +252,146 @@ class CheckoutPage extends Component
     {
         $this->syncShippingRate(failIfMissing: true);
 
+        // Server-side validation and recalculation of payable amount in AUD
+        $validatedCartItems = [];
+        $recalculatedSubtotal = 0.0;
+        foreach ($this->cart_items as $item) {
+            $product = Product::where('id', $item['product_id'])->where('is_active', true)->first();
+            if (! $product) {
+                session()->flash('error', 'One or more items in your cart are no longer available.');
+
+                return redirect()->route('cart-products');
+            }
+
+            $variationId = ! empty($item['variation_id']) ? (int) $item['variation_id'] : null;
+            $qty = max(1, (int) $item['quantity']);
+
+            if ($variationId) {
+                $variation = ProductVariation::with('product')
+                    ->where('id', $variationId)
+                    ->where('product_id', $product->id)
+                    ->where('is_enabled', true)
+                    ->first();
+
+                if (! $variation) {
+                    session()->flash('error', "A variation of {$product->name} is no longer available.");
+
+                    return redirect()->route('cart-products');
+                }
+
+                if ($variation->manage_stock && $variation->stock_quantity < $qty) {
+                    session()->flash('error', "Only {$variation->stock_quantity} available for {$product->name} ({$variation->combination_label}).");
+
+                    return redirect()->route('cart-products');
+                }
+
+                $unitAmount = (float) $variation->effective_price;
+                $variationSku = $variation->sku ?: $product->sku;
+                $optionsText = $variation->combination_label;
+            } else {
+                if ($product->stock_quantity > 0 && $product->stock_quantity < $qty) {
+                    session()->flash('error', "Only {$product->stock_quantity} available for {$product->name}.");
+
+                    return redirect()->route('cart-products');
+                }
+
+                $unitAmount = (float) $product->sale_price;
+                $variationSku = $product->sku;
+                $optionsText = null;
+            }
+
+            $totalAmount = round($unitAmount * $qty, 2);
+            $recalculatedSubtotal += $totalAmount;
+            $validatedCartItems[] = [
+                'product_id' => $product->id,
+                'variation_id' => $variationId,
+                'variation_sku' => $variationSku,
+                'options_text' => $optionsText,
+                'quantity' => $qty,
+                'unit_amount' => $unitAmount,
+                'total_amount' => $totalAmount,
+            ];
+        }
+
+        // Validate and recalculate discount
+        $recalculatedDiscount = 0.0;
+        if ($this->applied_coupon) {
+            $coupon = Coupon::where('code', $this->applied_coupon)->first();
+            if ($coupon && $coupon->isValid() && $coupon->isValidForAmount($recalculatedSubtotal)) {
+                $recalculatedDiscount = (float) $coupon->calculateDiscount($recalculatedSubtotal);
+            }
+        }
+
+        // Validate shipping
+        $shippingRate = ShippingRate::find($this->shipping_rate_id);
+        $recalculatedShipping = $shippingRate ? (float) $shippingRate->cost : 0.0;
+
+        $finalPayableAmount = round(max(0, $recalculatedSubtotal - $recalculatedDiscount) + $recalculatedShipping, 2);
+        $this->grand_total = $finalPayableAmount;
+        $this->discount_amount = $recalculatedDiscount;
+        $this->shipping_amount = $recalculatedShipping;
+        $this->cart_items = $validatedCartItems;
+
+        $currency = 'AUD';
+
         // Create the order
-        $order = DB::transaction(function () {
+        $order = DB::transaction(function () use ($finalPayableAmount, $recalculatedShipping, $recalculatedDiscount, $validatedCartItems, $currency) {
             $order = Order::create([
                 'user_id' => auth()->id(),
-                'grand_total' => $this->grand_total,
+                'grand_total' => $finalPayableAmount,
                 'payment_method' => $this->payment_method,
                 'payment_status' => 'pending', // all start pending, completed by driver callback/webhook
                 'status' => 'new',
-                'currency' => 'npr',
-                'shipping_amount' => $this->shipping_amount,
+                'currency' => $currency,
+                'shipping_amount' => $recalculatedShipping,
                 'shipping_method' => $this->shipping_method,
                 'notes' => 'Placed via checkout page.',
                 'coupon_code' => $this->applied_coupon,
-                'discount_amount' => $this->discount_amount,
+                'discount_amount' => $recalculatedDiscount,
             ]);
 
-            // Create order items
-            foreach ($this->cart_items as $item) {
+            // Create order items and deduct stock atomically
+            foreach ($validatedCartItems as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item['product_id'],
+                    'variation_id' => $item['variation_id'],
+                    'variation_sku' => $item['variation_sku'],
+                    'options_text' => $item['options_text'],
                     'quantity' => $item['quantity'],
                     'unit_amount' => $item['unit_amount'],
                     'total_amount' => $item['total_amount'],
                 ]);
 
-                // Log stock reduction in inventory logs
-                InventoryLog::create([
-                    'product_id' => $item['product_id'],
-                    'user_id' => auth()->id(),
-                    'quantity_change' => -$item['quantity'],
-                    'reason' => 'Customer Purchase (Order #'.$order->id.')',
-                ]);
+                if (! empty($item['variation_id'])) {
+                    $lockedVar = ProductVariation::where('id', $item['variation_id'])->lockForUpdate()->first();
+                    if ($lockedVar && $lockedVar->manage_stock) {
+                        $lockedVar->decrement('stock_quantity', $item['quantity']);
+                    }
+                    InventoryLog::create([
+                        'product_id' => $item['product_id'],
+                        'variation_id' => $item['variation_id'],
+                        'user_id' => auth()->id(),
+                        'quantity_change' => -$item['quantity'],
+                        'reason' => 'Customer Purchase (Order #'.$order->id.')',
+                    ]);
+                    $lockedVar?->product?->syncPriceAndStockFromVariations();
+                } else {
+                    $lockedProd = Product::where('id', $item['product_id'])->lockForUpdate()->first();
+                    if ($lockedProd) {
+                        $lockedProd->decrement('stock_quantity', $item['quantity']);
+                        if ($lockedProd->stock_quantity <= 0) {
+                            $lockedProd->update(['in_stock' => false]);
+                        }
+                    }
+                    InventoryLog::create([
+                        'product_id' => $item['product_id'],
+                        'variation_id' => null,
+                        'user_id' => auth()->id(),
+                        'quantity_change' => -$item['quantity'],
+                        'reason' => 'Customer Purchase (Order #'.$order->id.')',
+                    ]);
+                }
             }
 
             // Create address
@@ -303,7 +412,7 @@ class CheckoutPage extends Component
         app(OrderConfirmationService::class)->send($order);
 
         $voucherPath = null;
-        if (in_array($this->payment_method, ['bank_transfer', 'qr_payment'], true)) {
+        if ($this->payment_method === 'bank_transfer') {
             $voucherPath = $this->payment_voucher->store('payment-vouchers', 'local');
         }
         // Initialize payment via Gateway Manager
@@ -318,7 +427,7 @@ class CheckoutPage extends Component
                 'user_id' => auth()->id(),
                 'gateway_code' => $this->payment_method,
                 'amount' => $order->grand_total,
-                'currency' => $order->currency ?? 'NPR',
+                'currency' => $order->currency ?? 'AUD',
                 'status' => 'pending',
                 'type' => 'payment',
                 'payment_reference' => $this->payment_reference,

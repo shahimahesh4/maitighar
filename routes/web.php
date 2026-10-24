@@ -99,7 +99,6 @@ Route::get('/cancelled', CancelPage::class)->name('cancelled');
 Route::post('/payment/webhook/{gateway}', [PaymentController::class, 'webhook'])->name('payment.webhook');
 Route::get('/payment/callback/{gateway}', [PaymentController::class, 'callback'])->name('payment.callback');
 Route::post('/payment/callback/{gateway}', [PaymentController::class, 'callback']);
-Route::get('/payment/esewa/checkout', [PaymentController::class, 'esewaCheckout'])->name('payment.esewa.checkout');
 Route::get('/payment/cancel/{order_id}', [PaymentController::class, 'cancel'])->name('payment.cancel');
 
 Route::get('/stnapanel/orders/{order}/invoice', function (Order $order) {
@@ -111,6 +110,21 @@ Route::get('/stnapanel/orders/{order}/invoice', function (Order $order) {
 Route::get('/stnapanel/payment-vouchers/{transaction}', [PaymentVoucherController::class, 'show'])
     ->middleware('auth')
     ->name('payment-vouchers.show');
+
+Route::get('/stnapanel/sliders/{slider}/preview', function (\App\Models\Slider $slider) {
+    return view('filament.slider-iframe-preview', ['slider' => $slider]);
+})->middleware('auth')->name('filament.sliders.preview');
+
+
+Route::get('/currency/{currency}', function (string $currency) {
+    $code = strtoupper(trim($currency));
+    if (in_array($code, ['AUD', 'USD', 'NPR', 'EUR', 'GBP'], true)) {
+        session(['currency' => $code]);
+        cookie()->queue('currency', $code, 60 * 24 * 30);
+    }
+
+    return redirect()->back();
+})->name('currency.switch');
 
 // Public pages by slug. Exclude common reserved prefixes so we don't
 // accidentally intercept Filament admin, Livewire, API, or other system routes.

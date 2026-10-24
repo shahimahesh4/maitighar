@@ -1,4 +1,4 @@
-<div class="kba-product-detail-page w-full max-w-[1150px] py-12 px-4 sm:px-6 lg:px-8 mx-auto" x-data="{ mainImage: @js($mainImage), activeTab: @js($initialTab) }">
+<div class="kba-product-detail-page w-full max-w-[1320px] py-6 px-4 sm:px-6 sm:py-8 lg:px-8 mx-auto" x-data="{ mainImage: @js($mainImage), activeTab: @js($initialTab) }" @variation-image-changed.window="mainImage = $event.detail.image">
     <!-- Breadcrumb -->
     <nav class="kba-product-detail-breadcrumb flex mb-6 text-xs text-gray-500 dark:text-slate-400 font-medium" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-2">
@@ -102,16 +102,37 @@
                     
                     <!-- Stock Badge -->
                     <div class="pt-2">
-                        @if($product->in_stock)
-                            <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                                <span class="w-1.5 h-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>
-                                In Stock
-                            </span>
+                        @if($isVariable)
+                            @if($selectedVariationId)
+                                @if($isAvailable)
+                                    <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>
+                                        In Stock ({{ $displayStock }} available)
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>
+                                        Out of Stock
+                                    </span>
+                                @endif
+                            @else
+                                <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-blue-50 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400"></span>
+                                    Select Options
+                                </span>
+                            @endif
                         @else
-                            <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                                <span class="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>
-                                Out of Stock
-                            </span>
+                            @if($product->in_stock)
+                                <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-600 dark:bg-green-400"></span>
+                                    In Stock
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-600 dark:bg-red-400"></span>
+                                    Out of Stock
+                                </span>
+                            @endif
                         @endif
                     </div>
                 </div>
@@ -119,18 +140,42 @@
                 <!-- Price and Info -->
                 <div class="kba-product-detail-price py-4 border-y border-gray-100 dark:border-slate-800/80">
                     <div class="flex flex-wrap items-end gap-x-3 gap-y-1">
-                        <p class="text-3xl font-extrabold text-[#EC0205]">
-                            {{ \App\Support\Money::format($product->sale_price) }}
-                        </p>
-                        @if($product->discount_percentage)
-                            <del class="pb-1 text-base font-semibold text-gray-400">{{ \App\Support\Money::format($product->regular_price) }}</del>
-                            <span class="mb-1 rounded-full bg-red-50 px-2 py-1 text-xs font-bold text-red-600">
-                                {{ $product->discount_percentage }}% OFF
-                            </span>
+                        @if($isVariable)
+                            @if($displayPrice !== null)
+                                <p class="text-3xl font-extrabold text-[#EC0205]">
+                                    {{ \App\Support\Money::format($displayPrice) }}
+                                </p>
+                                @if($displayRegularPrice && $displayRegularPrice > $displayPrice)
+                                    <del class="pb-1 text-base font-semibold text-gray-400">{{ \App\Support\Money::format($displayRegularPrice) }}</del>
+                                    @php
+                                        $varDiscount = (int) round((($displayRegularPrice - $displayPrice) / $displayRegularPrice) * 100);
+                                    @endphp
+                                    <span class="mb-1 rounded-full bg-red-50 px-2 py-1 text-xs font-bold text-red-600">
+                                        {{ $varDiscount }}% OFF
+                                    </span>
+                                @endif
+                            @else
+                                <p class="text-2xl sm:text-3xl font-extrabold text-[#EC0205]">
+                                    {{ $product->getFormattedPriceRange() }}
+                                </p>
+                            @endif
+                        @else
+                            <p class="text-3xl font-extrabold text-[#EC0205]">
+                                {{ \App\Support\Money::format($product->sale_price) }}
+                            </p>
+                            @if($product->discount_percentage)
+                                <del class="pb-1 text-base font-semibold text-gray-400">{{ \App\Support\Money::format($product->regular_price) }}</del>
+                                <span class="mb-1 rounded-full bg-red-50 px-2 py-1 text-xs font-bold text-red-600">
+                                    {{ $product->discount_percentage }}% OFF
+                                </span>
+                            @endif
                         @endif
                     </div>
-                    @if($product->sku)
-                        <p class="text-xs text-gray-400 dark:text-slate-500 mt-2 font-mono">SKU: {{ $product->sku }}</p>
+                    @php
+                        $activeSku = $isVariable ? ($selectedVariationSku ?: $product->sku) : $product->sku;
+                    @endphp
+                    @if($activeSku)
+                        <p class="text-xs text-gray-400 dark:text-slate-500 mt-2 font-mono">SKU: {{ $activeSku }}</p>
                     @endif
                 </div>
 
@@ -142,6 +187,76 @@
                         <p>No description provided for this product.</p>
                     @endif
                 </div>
+
+                <!-- Attributes & Variations Selector -->
+                @if($isVariable && !empty($variationAttributes))
+                    <div class="kba-variation-selectors space-y-4 py-4 border-b border-gray-100 dark:border-slate-800/80">
+                        @foreach($variationAttributes as $attr)
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="text-xs font-bold text-gray-700 dark:text-slate-300 uppercase tracking-wider">
+                                        {{ $attr['name'] }}:
+                                        <span class="font-normal text-gray-500 normal-case ml-1">
+                                            @php
+                                                $selectedValId = $selectedAttributes[$attr['id']] ?? null;
+                                                $selectedVal = $selectedValId ? collect($attr['values'])->firstWhere('id', $selectedValId) : null;
+                                            @endphp
+                                            {{ $selectedVal ? $selectedVal['value'] : 'Select an option' }}
+                                        </span>
+                                    </label>
+                                </div>
+
+                                @if(($attr['type'] ?? 'select') === 'color')
+                                    <!-- Colour Swatches -->
+                                    <div class="flex flex-wrap items-center gap-2.5">
+                                        @foreach($attr['values'] as $val)
+                                            @php
+                                                $isSelected = ($selectedAttributes[$attr['id']] ?? null) == $val['id'];
+                                                $bg = $val['color_code'] ?: '#cccccc';
+                                                $isWhite = in_array(strtolower($val['color_code'] ?? ''), ['#ffffff', '#fff', '#f9fafb']);
+                                            @endphp
+                                            <button
+                                                type="button"
+                                                wire:click="selectAttribute({{ $attr['id'] }}, {{ $val['id'] }})"
+                                                title="{{ $val['value'] }}"
+                                                class="relative w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center p-0.5 shadow-sm {{ $isSelected ? 'ring-2 ring-[#EC0205] border-white scale-110 shadow-md' : 'border-gray-300 hover:border-gray-500 hover:scale-105' }}"
+                                                style="background-color: {{ $bg }};"
+                                            >
+                                                @if($isSelected)
+                                                    <svg class="w-4 h-4 {{ $isWhite ? 'text-gray-900' : 'text-white' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                @endif
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <!-- Text Buttons (Size, Material, etc.) -->
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        @foreach($attr['values'] as $val)
+                                            @php
+                                                $isSelected = ($selectedAttributes[$attr['id']] ?? null) == $val['id'];
+                                            @endphp
+                                            <button
+                                                type="button"
+                                                wire:click="selectAttribute({{ $attr['id'] }}, {{ $val['id'] }})"
+                                                class="px-4 py-2 text-xs font-bold rounded-xl border transition-all {{ $isSelected ? 'bg-[#EC0205] text-white border-[#EC0205] shadow-sm ring-2 ring-red-200' : 'bg-gray-50 dark:bg-slate-800 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-slate-700 hover:border-[#EC0205] hover:text-[#EC0205]' }}"
+                                            >
+                                                {{ $val['value'] }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+
+                        @if($variationNotice)
+                            <p class="text-xs font-medium {{ $selectedVariationId && !$isAvailable ? 'text-red-600' : 'text-amber-600' }} mt-1">
+                                {{ $variationNotice }}
+                            </p>
+                        @endif
+                    </div>
+                @endif
 
                 <!-- Actions -->
                 <div class="kba-product-actions space-y-4 pt-4">
@@ -162,18 +277,38 @@
                         </div>
 
                         <div class="kba-product-purchase flex-1 pt-6 flex items-center gap-2">
-                            @if($product->in_stock)
-                                <button type="button" wire:click="addToCart({{ $product->id }})" class="kba-product-add-button flex-1 py-3 px-6 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-xl border border-transparent bg-[#EC0205] text-white hover:bg-[#C90204] shadow-md shadow-red-500/15 transition hover-lift">
-                                    <svg class="kba-product-add-icon w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.119-1.243l1.263-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"></path>
-                                    </svg>
-                                    <span wire:loading.remove wire:target="addToCart({{ $product->id }})">Add to Cart</span>
-                                    <span wire:loading wire:target="addToCart({{ $product->id }})">Adding...</span>
-                                </button>
+                            @if($isVariable)
+                                @if(!$selectedVariationId)
+                                    <button type="button" disabled class="flex-1 py-3 px-6 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-xl border border-transparent bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500">
+                                        Select Options
+                                    </button>
+                                @elseif(!$isAvailable)
+                                    <button type="button" disabled class="flex-1 py-3 px-6 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-xl border border-transparent bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500">
+                                        Out of Stock
+                                    </button>
+                                @else
+                                    <button type="button" wire:click="addToCart({{ $product->id }})" class="kba-product-add-button flex-1 py-3 px-6 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-xl border border-transparent bg-[#EC0205] text-white hover:bg-[#C90204] shadow-md shadow-red-500/15 transition hover-lift">
+                                        <svg class="kba-product-add-icon w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.119-1.243l1.263-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"></path>
+                                        </svg>
+                                        <span wire:loading.remove wire:target="addToCart({{ $product->id }})">Add to Cart</span>
+                                        <span wire:loading wire:target="addToCart({{ $product->id }})">Adding...</span>
+                                    </button>
+                                @endif
                             @else
-                                <button type="button" disabled class="flex-1 py-3 px-6 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-xl border border-transparent bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500">
-                                    Out of Stock
-                                </button>
+                                @if($product->in_stock)
+                                    <button type="button" wire:click="addToCart({{ $product->id }})" class="kba-product-add-button flex-1 py-3 px-6 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-xl border border-transparent bg-[#EC0205] text-white hover:bg-[#C90204] shadow-md shadow-red-500/15 transition hover-lift">
+                                        <svg class="kba-product-add-icon w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.119-1.243l1.263-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"></path>
+                                        </svg>
+                                        <span wire:loading.remove wire:target="addToCart({{ $product->id }})">Add to Cart</span>
+                                        <span wire:loading wire:target="addToCart({{ $product->id }})">Adding...</span>
+                                    </button>
+                                @else
+                                    <button type="button" disabled class="flex-1 py-3 px-6 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-xl border border-transparent bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500">
+                                        Out of Stock
+                                    </button>
+                                @endif
                             @endif
 
                             <button type="button" wire:click="toggleWishlist" class="kba-product-wishlist-button p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700/60 transition shadow-sm" title="Add to Wishlist">
@@ -186,23 +321,7 @@
                         </div>
                     </div>
                 </div>
-
-                @if(!empty($product->specifications))
-                    <div class="pt-6 border-t border-gray-100 dark:border-slate-800/80">
-                        <h3 class="font-bold text-gray-800 dark:text-white text-base mb-3">Product Specifications</h3>
-                        <dl class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/60">
-                            @foreach($product->specifications as $specification)
-                                @if(!empty($specification['label']) || !empty($specification['value']))
-                                    <div class="grid grid-cols-[minmax(110px,0.8fr)_1.5fr] border-b border-stone-200 last:border-0">
-                                        <dt class="bg-slate-50 px-4 py-3 text-xs font-bold text-stone-700">{{ $specification['label'] ?? '' }}</dt>
-                                        <dd class="px-4 py-3 text-xs text-stone-600">{{ $specification['value'] ?? '' }}</dd>
-                                    </div>
-                                @endif
-                            @endforeach
-                        </dl>
-                    </div>
-                @endif
-            </div>
+</div>
         </div>
     </div>
 
@@ -218,8 +337,31 @@
             </div>
             <div class="p-6 sm:p-9">
                 @foreach($detailTabs as $tabKey => $tabLabel)
-                    <div x-show="activeTab === '{{ $tabKey }}'" @if($tabKey !== $initialTab) x-cloak @endif class="prose max-w-none text-stone-600 dark:prose-invert">
-                        {!! \App\Support\HtmlSanitizer::sanitize($detailTabContent[$tabKey]) !!}
+                    <div x-show="activeTab === '{{ $tabKey }}'" @if($tabKey !== $initialTab) x-cloak @endif>
+                        @if($tabKey === 'specifications')
+                            <div class="overflow-hidden rounded-xl border border-stone-200 bg-stone-50/60 dark:border-slate-800 dark:bg-slate-900/60 max-w-3xl">
+                                <dl>
+                                    @foreach($descriptiveAttributes as $attr)
+                                        <div class="grid grid-cols-[minmax(130px,1fr)_2fr] border-b border-stone-200 dark:border-slate-800 last:border-0">
+                                            <dt class="bg-slate-50 dark:bg-slate-800/80 px-5 py-3 text-xs sm:text-sm font-bold text-stone-700 dark:text-slate-200 border-r border-stone-200 dark:border-slate-800">{{ $attr['name'] }}</dt>
+                                            <dd class="px-5 py-3 text-xs sm:text-sm text-stone-600 dark:text-slate-300">{{ $attr['values'] }}</dd>
+                                        </div>
+                                    @endforeach
+                                    @foreach($product->specifications ?? [] as $specification)
+                                        @if(!empty($specification['label']) || !empty($specification['value']))
+                                            <div class="grid grid-cols-[minmax(130px,1fr)_2fr] border-b border-stone-200 dark:border-slate-800 last:border-0">
+                                                <dt class="bg-slate-50 dark:bg-slate-800/80 px-5 py-3 text-xs sm:text-sm font-bold text-stone-700 dark:text-slate-200 border-r border-stone-200 dark:border-slate-800">{{ $specification['label'] ?? '' }}</dt>
+                                                <dd class="px-5 py-3 text-xs sm:text-sm text-stone-600 dark:text-slate-300">{{ $specification['value'] ?? '' }}</dd>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </dl>
+                            </div>
+                        @else
+                            <div class="prose max-w-none text-stone-600 dark:prose-invert">
+                                {!! \App\Support\HtmlSanitizer::sanitize($detailTabContent[$tabKey]) !!}
+                            </div>
+                        @endif
                     </div>
                 @endforeach
             </div>

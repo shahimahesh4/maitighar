@@ -1,10 +1,16 @@
 <x-layouts.app :title="$album->title.' | Video Gallery'" :meta-description="$album->description ?: 'Watch videos from '.$album->title.' at Maitighar.'" :og-image="$album->cover_url">
     <div class="kba-gallery-page kba-video-gallery-page">
-        <section class="kba-album-hero kba-video-album-hero"><div class="kba-album-hero-inner"><div class="kba-album-hero-copy">
-            <nav class="kba-page-breadcrumbs" aria-label="Breadcrumb"><a wire:navigate href="{{ route('index') }}"><i class="bi bi-house-door" aria-hidden="true"></i>Home</a><i class="bi bi-chevron-right"></i><a wire:navigate href="{{ route('videos.index') }}">Videos</a><i class="bi bi-chevron-right"></i><span aria-current="page">{{ $album->title }}</span></nav>
-            <span class="kba-cms-eyebrow"><i class="bi bi-camera-video"></i> Video collection</span><h1>{{ $album->title }}</h1>@if($album->description)<p>{{ $album->description }}</p>@endif
-            <div class="kba-gallery-summary"><span><strong>{{ $album->video_count }}</strong> {{ Str::plural('video', $album->video_count) }}</span><i></i><a wire:navigate href="{{ route('videos.index') }}"><i class="bi bi-arrow-left"></i> All video albums</a></div>
-        </div><div class="kba-video-hero-cover"><img src="{{ $album->cover_url }}" alt="{{ $album->title }} cover"><span><i class="bi bi-play-fill"></i></span></div></div></section>
+        <section class="kba-album-hero kba-video-album-hero">
+            <div class="kba-album-hero-inner">
+                <div class="kba-album-hero-copy">
+                    <nav class="kba-page-breadcrumbs" aria-label="Breadcrumb"><a wire:navigate href="{{ route('index') }}"><i class="bi bi-house-door" aria-hidden="true"></i>Home</a><i class="bi bi-chevron-right"></i><a wire:navigate href="{{ route('videos.index') }}">Videos</a><i class="bi bi-chevron-right"></i><span aria-current="page">{{ $album->title }}</span></nav>
+                    <span class="kba-cms-eyebrow"><i class="bi bi-camera-video"></i> Video collection</span>
+                    <h1>{{ $album->title }}</h1>
+                    @if($album->description)<p>{{ $album->description }}</p>@endif
+                    <div class="kba-gallery-summary"><span><strong>{{ $album->video_count }}</strong> {{ Str::plural('video', $album->video_count) }}</span><i></i><a wire:navigate href="{{ route('videos.index') }}"><i class="bi bi-arrow-left"></i> All video albums</a></div>
+                </div>
+            </div>
+        </section>
 
         <main class="kba-album-gallery" data-kba-video-gallery>
             <header class="kba-gallery-section-head"><div><span>Album videos</span><h2>Watch the collection</h2></div><p>Select any video to open the popup player. Use previous and next controls to continue watching.</p></header>

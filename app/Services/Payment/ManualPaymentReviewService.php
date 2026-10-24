@@ -32,7 +32,7 @@ class ManualPaymentReviewService
 
     private function ensureReviewable(PaymentTransaction $transaction): void
     {
-        if (! in_array($transaction->gateway_code, ['bank_transfer', 'qr_payment'], true) || ! in_array($transaction->status, ['pending', 'pending_verification'], true) || blank($transaction->voucher_path) || blank($transaction->payment_reference)) {
+        if ($transaction->gateway_code !== 'bank_transfer' || ! in_array($transaction->status, ['pending', 'pending_verification'], true) || blank($transaction->voucher_path) || blank($transaction->payment_reference)) {
             throw ValidationException::withMessages(['payment' => 'This transaction does not have a complete, pending manual payment proof.']);
         }
     }

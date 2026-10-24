@@ -55,18 +55,18 @@ class OperationalDemoSeeder extends Seeder
 
         
         foreach ([
-            ['WELCOME10', 'percent', 10, 1000, now()->addMonths(6)],
-            ['BEAUTY250', 'fixed', 250, 2500, now()->addMonths(3)],
-            ['STUDENT15', 'percent', 15, 1500, now()->addYear()],
+            ['WELCOME10', 'percent', 10, 50, now()->addMonths(6)],
+            ['SAVE15', 'fixed', 15, 60, now()->addMonths(3)],
+            ['STUDENT15', 'percent', 15, 40, now()->addYear()],
         ] as [$code, $type, $value, $minimum, $expiry]) {
             Coupon::updateOrCreate(['code' => $code], ['type' => $type, 'value' => $value, 'min_amount' => $minimum, 'is_active' => true, 'expires_at' => $expiry]);
         }
 
         foreach ([
-            ['Standard Delivery', 'Bhairahawa / Siddharthanagar', 100, 1, 2],
-            ['Standard Delivery', 'Lumbini Province', 180, 2, 4],
-            ['Nationwide Delivery', 'Rest of Nepal', 250, 3, 7],
-            ['Store Pickup', 'Maitighar Store / Studio', 0, 1, 1],
+            ['Standard Delivery', 'Sydney Metro (NSW)', 9.95, 1, 2],
+            ['Standard Delivery', 'Regional NSW & ACT', 14.50, 2, 4],
+            ['Express Delivery', 'Interstate (VIC, QLD, SA, WA)', 19.95, 2, 3],
+            ['Free Local Pickup', 'Auburn Store / Studio', 0, 1, 1],
         ] as [$method, $zone, $cost, $min, $max]) {
             ShippingRate::updateOrCreate(['shipping_method' => $method, 'zone_name' => $zone], ['cost' => $cost, 'min_delivery_days' => $min, 'max_delivery_days' => $max, 'is_active' => true]);
         }
@@ -82,9 +82,9 @@ class OperationalDemoSeeder extends Seeder
         }
 
         $orders = [
-            ['DEMO-ORDER-001', 'delivered', 'paid', 'esewa', 100, 0, now()->subDays(18)],
-            ['DEMO-ORDER-002', 'processing', 'paid', 'cod', 180, 150, now()->subDays(4)],
-            ['DEMO-ORDER-003', 'new', 'pending', 'bank_transfer', 100, 0, now()->subDay()],
+            ['DEMO-ORDER-001', 'delivered', 'paid', 'cod', 9.95, 0, now()->subDays(18)],
+            ['DEMO-ORDER-002', 'processing', 'paid', 'cod', 14.50, 15.00, now()->subDays(4)],
+            ['DEMO-ORDER-003', 'new', 'pending', 'bank_transfer', 9.95, 0, now()->subDay()],
         ];
 
         foreach ($orders as $orderIndex => [$marker, $status, $paymentStatus, $paymentMethod, $shipping, $discount, $createdAt]) {
@@ -95,9 +95,9 @@ class OperationalDemoSeeder extends Seeder
             $subtotal = $selected->sum(fn (Product $product) => (float) $product->price);
             $order = Order::updateOrCreate(['user_id' => $customer->id, 'notes' => $marker], [
                 'grand_total' => $subtotal + $shipping - $discount, 'payment_method' => $paymentMethod,
-                'payment_status' => $paymentStatus, 'status' => $status, 'currency' => 'NPR',
-                'shipping_amount' => $shipping, 'shipping_method' => $shipping === 100 ? 'Local delivery' : 'Standard delivery',
-                'coupon_code' => $discount ? 'BEAUTY250' : null, 'discount_amount' => $discount, 'created_at' => $createdAt,
+                'payment_status' => $paymentStatus, 'status' => $status, 'currency' => 'AUD',
+                'shipping_amount' => $shipping, 'shipping_method' => $shipping == 9.95 ? 'Standard delivery' : 'Regional delivery',
+                'coupon_code' => $discount ? 'SAVE15' : null, 'discount_amount' => $discount, 'created_at' => $createdAt,
             ]);
             foreach ($selected as $product) {
                 $order->items()->updateOrCreate(['product_id' => $product->id], ['quantity' => 1, 'unit_amount' => $product->price, 'total_amount' => $product->price]);

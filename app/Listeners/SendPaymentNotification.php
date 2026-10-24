@@ -25,7 +25,7 @@ class SendPaymentNotification implements ShouldQueue
             $user->notify(new PaymentEventNotification('received', [
                 'order_id' => $order->id,
                 'amount' => $order->grand_total,
-                'currency' => $order->currency ?? 'NPR',
+                'currency' => $order->currency ?? 'AUD',
             ]));
         }
     }

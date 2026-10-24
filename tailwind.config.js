@@ -8,7 +8,12 @@ export default {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['DM Sans', 'sans-serif'],
+        display: ['DM Sans', 'sans-serif'],
+      },
+    },
   },
   plugins: [
     require('preline/plugin'),

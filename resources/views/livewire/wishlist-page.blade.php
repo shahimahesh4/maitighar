@@ -1,21 +1,21 @@
-<main class="mx-auto w-[calc(100%-32px)] max-w-[1150px] py-8 sm:py-10 lg:py-12">
+<main class="mx-auto w-[calc(100%-32px)] max-w-[1320px] py-4 sm:py-6 lg:py-8">
     <nav class="mb-5 flex items-center gap-2 text-xs font-medium text-stone-500 sm:mb-6" aria-label="Breadcrumb">
         <a wire:navigate href="{{ route('index') }}" class="inline-flex items-center gap-1.5 transition hover:text-[#EC0205]"><i class="bi bi-house-door" aria-hidden="true"></i>Home</a>
         <i class="bi bi-chevron-right text-[9px] text-stone-400" aria-hidden="true"></i>
         <span class="font-semibold text-stone-800" aria-current="page">Wishlist</span>
     </nav>
 
-    <header class="relative mb-7 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#091b38] via-[#0C1E8C] to-[#071355] px-5 py-7 text-white shadow-[0_20px_50px_rgba(12,30,140,.18)] sm:px-8 sm:py-9 lg:px-10">
-        <span class="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full border border-white/10"></span>
-        <span class="pointer-events-none absolute -bottom-36 right-24 h-64 w-64 rounded-full border border-white/10"></span>
+    <header class="relative mb-7 overflow-hidden rounded-[28px] border border-[#ccc] bg-[#f1f3f5] px-5 py-4 text-slate-900 shadow-[0_16px_38px_rgba(15,23,42,.08)] sm:px-8 sm:py-5 lg:px-10">
+        <span class="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full border border-slate-300/70"></span>
+        <span class="pointer-events-none absolute -bottom-36 right-24 h-64 w-64 rounded-full border border-slate-300/70"></span>
         <div class="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <p class="mb-2 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[.22em] text-red-400"><i class="bi bi-heart" aria-hidden="true"></i> Saved especially for you</p>
                 <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">My Wishlist</h1>
-                <p class="mt-2 max-w-xl text-sm leading-6 text-white/65">Keep your favourite handcrafted items together and move them to your shopping bag whenever you are ready.</p>
+                <p class="mt-2 max-w-xl text-sm leading-5 text-slate-600">Keep your favourite handcrafted items together and move them to your shopping bag whenever you are ready.</p>
             </div>
             <div class="flex items-center gap-3">
-                <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2.5 text-xs font-bold backdrop-blur-sm"><i class="bi bi-heart-fill text-red-400" aria-hidden="true"></i>{{ $wishlist_items->count() }} {{ \Illuminate\Support\Str::plural('item', $wishlist_items->count()) }}</span>
+                <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm backdrop-blur-sm"><i class="bi bi-heart-fill text-[#EC0205]" aria-hidden="true"></i>{{ $wishlist_items->count() }} {{ \Illuminate\Support\Str::plural('item', $wishlist_items->count()) }}</span>
                 <a wire:navigate href="{{ route('all-products') }}" class="inline-flex items-center gap-2 rounded-full bg-[#EC0205] px-4 py-2.5 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#C90204]">Shop more <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
             </div>
         </div>

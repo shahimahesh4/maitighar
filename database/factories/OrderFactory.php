@@ -18,10 +18,10 @@ class OrderFactory extends Factory
         return [
             'user_id' => User::factory(),
             'grand_total' => fake()->randomFloat(2, 50, 2000),
-            'payment_method' => fake()->randomElement(['cod', 'khalti', 'esewa']),
+            'payment_method' => fake()->randomElement(['cod', 'bank_transfer']),
             'payment_status' => fake()->randomElement(['pending', 'paid', 'failed']),
             'status' => fake()->randomElement(['new', 'processing', 'shipped', 'delivered', 'cancelled']),
-            'currency' => 'usd',
+            'currency' => 'NPR',
             'shipping_amount' => fake()->randomFloat(2, 5, 50),
             'shipping_method' => fake()->randomElement(['standard', 'express']),
             'notes' => fake()->sentence(),

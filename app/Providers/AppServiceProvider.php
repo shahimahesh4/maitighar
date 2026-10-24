@@ -30,6 +30,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        if (file_exists(app_path('helpers.php'))) {
+            require_once app_path('helpers.php');
+        }
+
         $this->app->singleton(PaymentGatewayManager::class, function ($app) {
             return new PaymentGatewayManager;
         });
@@ -43,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
         // Livewire navigation reuses the existing stylesheet. Re-preloading that
         // CSS on every navigated response creates Chrome's "preloaded but not
         // used" warning, so retain Vite's module preloads but skip CSS preloads.
-        Vite::usePreloadTagAttributes(function (string $src, string $url): array|false {
+        Vite::usePreloadTagAttributes(function (?string $src, string $url): array|false {
             return str_ends_with(parse_url($url, PHP_URL_PATH) ?: $url, '.css') ? false : [];
         });
 
@@ -62,7 +66,7 @@ class AppServiceProvider extends ServiceProvider
                 'Product', 'Category', 'Brand', 'ProductFaq', 'InventoryLog' => 'catalog',
                 'Order', 'OrderItem', 'Address' => 'orders',
                 'User' => 'users',
-                'Page', 'PageFaq', 'MediaAsset', 'MediaFolder', 'GalleryAlbum' => 'content',
+                'Page', 'PageFaq', 'MediaAsset', 'MediaFolder', 'GalleryAlbum', 'Slider', 'SliderItem' => 'content',
                 'Coupon', 'Review', 'Wishlist', 'Subscriber' => 'marketing',
                 'SupportTicket', 'ContactMessage' => 'support',
                 'PaymentGateway', 'PaymentTransaction', 'PaymentRefund', 'PaymentDispute', 'PaymentPayout' => 'payments',

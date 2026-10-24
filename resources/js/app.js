@@ -1,3 +1,5 @@
+import './slider-revolution.js';
+
 const showToast = (input = {}) => {
     const payload = Array.isArray(input) ? (input[0] ?? {}) : input;
     const message = payload.message ?? payload.text;

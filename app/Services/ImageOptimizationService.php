@@ -3,9 +3,66 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ImageOptimizationService
 {
+    /**
+     * Convert an uploaded banner image to an efficiently encoded WebP file.
+     *
+     * @return string|null The stored path, or null when the source cannot be converted.
+     */
+    public function storeAsWebp(string $sourcePath, string $disk, string $directory, int $maxWidth, int $maxHeight): ?string
+    {
+        if (! extension_loaded('gd') || ! is_file($sourcePath) || ! is_readable($sourcePath)) {
+            return null;
+        }
+
+        $info = @getimagesize($sourcePath);
+        if (! $info || ! in_array($info[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
+            return null;
+        }
+
+        [$width, $height] = $info;
+        $source = match ($info[2]) {
+            IMAGETYPE_JPEG => @imagecreatefromjpeg($sourcePath),
+            IMAGETYPE_PNG => @imagecreatefrompng($sourcePath),
+            IMAGETYPE_WEBP => @imagecreatefromwebp($sourcePath),
+        };
+
+        if (! $source) {
+            return null;
+        }
+
+        $scale = min(1, $maxWidth / $width, $maxHeight / $height);
+        $targetWidth = max(1, (int) round($width * $scale));
+        $targetHeight = max(1, (int) round($height * $scale));
+        $target = imagecreatetruecolor($targetWidth, $targetHeight);
+
+        if (in_array($info[2], [IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
+            imagealphablending($target, false);
+            imagesavealpha($target, true);
+            $transparent = imagecolorallocatealpha($target, 0, 0, 0, 127);
+            imagefilledrectangle($target, 0, 0, $targetWidth, $targetHeight, $transparent);
+        }
+
+        imagecopyresampled($target, $source, 0, 0, 0, 0, $targetWidth, $targetHeight, $width, $height);
+
+        ob_start();
+        $written = imagewebp($target, null, 82);
+        $contents = ob_get_clean();
+        imagedestroy($source);
+        imagedestroy($target);
+
+        if (! $written || ! is_string($contents) || $contents === '') {
+            return null;
+        }
+
+        $path = trim($directory . '/' . Str::ulid() . '.webp', '/');
+
+        return Storage::disk($disk)->put($path, $contents, ['visibility' => 'public']) ? $path : null;
+    }
+
     public function optimizeDiskPath(string $disk, ?string $path, int $maxDimension = 2200): bool
     {
         if (blank($path) || str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {

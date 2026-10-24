@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class HomeSliderResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $model = HomeSlider::class;
     protected static ?string $navigationIcon = 'heroicon-o-photo';
     protected static ?string $navigationGroup = 'Website';
@@ -32,10 +33,29 @@ class HomeSliderResource extends Resource
                     Forms\Components\Textarea::make('subtitle')->rows(2)->maxLength(255)->columnSpanFull(),
                 ])->columns(2),
             Forms\Components\Section::make('Banner Images')
-                ->description('Use transparent PNG/WebP portraits when possible. Recommended desktop size: 900 × 900 px.')
+                ->description('Upload full banner images in their actual dimensions (e.g. 1024×400, 1920×600). Banners will display at their full natural aspect ratio without any cropping.')
                 ->schema([
-                    Forms\Components\FileUpload::make('desktop_image')->label('Desktop / tablet image')->required()->image()->disk('public')->directory('sliders')->visibility('public')->imageEditor()->openable()->downloadable(),
-                    Forms\Components\FileUpload::make('mobile_image')->label('Optional mobile image')->image()->disk('public')->directory('sliders/mobile')->visibility('public')->imageEditor()->openable()->downloadable()->helperText('Leave empty to use the desktop image.'),
+                    Forms\Components\FileUpload::make('desktop_image')
+                        ->label('Desktop / tablet image')
+                        ->required()
+                        ->image()
+                        ->disk('public')
+                        ->directory('sliders')
+                        ->visibility('public')
+                        ->imagePreviewHeight('220')
+                        ->openable()
+                        ->downloadable()
+                        ->helperText('Upload full banner image. Actual image dimensions and aspect ratio are preserved without cropping.'),
+                    Forms\Components\FileUpload::make('mobile_image')
+                        ->label('Optional mobile image')
+                        ->image()
+                        ->disk('public')
+                        ->directory('sliders/mobile')
+                        ->visibility('public')
+                        ->imagePreviewHeight('220')
+                        ->openable()
+                        ->downloadable()
+                        ->helperText('Optional mobile image. Leave empty to use desktop image.'),
                 ])->columns(2),
             Forms\Components\Section::make('Button & Display')
                 ->schema([
@@ -52,7 +72,13 @@ class HomeSliderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('desktop_image')->label('Preview')->getStateUsing(fn (HomeSlider $record): string => $record->desktopImageUrl())->square(),
+                Tables\Columns\ImageColumn::make('desktop_image')
+                    ->label('Banner Preview')
+                    ->getStateUsing(fn (HomeSlider $record): string => $record->desktopImageUrl())
+                    ->height(65)
+                    ->extraImgAttributes([
+                        'style' => 'max-height: 65px; width: auto; object-fit: contain; border-radius: 6px;',
+                    ]),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable()->description(fn (HomeSlider $record): string => $record->title),
                 Tables\Columns\TextColumn::make('sort_order')->label('Order')->sortable(),
                 Tables\Columns\TextColumn::make('duration')->formatStateUsing(fn (int $state): string => number_format($state / 1000, 1).' sec'),

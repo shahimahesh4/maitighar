@@ -1,10 +1,8 @@
 <?php
 
 use App\Services\Payment\Drivers\CodDriver;
-use App\Services\Payment\Drivers\EsewaDriver;
-use App\Services\Payment\Drivers\FonepayDriver;
-use App\Services\Payment\Drivers\KhaltiDriver;
 use App\Services\Payment\Drivers\ManualPaymentDriver;
+use App\Services\Payment\Drivers\StripeDriver;
 
 return [
     /*
@@ -30,11 +28,9 @@ return [
     */
 
     'drivers' => [
-        'khalti' => KhaltiDriver::class,
-        'esewa' => EsewaDriver::class,
-        'fonepay' => FonepayDriver::class,
         'manual' => ManualPaymentDriver::class,
         'cod' => CodDriver::class,
+        'stripe' => StripeDriver::class,
     ],
 
     /*

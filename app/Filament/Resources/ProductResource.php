@@ -48,6 +48,18 @@ class ProductResource extends Resource
                 Group::make()->schema([
                     Section::make('Product Information')->schema([
 
+                        Select::make('product_type')
+                            ->label('Product Type')
+                            ->options([
+                                'simple' => 'Simple Product',
+                                'variable' => 'Variable Product',
+                            ])
+                            ->default('simple')
+                            ->required()
+                            ->live()
+                            ->helperText('Choose "Variable Product" to manage attributes (Size, Colour, etc.) and variations in the tabs below.')
+                            ->columnSpanFull(),
+
                         TextInput::make('name')
                             ->label('Product Name')
                             ->required()
@@ -80,7 +92,7 @@ class ProductResource extends Resource
                                         $categoryId = $get('category_id');
                                         $brandId = $get('brand_id');
 
-                                        $categoryName = $categoryId ? Category::find($categoryId)?->name : 'Electronics';
+                                        $categoryName = $categoryId ? Category::find($categoryId)?->name : 'Products';
                                         $brandName = $brandId ? Brand::find($brandId)?->name : null;
 
                                         Notification::make()
@@ -130,6 +142,24 @@ class ProductResource extends Resource
                             ->label('SKU')
                             ->required()
                             ->maxLength(255)
+                            ->default(fn () => Product::generateNextSku())
+                            ->unique(Product::class, 'sku', ignoreRecord: true)
+                            ->suffixAction(
+                                Forms\Components\Actions\Action::make('generateSku')
+                                    ->label('Generate Next SKU')
+                                    ->icon('heroicon-m-arrow-path')
+                                    ->tooltip('Generate next available sequential SKU')
+                                    ->action(function (Forms\Set $set) {
+                                        $next = Product::generateNextSku();
+                                        $set('sku', $next);
+                                        Notification::make()
+                                            ->success()
+                                            ->title('SKU Generated')
+                                            ->body("Assigned next sequential SKU: {$next}")
+                                            ->send();
+                                    })
+                            )
+                            ->helperText('Auto-generated sequential SKU format (e.g. MG-AUS-001). Can be edited manually if needed.')
                             ->columnSpanFull(),
 
                     ])->columns(2),
@@ -378,19 +408,26 @@ class ProductResource extends Resource
 
                 Group::make()->schema([
 
-                    Section::make('Price')->schema([
-                        TextInput::make('sale_price')
-                            ->label('Sale / Selling Price')
-                            ->numeric()
-                            ->required()
-                            ->prefix('Rs.'),
-                        TextInput::make('regular_price')
-                            ->label('Regular Price')
-                            ->numeric()
-                            ->prefix('Rs.')
-                            ->gte('sale_price')
-                            ->helperText('Discount percentage is calculated automatically from regular and sale prices.'),
-                    ]),
+                    Section::make('Price (AUD)')
+                        ->description(fn (Forms\Get $get) => ($get('product_type') ?? 'simple') === 'variable'
+                            ? 'For variable products, prices are managed per-variation in the Variations tab.'
+                            : null)
+                        ->schema([
+                            TextInput::make('sale_price')
+                                ->label('Price (AUD)')
+                                ->numeric()
+                                ->required(fn (Forms\Get $get) => ($get('product_type') ?? 'simple') === 'simple')
+                                ->prefix('$')
+                                ->helperText(fn (Forms\Get $get) => ($get('product_type') ?? 'simple') === 'variable'
+                                    ? 'Base / minimum price across variations.'
+                                    : null),
+                            TextInput::make('regular_price')
+                                ->label('Regular Price (AUD)')
+                                ->numeric()
+                                ->prefix('$')
+                                ->gte('sale_price')
+                                ->helperText('Discount percentage is calculated automatically from regular and sale prices.'),
+                        ]),
 
                     Section::make('Associations')->schema([
 
@@ -417,6 +454,12 @@ class ProductResource extends Resource
 
                                             return;
                                         }
+
+                                        $categoryId = $get('category_id');
+                                        $brandId = $get('brand_id');
+
+                                        $categoryName = $categoryId ? Category::find($categoryId)?->name : 'Products';
+                                        $brandName = $brandId ? Brand::find($brandId)?->name : null;
 
                                         Notification::make()
                                             ->info()
@@ -459,7 +502,14 @@ class ProductResource extends Resource
                             ->relationship('brand', 'name'),
                     ]),
 
-                    Section::make('Status')->schema([
+                    Section::make('Inventory & Status')->schema([
+
+                        TextInput::make('stock_quantity')
+                            ->label('Stock Quantity')
+                            ->numeric()
+                            ->default(0)
+                            ->visible(fn (Forms\Get $get) => ($get('product_type') ?? 'simple') === 'simple')
+                            ->helperText('Stock quantity for simple product. Variable products track stock per variation.'),
 
                         Toggle::make('in_stock')
                             ->required()
@@ -493,6 +543,13 @@ class ProductResource extends Resource
                     ->getStateUsing(fn (Product $record): string => $record->getImageUrl())
                     ->square(),
 
+                Tables\Columns\TextColumn::make('product_type')
+                    ->label('Type')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state === 'variable' ? 'Variable' : 'Simple')
+                    ->color(fn ($state) => $state === 'variable' ? 'warning' : 'info')
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('category.name')
                     ->sortable(),
 
@@ -500,9 +557,11 @@ class ProductResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('sale_price')
-                    ->label('Price')
-                    ->formatStateUsing(fn ($state) => Money::format($state))
-                    ->sortable(),
+                    ->label('Price (AUD)')
+                    ->getStateUsing(fn (Product $record) => $record->getFormattedPriceRange())
+                    ->sortable(query: function ($query, string $direction) {
+                        return $query->orderBy('sale_price', $direction);
+                    }),
 
                 Tables\Columns\ToggleColumn::make('is_active'),
 
@@ -523,6 +582,12 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('product_type')
+                    ->options([
+                        'simple' => 'Simple Product',
+                        'variable' => 'Variable Product',
+                    ]),
+
                 SelectFilter::make('category')
                     ->relationship('category', 'name'),
 
@@ -552,12 +617,17 @@ class ProductResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])->defaultSort('created_at', 'desc');
+            ])
+            ->defaultPaginationPageOption(12)
+            ->paginationPageOptions([12, 25, 50, 100])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array
     {
         return [
+            RelationManagers\AttributesRelationManager::class,
+            RelationManagers\VariationsRelationManager::class,
             RelationManagers\FaqsRelationManager::class,
             RelationManagers\InventoryLogsRelationManager::class,
         ];

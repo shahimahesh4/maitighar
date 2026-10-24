@@ -22,6 +22,7 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
             ['name' => 'Makeup', 'slug' => 'makeup', 'image' => 'images/kba/makeup-brush.jpeg'],
             ['name' => 'Skin Care', 'slug' => 'skin-care', 'image' => 'images/kba/facial-serum.jpeg'],
             ['name' => 'Hair Removal', 'slug' => 'hair-removal', 'image' => 'images/kba/hair-remover.jpeg'],
+            ['name' => 'Beauty Tools', 'slug' => 'beauty-tools', 'image' => 'images/kba/skin-brush.jpeg'],
         ])->mapWithKeys(function (array $data) {
             $category = Category::updateOrCreate(
                 ['slug' => $data['slug']],
@@ -32,12 +33,12 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
         });
 
         $products = [
-            ['Makeup Brush', 'makeup', 650, 'makeup-brush.jpeg', 'KBA-MB-001', 'A versatile premium makeup brush for smooth, even application and a professional finish.'],
-            ['Eye Brushes', 'makeup', 600, 'eye-brushes.jpeg', 'KBA-EB-002', 'A complete eye-brush selection for blending, lining, and detailed eye makeup.'],
-            ['Brush for Skin', 'makeup', 400, 'skin-brush.jpeg', 'KBA-SB-003', 'Soft, dense bristles designed for effortless powder and complexion application.'],
-            ['Crack Removal Cream', 'skin-care', 800, 'crack-removal-cream.jpeg', 'KBA-CRC-004', 'Deeply moisturizing care formulated to soften and restore dry, cracked skin.'],
-            ['Hair Remover', 'hair-removal', 850, 'hair-remover.jpeg', 'KBA-HR-005', 'Gentle, convenient hair-removal care for smooth-looking skin at home.'],
-            ['Facial Serum', 'skin-care', 850, 'facial-serum.jpeg', 'KBA-FS-006', 'A lightweight facial serum that hydrates and supports a brighter, refreshed complexion.'],
+            ['Bamboo Stainless Steel Bottle -500ML', 'skin-care', 22.00, 'makeup-brush.jpeg', 'MG-AUS-001', 'A versatile premium bamboo stainless steel bottle with double-wall insulation.'],
+            ['Bamboo Clicker Pen', 'makeup', 18.50, 'eye-brushes.jpeg', 'MG-AUS-002', 'Eco-friendly smooth writing bamboo clicker pen handcrafted from seasoned bamboo.'],
+            ['Handle Bamboo Baskets', 'beauty-tools', 15.00, 'skin-brush.jpeg', 'MG-AUS-003', 'Handwoven natural bamboo basket with sturdy handle for home storage and gifting.'],
+            ['Bamboo Bookmarks with Design 15 cm', 'skin-care', 26.00, 'crack-removal-cream.jpeg', 'MG-AUS-004', 'Laser-engraved natural bamboo bookmarks featuring traditional Nepali art motifs.'],
+            ['Hair Remover', 'hair-removal', 28.50, 'hair-remover.jpeg', 'MG-AUS-005', 'Gentle, convenient hair-removal care for smooth-looking skin at home.'],
+            ['Facial Serum', 'skin-care', 34.00, 'facial-serum.jpeg', 'MG-AUS-006', 'A lightweight facial serum that hydrates and supports a brighter, refreshed complexion.'],
         ];
 
         foreach ($products as [$name, $category, $price, $file, $sku, $description]) {
@@ -54,6 +55,8 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
                     'description' => '<p>'.e($description).'</p>',
                     'short_description' => $description,
                     'price' => $price,
+                    'sale_price' => $price,
+                    'regular_price' => round($price * 1.25, 2),
                     'sku' => $sku,
                     'is_active' => true,
                     'is_featured' => true,
@@ -61,7 +64,7 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
                     'on_sale' => false,
                     'meta_title' => $name.' | Maitighar',
                     'meta_description' => $description,
-                    'meta_keywords' => strtolower($name.', Maitighar, beauty products, Nepal'),
+                    'meta_keywords' => strtolower($name.', Maitighar, beauty products, Australia'),
                 ]
             );
         }

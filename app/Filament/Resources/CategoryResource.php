@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
+use App\Services\ImageOptimizationService;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -13,7 +15,9 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class CategoryResource extends Resource
 {
@@ -49,9 +53,31 @@ class CategoryResource extends Resource
                                 ->unique(Category::class, 'slug', ignoreRecord: true),
                         ]),
 
+                    Select::make('parent_id')
+                        ->label('Parent Category')
+                        ->relationship('parent', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->nullable()
+                        ->helperText('Leave blank for a top-level category. Select a category here to create a subcategory.'),
+
                     FileUpload::make('image')
                         ->image()
-                        ->directory('categories'),
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                        ->disk('public')
+                        ->directory('categories')
+                        ->visibility('public')
+                        ->imagePreviewHeight('220')
+                        ->imageResizeMode('contain')
+                        ->imageResizeTargetWidth('1200')
+                        ->imageResizeTargetHeight('1200')
+                        ->imageResizeUpscale(false)
+                        ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                            ->storeAsWebp($file->getRealPath(), 'public', 'categories', 1200, 1200))
+                        ->deletable()
+                        ->removeUploadedFileButtonPosition('right')
+                        ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
+                        ->helperText('Saved as an optimized WebP image, up to 1200×1200px without cropping.'),
 
                     Toggle::make('is_active')
                         ->required()
@@ -66,6 +92,10 @@ class CategoryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('parent.name')
+                    ->label('Parent Category')
+                    ->placeholder('Top-level')
+                    ->sortable(),
                 Tables\Columns\ImageColumn::make('image'),
 
                 Tables\Columns\TextColumn::make('products_count')
@@ -73,6 +103,13 @@ class CategoryResource extends Resource
                     ->label('Products')
                     ->badge()
                     ->color('info')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('children_count')
+                    ->counts('children')
+                    ->label('Subcategories')
+                    ->badge()
+                    ->color('gray')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('slug')

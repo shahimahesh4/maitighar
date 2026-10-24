@@ -20,6 +20,8 @@ This repository is a Laravel 12 e-commerce application with:
 - `app/Models/Setting.php` - dynamic store settings used by Filament and services.
 
 ## Project conventions
+- **CRITICAL DATABASE RULE:** NEVER run `migrate:fresh`, `migrate:refresh`, `db:wipe`, or any destructive database command without explicit user permission. Live products, variations, categories, settings, and users must be strictly preserved.
+- In test suites, NEVER use `RefreshDatabase`; always use `DatabaseTransactions` so test runs do not alter or delete existing records.
 - Admin panel is mounted at `http://127.0.0.1:8000/stnapanel`.
 - Payment drivers are configured in the DB and resolved through `PaymentGatewayManager`.
 - AI settings are stored in Filament Store Settings and used by `ProductResource` for description generation.
@@ -33,10 +35,8 @@ Use these commands to install and run the application locally:
 2. `npm install`
 3. copy `.env.example` to `.env`
 4. `php artisan key:generate`
-5. `php artisan migrate:fresh --seed`
-6. `php artisan db:seed --class=PaymentGatewaySeeder`
-7. `npm run dev`
-8. `php artisan serve`
+5. `npm run dev`
+6. `php artisan serve`
 
 Useful commands:
 - `php artisan test`
@@ -51,5 +51,3 @@ Useful commands:
 
 ## Useful documentation
 - [`README.md`](README.md) - install instructions, feature overview, and AI/Payment architecture notes.
-
-> Note: No existing `.github/copilot-instructions.md`, `AGENTS.md`, or agent customization file was present when this guide was created.

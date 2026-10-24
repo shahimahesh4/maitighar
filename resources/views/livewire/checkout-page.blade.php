@@ -1,5 +1,5 @@
-<div class="min-h-screen bg-slate-50 py-8 sm:py-11">
-    <div class="mx-auto w-[calc(100%-32px)] max-w-[1150px]">
+<div class="min-h-screen bg-slate-50 py-4 sm:py-6">
+    <div class="mx-auto w-[calc(100%-32px)] max-w-[1320px]">
         <nav class="mb-5 flex items-center gap-2 text-xs text-slate-500 sm:mb-6" aria-label="Breadcrumb">
             <a wire:navigate href="{{ route('index') }}" class="inline-flex items-center gap-1.5 font-semibold hover:text-[#EC0205]"><i class="bi bi-house-door" aria-hidden="true"></i>Home</a><i class="bi bi-chevron-right text-[9px]"></i>
             <a wire:navigate href="{{ route('cart-products') }}" class="font-semibold hover:text-[#EC0205]">Cart</a><i class="bi bi-chevron-right text-[9px]"></i>
@@ -124,27 +124,20 @@
                         <div class="grid gap-3 sm:grid-cols-2">
                             @foreach($active_gateways as $gateway)
                                 <label for="pay-{{ $gateway['code'] }}" @class(['relative cursor-pointer rounded-2xl border p-4 transition','border-[#0C1E8C] bg-blue-50/50 ring-2 ring-blue-100'=>$payment_method===$gateway['code'],'border-slate-200 bg-white hover:border-[#0C1E8C]/40'=>$payment_method!==$gateway['code']])>
-                                    <div class="flex items-center gap-3"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-lg text-[#0C1E8C] shadow-sm"><i class="bi {{ match($gateway['code']) {'cod'=>'bi-cash-coin','bank_transfer'=>'bi-bank','qr_payment'=>'bi-qr-code-scan','esewa'=>'bi-wallet2',default=>'bi-credit-card'} }}"></i></span><div class="min-w-0 flex-1"><strong class="block truncate text-xs text-slate-900">{{ $gateway['name'] }}</strong><small class="mt-1 block text-[10px] leading-4 text-slate-500">{{ match($gateway['code']) {'cod'=>'Pay when your order arrives.','bank_transfer'=>'Transfer and upload receipt.','qr_payment'=>'Scan QR and upload receipt.','esewa'=>'Pay using your eSewa wallet.',default=>'Secure online payment.'} }}</small></div><input id="pay-{{ $gateway['code'] }}" type="radio" wire:model.live="payment_method" value="{{ $gateway['code'] }}" class="h-4 w-4 text-[#0C1E8C] focus:ring-[#0C1E8C]"></div>
+                                    <div class="flex items-center gap-3"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-lg text-[#0C1E8C] shadow-sm"><i class="bi {{ match($gateway['code']) {'cod'=>'bi-cash-coin','bank_transfer'=>'bi-bank',default=>'bi-credit-card'} }}"></i></span><div class="min-w-0 flex-1"><strong class="block truncate text-xs text-slate-900">{{ $gateway['name'] }}</strong><small class="mt-1 block text-[10px] leading-4 text-slate-500">{{ match($gateway['code']) {'cod'=>'Pay when your order arrives.','bank_transfer'=>'Transfer to our bank account and upload receipt.',default=>'Secure payment.'} }}</small></div><input id="pay-{{ $gateway['code'] }}" type="radio" wire:model.live="payment_method" value="{{ $gateway['code'] }}" class="h-4 w-4 text-[#0C1E8C] focus:ring-[#0C1E8C]"></div>
                                 </label>
                             @endforeach
                         </div>
                         @error('payment_method')<p class="text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
 
-                        @if(in_array($payment_method, ['bank_transfer','qr_payment'], true))
-                            <div wire:key="manual-{{ $payment_method }}" class="space-y-5 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 sm:p-5">
-                                <div><span class="text-[10px] font-bold uppercase tracking-[.16em] text-[#0C1E8C]">Pay before placing order</span><p class="mt-2 text-xs leading-5 text-slate-600">{{ $paymentSettings['instructions'] ?? 'Pay the exact order total and upload your receipt.' }}</p></div>
-                                @if($payment_method === 'bank_transfer')
-                                    <dl class="grid gap-3 rounded-2xl border border-blue-100 bg-white p-4 text-xs sm:grid-cols-3">
-                                        @foreach([['Bank',$paymentSettings['bank_name']??'Configure in admin'],['Account name',$paymentSettings['account_name']??'Configure in admin'],['Account number',$paymentSettings['account_number']??'Configure in admin']] as [$label,$value])<div><dt class="text-[10px] uppercase tracking-wider text-slate-400">{{ $label }}</dt><dd class="mt-1 break-all font-bold text-slate-900">{{ $value }}</dd></div>@endforeach
-                                    </dl>
-                                @else
-                                    <div class="grid items-center gap-4 sm:grid-cols-[190px_1fr]">
-                                        @if(!empty($paymentSettings['qr_image']))<img src="{{ Storage::disk('public')->url($paymentSettings['qr_image']) }}" alt="Payment QR code" class="h-[190px] w-[190px] rounded-2xl border bg-white p-3 object-contain shadow-sm">@else<div class="grid h-[190px] w-[190px] place-items-center rounded-2xl border border-dashed border-blue-300 bg-white text-center text-[#0C1E8C]"><div><i class="bi bi-qr-code text-5xl"></i><p class="mt-2 text-[10px] font-bold">QR awaiting admin upload</p></div></div>@endif
-                                        <div class="rounded-2xl bg-white p-4 text-xs"><span class="text-slate-400">Provider / Bank</span><strong class="mt-1 block text-slate-900">{{ $paymentSettings['bank_name'] ?? 'Configure in admin' }}</strong><p class="mt-4 rounded-xl bg-blue-50 p-3 leading-5 text-[#0C1E8C]">Pay exactly <strong>{{ \App\Support\Money::format($grand_total) }}</strong>, then enter the reference and upload the receipt.</p></div>
-                                    </div>
-                                @endif
+                        @if($payment_method === 'bank_transfer')
+                            <div wire:key="manual-bank-transfer" class="space-y-5 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-white p-4 sm:p-5">
+                                <div><span class="text-[10px] font-bold uppercase tracking-[.16em] text-[#0C1E8C]">Pay before placing order</span><p class="mt-2 text-xs leading-5 text-slate-600">{{ $paymentSettings['instructions'] ?? 'Transfer the exact order total to our bank account and upload your receipt.' }}</p></div>
+                                <dl class="grid gap-3 rounded-2xl border border-blue-100 bg-white p-4 text-xs sm:grid-cols-3">
+                                    @foreach([['Bank',$paymentSettings['bank_name']??'Configure in admin'],['Account name',$paymentSettings['account_name']??'Configure in admin'],['Account number',$paymentSettings['account_number']??'Configure in admin']] as [$label,$value])<div><dt class="text-[10px] uppercase tracking-wider text-slate-400">{{ $label }}</dt><dd class="mt-1 break-all font-bold text-slate-900">{{ $value }}</dd></div>@endforeach
+                                </dl>
                                 <div class="grid gap-4 sm:grid-cols-2">
-                                    <div data-checkout-field><label for="payment_reference" class="mb-2 block text-[10px] font-bold uppercase tracking-wider text-slate-500">Transaction reference <b class="text-red-500">*</b></label><input id="payment_reference" wire:model="payment_reference" type="text" placeholder="Reference / transaction ID" class="h-11 w-full rounded-xl border border-slate-300 bg-white px-4 text-xs outline-none focus:border-[#0C1E8C] focus:ring-4 focus:ring-blue-100" required>@error('payment_reference')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror</div>
+                                    <div data-checkout-field><label for="payment_reference" class="mb-2 block text-[10px] font-bold uppercase tracking-wider text-slate-500">Transaction reference <b class="text-red-500">*</b></label><input id="payment_reference" wire:model="payment_reference" type="text" placeholder="Bank transaction ID / Reference" class="h-11 w-full rounded-xl border border-slate-300 bg-white px-4 text-xs outline-none focus:border-[#0C1E8C] focus:ring-4 focus:ring-blue-100" required>@error('payment_reference')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror</div>
                                     <div data-checkout-field><label for="payment_voucher" class="mb-2 block text-[10px] font-bold uppercase tracking-wider text-slate-500">Payment receipt <b class="text-red-500">*</b></label><div class="rounded-xl border border-dashed border-blue-300 bg-white p-3"><input id="payment_voucher" wire:model="payment_voucher" type="file" accept="image/jpeg,image/png,image/webp" class="w-full text-[11px] text-slate-500 file:mr-2 file:rounded-lg file:border-0 file:bg-[#0C1E8C] file:px-3 file:py-2 file:text-[10px] file:font-bold file:text-white" required><span wire:loading wire:target="payment_voucher" class="mt-2 block text-[10px] text-[#0C1E8C]">Uploading receipt…</span>@if($payment_voucher)<img src="{{ $payment_voucher->temporaryUrl() }}" alt="Receipt preview" class="mt-3 max-h-36 rounded-lg border object-contain">@endif</div>@error('payment_voucher')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror</div>
                                 </div>
                             </div>
@@ -158,7 +151,20 @@
                     <div class="bg-gradient-to-br from-[#091b38] to-[#0C1E8C] px-6 py-5 text-white"><p class="text-[10px] font-bold uppercase tracking-[.18em] text-red-400">Order review</p><div class="mt-2 flex items-center justify-between"><h2 class="text-lg font-extrabold">Your order</h2><span class="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold">{{ $cartQuantity }} items</span></div></div>
                     <ul class="max-h-64 divide-y divide-slate-100 overflow-y-auto px-5">
                         @foreach($checkoutItems as $item)
-                            <li class="flex items-center gap-3 py-4"><span class="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border bg-slate-50 p-1"><img src="{{ $item['image_url'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}'" alt="{{ $item['name'] }}" class="h-full w-full object-contain"><b class="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-[#EC0205] px-1 text-[9px] text-white">{{ $item['quantity'] }}</b></span><span class="min-w-0 flex-1"><strong class="line-clamp-2 text-xs leading-4 text-slate-800">{{ $item['name'] }}</strong><small class="mt-1 block text-[10px] text-slate-400">{{ \App\Support\Money::format($item['unit_amount']) }} each</small></span><strong class="text-xs text-slate-800">{{ \App\Support\Money::format($item['total_amount']) }}</strong></li>
+                            <li class="flex items-center gap-3 py-4">
+                                <span class="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border bg-slate-50 p-1">
+                                    <img src="{{ $item['image_url'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}'" alt="{{ $item['name'] }}" class="h-full w-full object-contain">
+                                    <b class="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-[#EC0205] px-1 text-[9px] text-white">{{ $item['quantity'] }}</b>
+                                </span>
+                                <span class="min-w-0 flex-1">
+                                    <strong class="line-clamp-2 text-xs leading-4 text-slate-800">{{ $item['name'] }}</strong>
+                                    @if(!empty($item['options_text']))
+                                        <span class="block text-[10px] text-slate-500 font-medium">{{ $item['options_text'] }}</span>
+                                    @endif
+                                    <small class="mt-0.5 block text-[10px] text-slate-400">{{ \App\Support\Money::format($item['unit_amount']) }} each</small>
+                                </span>
+                                <strong class="text-xs text-slate-800">{{ \App\Support\Money::format($item['total_amount']) }}</strong>
+                            </li>
                         @endforeach
                     </ul>
                     <div class="border-t border-slate-100 p-5">
@@ -191,7 +197,8 @@
                         </dl>
                         <div class="my-4 border-t border-dashed border-slate-200"></div>
                         <div class="flex items-end justify-between"><span class="text-sm font-extrabold text-slate-900">Total</span><strong class="text-xl font-extrabold text-[#EC0205]">{{ \App\Support\Money::format($grand_total) }}</strong></div>
-                        <button type="submit" wire:loading.attr="disabled" wire:target="placeOrder,payment_voucher" class="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#EC0205] to-[#C90204] px-5 text-xs font-extrabold text-white shadow-lg shadow-amber-900/15 transition hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60"><span wire:loading.remove wire:target="placeOrder">Place order securely <i class="bi bi-arrow-right ml-1"></i></span><span wire:loading wire:target="placeOrder"><i class="bi bi-arrow-repeat kba-spin"></i>Processing order…</span></button>
+                        <p class="mt-1.5 text-right text-[11px] font-semibold text-slate-500">Your card will be charged in Australian dollars (AUD).</p>
+                        <button type="submit" wire:loading.attr="disabled" wire:target="placeOrder,payment_voucher" class="mt-5 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#EC0205] to-[#C90204] px-5 text-xs font-extrabold text-white shadow-lg shadow-amber-900/15 transition hover:-translate-y-0.5 disabled:cursor-wait disabled:opacity-60"><span wire:loading.remove wire:target="placeOrder">Pay {{ \App\Support\Money::format($grand_total) }} AUD <i class="bi bi-arrow-right ml-1"></i></span><span wire:loading wire:target="placeOrder"><i class="bi bi-arrow-repeat kba-spin"></i>Processing order…</span></button>
                         <p class="mt-3 text-center text-[10px] leading-4 text-slate-400"><i class="bi bi-shield-lock mr-1 text-emerald-600"></i>Your information is encrypted and protected.</p>
                     </div>
                 </section>
@@ -199,30 +206,31 @@
             </aside>
         </form>
     </div>
+
+    @script
+    <script>
+        $wire.on('checkout-validation-failed', () => {
+            window.setTimeout(() => {
+                const error = document.querySelector('[data-checkout-field] .text-red-600');
+                if (! error) return;
+                const field = error.closest('[data-checkout-field]');
+                const control = field?.querySelector('input, select, textarea');
+                field?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                window.setTimeout(() => control?.focus({ preventScroll: true }), 350);
+            }, 75);
+        });
+
+        $wire.on('order-otp-ready', () => {
+            window.setTimeout(() => {
+                const panel = document.getElementById('order-otp-panel');
+                const input = document.getElementById('order-otp');
+                if (! panel || ! input) return;
+
+                panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                window.setTimeout(() => input.focus({ preventScroll: true }), 450);
+            }, 100);
+        });
+    </script>
+    @endscript
 </div>
 
-@script
-<script>
-    $wire.on('checkout-validation-failed', () => {
-        window.setTimeout(() => {
-            const error = document.querySelector('[data-checkout-field] .text-red-600');
-            if (! error) return;
-            const field = error.closest('[data-checkout-field]');
-            const control = field?.querySelector('input, select, textarea');
-            field?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            window.setTimeout(() => control?.focus({ preventScroll: true }), 350);
-        }, 75);
-    });
-
-    $wire.on('order-otp-ready', () => {
-        window.setTimeout(() => {
-            const panel = document.getElementById('order-otp-panel');
-            const input = document.getElementById('order-otp');
-            if (! panel || ! input) return;
-
-            panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            window.setTimeout(() => input.focus({ preventScroll: true }), 450);
-        }, 100);
-    });
-</script>
-@endscript

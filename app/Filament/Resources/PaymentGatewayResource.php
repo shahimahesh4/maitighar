@@ -33,18 +33,18 @@ class PaymentGatewayResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255)
-                            ->helperText('The customer-facing label shown on the checkout screen (e.g., Khalti or eSewa).'),
+                            ->helperText('The customer-facing label shown on the checkout screen (e.g., Cash on Delivery or Bank Transfer).'),
                         Forms\Components\TextInput::make('code')
                             ->required()
                             ->disabled(fn (?PaymentGateway $record) => $record !== null)
                             ->unique(ignoreRecord: true)
                             ->maxLength(255)
-                            ->helperText('A unique lowercase alphanumeric identifier code for this gateway (e.g., khalti, esewa, fonepay, custom_gw).'),
+                            ->helperText('A unique lowercase alphanumeric identifier code for this gateway (e.g., cod, bank_transfer).'),
                         Forms\Components\TextInput::make('driver')
                             ->required()
                             ->disabled(fn (?PaymentGateway $record) => $record !== null)
                             ->maxLength(255)
-                            ->helperText('The driver implementation key registered in config/payment.php (e.g., khalti, esewa, fonepay, cod).'),
+                            ->helperText('The driver implementation key registered in config/payment.php (e.g., cod, manual).'),
                         Forms\Components\Select::make('environment')
                             ->options([
                                 'sandbox' => 'Sandbox / Testing',

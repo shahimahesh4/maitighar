@@ -4,13 +4,13 @@ namespace Tests\Feature;
 
 use App\Livewire\Partials\Footer;
 use App\Models\Subscriber;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class FooterTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_footer_newsletter_subscription_is_saved(): void
     {

@@ -45,9 +45,14 @@ class ManageSettings extends Page
             'store_email' => Setting::get('store_email', 'maitigharaustralia@gmail.com'),
             'store_phone' => Setting::get('store_phone', '+61 432 685 546'),
             'store_address' => Setting::get('store_address', '2/75 Dartbrook Road, Auburn NSW, Sydney, NSW 2144'),
+            'default_currency' => Setting::get('default_currency', 'AUD'),
+            'currency_symbol' => Setting::get('currency_symbol', '$'),
+            'sku_prefix' => Setting::get('sku_prefix', 'MG-AUS-'),
             'shipping_cost' => Setting::get('shipping_cost', 0.00),
-            'facebook_url' => Setting::get('facebook_url', 'https://www.facebook.com/maitigharaustralia'),
+            'facebook_url' => Setting::get('facebook_url', 'https://www.facebook.com/maitighar'),
             'instagram_url' => Setting::get('instagram_url', 'https://instagram.com/maitighar'),
+            'tiktok_url' => Setting::get('tiktok_url', 'https://www.tiktok.com'),
+            'youtube_url' => Setting::get('youtube_url', 'https://www.youtube.com'),
             'twitter_url' => Setting::get('twitter_url', 'https://twitter.com/maitighar'),
             'maintenance_mode' => (bool) Setting::get('maintenance_mode', false),
             'maintenance_title' => Setting::get('maintenance_title', 'Maitighar update is underway'),
@@ -121,14 +126,37 @@ class ManageSettings extends Page
                                             ->columnSpanFull(),
                                     ])->columns(2),
 
-                                Section::make('Shipping Options')
-                                    ->description('Default shipping configurations.')
+                                Section::make('Currency & Shipping')
+                                    ->description('Default store currency and shipping configurations.')
                                     ->schema([
-                                        TextInput::make('shipping_cost')
-                                            ->numeric()
-                                            ->prefix('Rs.')
+                                        Select::make('default_currency')
+                                            ->label('Default Store Currency')
+                                            ->options([
+                                                'AUD' => 'Australian Dollar (AUD - $)',
+                                                'USD' => 'US Dollar (USD - $)',
+                                                'EUR' => 'Euro (EUR - €)',
+                                                'GBP' => 'British Pound (GBP - £)',
+                                                'NPR' => 'Nepalese Rupee (NPR - Rs.)',
+                                            ])
+                                            ->default('AUD')
                                             ->required(),
-                                    ]),
+                                        TextInput::make('currency_symbol')
+                                            ->label('Currency Symbol')
+                                            ->default('$')
+                                            ->required()
+                                            ->maxLength(10),
+                                        TextInput::make('shipping_cost')
+                                            ->label('Default Shipping Cost (AUD)')
+                                            ->numeric()
+                                            ->prefix('$')
+                                            ->required(),
+                                        TextInput::make('sku_prefix')
+                                            ->label('Default Product SKU Prefix')
+                                            ->default('MG-AUS-')
+                                            ->helperText('Prefix used for sequential product SKU auto-generation (e.g. MG-AUS-001).')
+                                            ->required()
+                                            ->maxLength(30),
+                                    ])->columns(2),
 
                                 Section::make('Social Media Accounts')
                                     ->description('Configure profile links for store social networks.')
@@ -139,7 +167,16 @@ class ManageSettings extends Page
                                         TextInput::make('instagram_url')
                                             ->url()
                                             ->placeholder('https://instagram.com/username'),
+                                        TextInput::make('tiktok_url')
+                                            ->label('TikTok URL')
+                                            ->url()
+                                            ->placeholder('https://tiktok.com/@username'),
+                                        TextInput::make('youtube_url')
+                                            ->label('YouTube URL')
+                                            ->url()
+                                            ->placeholder('https://youtube.com/@channel'),
                                         TextInput::make('twitter_url')
+                                            ->label('Twitter / X URL')
                                             ->url()
                                             ->placeholder('https://twitter.com/username'),
                                     ])->columns(3),

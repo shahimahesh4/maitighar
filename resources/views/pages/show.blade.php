@@ -18,14 +18,6 @@
                     <span class="kba-cms-eyebrow"><i class="bi {{ $pageDesign['icon'] }}" aria-hidden="true"></i>{{ $pageDesign['eyebrow'] }}</span>
                     <h1 id="page-title">{{ $page->title }}</h1>
                     <p>{{ $pageDesign['intro'] }}</p>
-                    <div class="kba-cms-actions">
-                        <a href="{{ $pageDesign['cta'][1] }}" class="kba-cms-button kba-cms-button--primary">{{ $pageDesign['cta'][0] }} <i class="bi bi-arrow-up-right" aria-hidden="true"></i></a>
-                        <a href="{{ $pageDesign['secondary'][1] }}" class="kba-cms-button kba-cms-button--secondary">{{ $pageDesign['secondary'][0] }}</a>
-                    </div>
-                </div>
-                <div class="kba-cms-hero-visual">
-                    <img src="{{ $page->getBannerUrl() }}" alt="{{ $page->title }} at Maitighar" width="720" height="620">
-                    <div class="kba-cms-hero-badge"><span><i class="bi {{ $pageDesign['icon'] }}" aria-hidden="true"></i></span><div><small>Maitighar</small><strong>{{ $pageDesign['stat'] }}</strong></div></div>
                 </div>
             </div>
         </section>

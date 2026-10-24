@@ -68,6 +68,13 @@
         <div class="kba-footer-bottom-grid">
             <div class="kba-copyright">
                 <p>© {{ now()->year }} Maitighar. All rights reserved.</p>
+                <p class="text-xs font-semibold text-slate-400 mt-1">
+                    @if(\App\Support\Money::currentCurrency() === 'AUD')
+                        All prices are in Australian dollars (AUD).
+                    @else
+                        Prices are displayed in {{ \App\Support\Money::currentCurrency() }}. All transactions are processed in Australian dollars (AUD).
+                    @endif
+                </p>
                 <p>Crafted by: <a href="https://siddhitechnepal.com" target="_blank" rel="noopener">Siddhi Tech Nepal</a></p>
             </div>
             <div class="kba-payment-methods">

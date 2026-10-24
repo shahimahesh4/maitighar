@@ -1,4 +1,4 @@
-<div class="w-full max-w-[1150px] py-10 px-4 sm:px-6 lg:px-8 mx-auto">
+<div class="w-full max-w-[1320px] py-6 px-4 sm:px-6 sm:py-8 lg:px-8 mx-auto">
     <!-- Breadcrumb -->
     <nav class="flex mb-6 text-xs text-slate-500 font-medium" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-2">

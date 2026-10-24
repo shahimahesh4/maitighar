@@ -41,7 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Maitighar')
             ->brandLogo(asset('images/logo.png'))
             ->darkModeBrandLogo(asset('images/logo.png'))
-            ->brandLogoHeight('3rem')
+            ->brandLogoHeight('3.5rem')
             ->favicon(asset('favicon.ico'))
             ->userMenuItems([
                 'profile' => UserMenuItem::make()
@@ -50,6 +50,10 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Change Password')
                     ->icon('heroicon-o-key')
                     ->url(fn (): string => EditProfile::getUrl()),
+                'website' => UserMenuItem::make()
+                    ->label('Visit Website')
+                    ->icon('heroicon-o-globe-alt')
+                    ->url(fn (): string => url('/'), shouldOpenInNewTab: true),
             ])
             ->colors([
                 'primary' => Color::hex('#EC0205'),
@@ -95,6 +99,11 @@ class AdminPanelProvider extends PanelProvider
     public function boot(): void
     {
         FilamentView::registerRenderHook(
+            PanelsRenderHook::USER_MENU_BEFORE,
+            fn () => view('filament.components.topbar-website-link'),
+        );
+
+        FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
             fn (): HtmlString => new HtmlString('
                 <style>
@@ -106,10 +115,24 @@ class AdminPanelProvider extends PanelProvider
                         --maitighar-bg: #f8fafc;
                     }
                     .fi-body { background: #f8fafc; }
-                    .fi-topbar nav,
-                    .fi-simple-layout { background-color: #ffffff; border-bottom: 2px solid rgba(12, 30, 140, 0.08); }
-                    .fi-sidebar,
-                    .fi-sidebar-header { background: linear-gradient(180deg, #091b38 0%, #071355 100%); }
+                    .fi-sidebar {
+                        background: linear-gradient(180deg, #091b38 0%, #071355 100%);
+                    }
+                    .fi-sidebar-header {
+                        background: #EB0302 !important;
+                        background-color: #EB0302 !important;
+                        border-bottom: 2px solid #C90204 !important;
+                    }
+                    .fi-sidebar-header button,
+                    .fi-sidebar-header button svg,
+                    .fi-sidebar-header .fi-icon-btn,
+                    .fi-sidebar-header .fi-icon-btn svg {
+                        color: #ffffff !important;
+                    }
+                    .fi-topbar nav {
+                        background-color: #ffffff;
+                        border-bottom: 2px solid #EB0302;
+                    }
                     .fi-sidebar-group-label,
                     .fi-sidebar-item-label,
                     .fi-sidebar-item-icon { color: #e2e8f0; }
@@ -131,6 +154,58 @@ class AdminPanelProvider extends PanelProvider
                     }
                     .fi-btn-color-primary {
                         background: linear-gradient(135deg, var(--maitighar-red), var(--maitighar-red-dark));
+                    }
+                    /* Website link button in topbar */
+                    .fi-topbar-website-btn {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.375rem;
+                        padding: 0.375rem 0.75rem;
+                        font-size: 0.8125rem;
+                        font-weight: 600;
+                        line-height: 1.25rem;
+                        color: #334155;
+                        background-color: #ffffff;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 0.5rem;
+                        text-decoration: none !important;
+                        transition: all 0.2s ease-in-out;
+                        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                    }
+                    .fi-topbar-website-btn .fi-topbar-website-icon {
+                        width: 1rem;
+                        height: 1rem;
+                        color: #EC0205;
+                        transition: color 0.2s ease;
+                    }
+                    .fi-topbar-website-btn .fi-topbar-website-ext {
+                        width: 0.75rem;
+                        height: 0.75rem;
+                        color: #94a3b8;
+                        transition: color 0.2s ease;
+                    }
+                    .fi-topbar-website-btn:hover {
+                        background-color: #fef2f2;
+                        border-color: #EC0205;
+                        color: #EC0205;
+                        box-shadow: 0 2px 6px rgba(236, 2, 5, 0.15);
+                    }
+                    .fi-topbar-website-btn:hover .fi-topbar-website-icon,
+                    .fi-topbar-website-btn:hover .fi-topbar-website-ext {
+                        color: #EC0205;
+                    }
+                    .fi-topbar-website-btn:active {
+                        transform: scale(0.97);
+                    }
+                    .dark .fi-topbar-website-btn {
+                        background-color: #1e293b;
+                        border-color: #334155;
+                        color: #f1f5f9;
+                    }
+                    .dark .fi-topbar-website-btn:hover {
+                        background-color: rgba(236, 2, 5, 0.15);
+                        border-color: #EC0205;
+                        color: #ffffff;
                     }
                     /* Hide scrollbar for Chrome, Safari and Opera */
                     .fi-sidebar-nav::-webkit-scrollbar,

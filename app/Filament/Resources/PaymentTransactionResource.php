@@ -105,7 +105,7 @@ class PaymentTransactionResource extends Resource
                     ->getStateUsing(fn (PaymentTransaction $record): bool => filled($record->voucher_path))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('amount')
-                    ->formatStateUsing(fn ($state) => Money::format($state))
+                    ->formatStateUsing(fn ($state, PaymentTransaction $record) => Money::format($state, $record->currency ?? 'AUD'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
@@ -129,11 +129,7 @@ class PaymentTransactionResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('gateway_code')
                     ->options([
-                        'khalti' => 'Khalti',
-                        'esewa' => 'eSewa',
-                        'fonepay' => 'Fonepay',
                         'bank_transfer' => 'Bank Transfer',
-                        'qr_payment' => 'QR Scan',
                         'cod' => 'Cash on Delivery',
                     ]),
                 Tables\Filters\SelectFilter::make('status')
@@ -166,7 +162,7 @@ class PaymentTransactionResource extends Resource
                         app(ManualPaymentReviewService::class)->approve($record, auth()->id());
                         Notification::make()->success()->title('Manual payment approved')->send();
                     })
-                    ->visible(fn (PaymentTransaction $record) => in_array($record->gateway_code, ['bank_transfer', 'qr_payment'], true) && in_array($record->status, ['pending', 'pending_verification'], true)),
+                    ->visible(fn (PaymentTransaction $record) => $record->gateway_code === 'bank_transfer' && in_array($record->status, ['pending', 'pending_verification'], true)),
 
                 Tables\Actions\Action::make('rejectManualPayment')
                     ->label('Reject Payment')
@@ -179,7 +175,7 @@ class PaymentTransactionResource extends Resource
                         app(ManualPaymentReviewService::class)->reject($record, auth()->id(), $data['reason']);
                         Notification::make()->danger()->title('Manual payment rejected')->send();
                     })
-                    ->visible(fn (PaymentTransaction $record) => in_array($record->gateway_code, ['bank_transfer', 'qr_payment'], true) && in_array($record->status, ['pending', 'pending_verification'], true)),
+                    ->visible(fn (PaymentTransaction $record) => $record->gateway_code === 'bank_transfer' && in_array($record->status, ['pending', 'pending_verification'], true)),
                 // Manual Sync Action
                 Tables\Actions\Action::make('syncStatus')
                     ->label('Sync Gateway')

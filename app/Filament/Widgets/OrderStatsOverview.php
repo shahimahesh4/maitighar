@@ -28,9 +28,9 @@ class OrderStatsOverview extends BaseWidget
             ->toArray());
 
         return [
-            Stat::make('Total Revenue', Money::format($totalSales))
-                ->description('Total completed sales revenue')
-                ->descriptionIcon('heroicon-m-currency-rupee')
+            Stat::make('Total Revenue (AUD)', Money::format($totalSales, 'AUD'))
+                ->description('Total completed sales revenue in AUD')
+                ->descriptionIcon('heroicon-m-currency-dollar')
                 ->chart(! empty($salesTrend) ? array_reverse($salesTrend) : [1000, 2000, 1500, 3000, 2500, 4000])
                 ->color('success'),
 
@@ -41,7 +41,7 @@ class OrderStatsOverview extends BaseWidget
                 ->color('info'),
 
             Stat::make('Active Catalog Products', $productsCount)
-                ->description('Active electronics in inventory')
+                ->description('Active products in inventory')
                 ->descriptionIcon('heroicon-m-squares-2x2')
                 ->color('warning'),
 

@@ -4,12 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\Page;
 use Database\Seeders\PolicyPageSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class PageFrontendTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_published_page_is_rendered_on_frontend(): void
     {

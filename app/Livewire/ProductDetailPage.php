@@ -29,10 +29,153 @@ class ProductDetailPage extends Component
 
     public $comment;
 
+    // Variation properties
+    public bool $isVariable = false;
+
+    public array $variationAttributes = [];
+
+    public array $descriptiveAttributes = [];
+
+    public array $selectedAttributes = [];
+
+    public ?int $selectedVariationId = null;
+
+    public ?string $selectedVariationSku = null;
+
+    public ?float $displayPrice = null;
+
+    public ?float $displayRegularPrice = null;
+
+    public ?int $displayStock = null;
+
+    public bool $isAvailable = true;
+
+    public ?string $variationNotice = null;
+
+    public string $activeImage = '';
+
     public function mount(string $slug): void
     {
-        $this->product = Product::where('slug', $slug)->with('approvedReviews.user')->firstOrFail();
+        $this->product = Product::where('slug', $slug)
+            ->with([
+                'approvedReviews.user',
+                'category',
+                'brand',
+                'productAttributes.attribute',
+                'productAttributes.values',
+                'enabledVariations.variationAttributeValues.attribute',
+                'enabledVariations.variationAttributeValues.attributeValue',
+            ])
+            ->firstOrFail();
+
         $this->title = $this->product->name.' - Maitighar';
+        $this->isVariable = $this->product->isVariable();
+        $this->activeImage = $this->product->getImageUrl();
+
+        if ($this->isVariable) {
+            $this->loadVariationData();
+        } else {
+            $this->displayPrice = (float) $this->product->sale_price;
+            $this->displayRegularPrice = (float) ($this->product->regular_price ?: $this->product->sale_price);
+            $this->displayStock = (int) $this->product->stock_quantity;
+            $this->isAvailable = (bool) $this->product->in_stock;
+            $this->selectedVariationSku = $this->product->sku;
+        }
+
+        // Descriptive attributes visible on product page
+        $this->descriptiveAttributes = $this->product->productAttributes
+            ->where('is_visible', true)
+            ->map(fn ($pa) => [
+                'name' => $pa->attribute->name,
+                'values' => $pa->values->pluck('value')->implode(', '),
+            ])
+            ->all();
+    }
+
+    private function loadVariationData(): void
+    {
+        $varAttrs = $this->product->productAttributes
+            ->where('is_variation', true)
+            ->values();
+
+        $this->variationAttributes = $varAttrs->map(function ($pa) {
+            return [
+                'id' => $pa->attribute_id,
+                'name' => $pa->attribute->name,
+                'type' => $pa->attribute->type ?? 'select',
+                'values' => $pa->values->map(fn ($v) => [
+                    'id' => $v->id,
+                    'value' => $v->value,
+                    'slug' => $v->slug,
+                    'color_code' => $v->color_code,
+                ])->all(),
+            ];
+        })->all();
+
+        $this->selectedAttributes = [];
+        $this->selectedVariationId = null;
+        $this->selectedVariationSku = $this->product->sku;
+        $this->displayPrice = null; // show price range initially
+        $this->displayRegularPrice = null;
+        $this->displayStock = null;
+        $this->isAvailable = true;
+        $this->variationNotice = null;
+    }
+
+    public function selectAttribute(int $attributeId, int $valueId): void
+    {
+        $this->selectedAttributes[$attributeId] = $valueId;
+        $this->resolveVariation();
+    }
+
+    public function resolveVariation(): void
+    {
+        $requiredCount = count($this->variationAttributes);
+        $selectedCount = count($this->selectedAttributes);
+
+        if ($selectedCount < $requiredCount) {
+            $this->selectedVariationId = null;
+            $this->displayPrice = null;
+            $this->displayRegularPrice = null;
+            $this->displayStock = null;
+            $this->selectedVariationSku = $this->product->sku;
+            $this->isAvailable = true;
+            $this->variationNotice = 'Please select all available options.';
+
+            return;
+        }
+
+        // Search for matching enabled variation
+        $matched = null;
+        foreach ($this->product->enabledVariations as $var) {
+            $varMap = $var->getOptionsMap();
+            if ($varMap == $this->selectedAttributes) {
+                $matched = $var;
+                break;
+            }
+        }
+
+        if ($matched) {
+            $this->selectedVariationId = $matched->id;
+            $this->displayPrice = (float) $matched->effective_price;
+            $this->displayRegularPrice = (float) ($matched->regular_price ?: $matched->effective_price);
+            $this->selectedVariationSku = $matched->sku ?: $this->product->sku;
+            $this->displayStock = $matched->manage_stock ? (int) $matched->stock_quantity : 999;
+            $this->isAvailable = $matched->isInStock();
+            $this->variationNotice = $matched->isInStock() ? null : 'This combination is currently out of stock.';
+
+            if (filled($matched->image)) {
+                $this->activeImage = $matched->getImageUrl();
+                $this->dispatch('variation-image-changed', image: $this->activeImage);
+            }
+        } else {
+            $this->selectedVariationId = null;
+            $this->displayPrice = null;
+            $this->displayRegularPrice = null;
+            $this->displayStock = 0;
+            $this->isAvailable = false;
+            $this->variationNotice = 'This combination is currently unavailable.';
+        }
     }
 
     public function increaseQty(): void
@@ -47,22 +190,77 @@ class ProductDetailPage extends Component
         }
     }
 
-    // Method for adding the product in the cart
-
     public function addToCart(int $product_id): void
     {
-        $total_count = CartManagement::addItemToCart($product_id, $this->quantity);
+        if ($this->isVariable) {
+            $requiredCount = count($this->variationAttributes);
+            if (count($this->selectedAttributes) < $requiredCount) {
+                $this->alert('warning', 'Please select all required options before adding to cart.', [
+                    'position' => 'top-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
 
-        $this->dispatch('update-cart-count', total_count: $total_count);
+                return;
+            }
 
-        $this->dispatch('product-added-to-cart', product_id: $product_id, quantity: (int) $this->quantity);
+            if (! $this->selectedVariationId) {
+                $this->alert('error', 'The selected combination is unavailable.', [
+                    'position' => 'top-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+
+                return;
+            }
+
+            // Server-side stock verification
+            $variation = $this->product->enabledVariations->firstWhere('id', $this->selectedVariationId);
+            if (! $variation || ! $variation->isInStock()) {
+                $this->alert('error', 'This variation is currently out of stock.', [
+                    'position' => 'top-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+
+                return;
+            }
+
+            if ($variation->manage_stock && $variation->stock_quantity < $this->quantity) {
+                $this->alert('error', "Only {$variation->stock_quantity} item(s) available in stock.", [
+                    'position' => 'top-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+
+                return;
+            }
+
+            $total_count = CartManagement::addItemToCart($this->product->id, $this->quantity, $this->selectedVariationId);
+            $this->dispatch('update-cart-count', total_count: $total_count);
+            $this->dispatch('product-added-to-cart', product_id: $this->product->id, quantity: (int) $this->quantity, variation_id: $this->selectedVariationId);
+        } else {
+            // Simple product stock check
+            if ($this->product->stock_quantity > 0 && $this->product->stock_quantity < $this->quantity) {
+                $this->alert('error', "Only {$this->product->stock_quantity} item(s) available in stock.", [
+                    'position' => 'top-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+
+                return;
+            }
+
+            $total_count = CartManagement::addItemToCart($this->product->id, $this->quantity);
+            $this->dispatch('update-cart-count', total_count: $total_count);
+            $this->dispatch('product-added-to-cart', product_id: $this->product->id, quantity: (int) $this->quantity);
+        }
 
         $this->alert('success', 'Product added to the cart successfully!', [
             'position' => 'top-end',
             'timer' => 3000,
             'toast' => true,
         ]);
-
     }
 
     public function submitReview(): void
@@ -106,13 +304,12 @@ class ProductDetailPage extends Component
             'is_approved' => true,
         ]);
 
-        $this->comment = '';
+        $this->reset(['comment']);
         $this->rating = 5;
 
-        // Reload the product relationships
         $this->product->load('approvedReviews.user');
 
-        $this->alert('success', 'Thank you! Your review has been posted.', [
+        $this->alert('success', 'Thank you! Your review has been submitted.', [
             'position' => 'top-end',
             'timer' => 3000,
             'toast' => true,
@@ -122,7 +319,7 @@ class ProductDetailPage extends Component
     public function toggleWishlist(): void
     {
         if (! auth()->check()) {
-            $this->alert('info', 'Please log in to add items to your wishlist.', [
+            $this->alert('error', 'Please login to manage your wishlist.', [
                 'position' => 'top-end',
                 'timer' => 3000,
                 'toast' => true,
@@ -131,21 +328,22 @@ class ProductDetailPage extends Component
             return;
         }
 
-        $existing = Wishlist::where('user_id', auth()->id())
+        $userId = auth()->id();
+        $wishlist = Wishlist::where('user_id', $userId)
             ->where('product_id', $this->product->id)
             ->first();
 
-        if ($existing) {
-            $existing->delete();
+        if ($wishlist) {
+            $wishlist->delete();
             $this->dispatch('update-wishlist-count');
-            $this->alert('success', 'Removed from wishlist.', [
+            $this->alert('info', 'Removed from wishlist!', [
                 'position' => 'top-end',
                 'timer' => 3000,
                 'toast' => true,
             ]);
         } else {
             Wishlist::create([
-                'user_id' => auth()->id(),
+                'user_id' => $userId,
                 'product_id' => $this->product->id,
             ]);
             $this->dispatch('update-wishlist-count');
@@ -168,7 +366,7 @@ class ProductDetailPage extends Component
 
         return view('livewire.product-detail-page', [
             'product' => $this->product,
-            'mainImage' => $this->product->getImageUrl(),
+            'mainImage' => $this->activeImage ?: $this->product->getImageUrl(),
             'productGallery' => $this->product->getGalleryImageUrls(),
             'detailTabs' => $detailTabs,
             'detailTabContent' => $detailTabContent,
@@ -192,6 +390,14 @@ class ProductDetailPage extends Component
             $content['description'] = preg_match('/<[^>]+>/', $this->product->description)
                 ? $this->product->description
                 : Str::markdown($this->product->description);
+        }
+
+        $hasSpecs = !empty($this->descriptiveAttributes)
+            || !empty(array_filter($this->product->specifications ?? [], fn ($s) => !empty($s['label']) || !empty($s['value'])));
+
+        if ($hasSpecs) {
+            $tabs['specifications'] = 'Product Specifications';
+            $content['specifications'] = '';
         }
 
         $productTabs = $this->product->product_tabs ?? [];

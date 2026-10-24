@@ -4,13 +4,13 @@ namespace Tests\Feature;
 
 use App\Livewire\Auth\RegisterPage;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_customer_can_register_with_a_nepal_phone_number(): void
     {

@@ -29,7 +29,10 @@ class StripeDriver extends AbstractGatewayDriver
 
         // Amount in cents
         $amount = (int) round($order->grand_total * 100);
-        $currency = strtolower($order->currency ?? 'npr');
+        $currency = strtolower($order->currency ?: 'aud');
+        if (! in_array($currency, ['aud', 'usd', 'eur', 'gbp', 'nzd', 'cad', 'sgd'], true)) {
+            $currency = 'aud';
+        }
 
         try {
             $response = Http::asForm()

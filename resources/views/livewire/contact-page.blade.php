@@ -1,26 +1,9 @@
 <div class="kba-contact-page kba-cms-page">
     <section class="kba-cms-hero" aria-labelledby="contact-page-title">
-        <div class="kba-cms-hero-glow" aria-hidden="true"></div>
         <div class="kba-cms-hero-inner">
             <div class="kba-cms-hero-copy">
-                <nav class="kba-page-breadcrumbs" aria-label="Breadcrumb">
-                    <a wire:navigate href="{{ route('index') }}"><i class="bi bi-house-door" aria-hidden="true"></i>Home</a>
-                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
-                    <span aria-current="page">Contact Us</span>
-                </nav>
-                <span class="kba-cms-eyebrow"><i class="bi bi-chat-heart" aria-hidden="true"></i> We would love to hear from you</span>
                 <h1 id="contact-page-title">Contact Us</h1>
                 <p>Questions about our products, orders, or custom requests? Our friendly team is ready to help.</p>
-                <div class="kba-cms-actions">
-                    <a href="#contact-form" class="kba-cms-button kba-cms-button--primary">Send us a message <i class="bi bi-arrow-down" aria-hidden="true"></i></a>
-                </div>
-            </div>
-            <div class="kba-cms-hero-visual">
-                <img src="{{ asset('images/kba/about-us-academy.png') }}" alt="Maitighar - Nepalese Heritage with Love" width="720" height="620">
-                <div class="kba-cms-hero-badge">
-                    <span><i class="bi bi-headset" aria-hidden="true"></i></span>
-                    <div><small>Maitighar</small><strong>We’re here to help</strong></div>
-                </div>
             </div>
         </div>
     </section>
@@ -53,8 +36,8 @@
                 <div class="kba-contact-socials">
                     <a href="{{ \App\Models\Setting::get('facebook_url', 'https://www.facebook.com/maitigharaustralia') }}" target="_blank" rel="noopener" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
                     <a href="{{ \App\Models\Setting::get('instagram_url', 'https://www.instagram.com/maitighar') }}" target="_blank" rel="noopener" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-                    <a href="https://www.youtube.com" target="_blank" rel="noopener" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
-                    <a href="https://www.tiktok.com" target="_blank" rel="noopener" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
+                    <a href="{{ \App\Models\Setting::get('youtube_url', 'https://www.youtube.com') }}" target="_blank" rel="noopener" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+                    <a href="{{ \App\Models\Setting::get('tiktok_url', 'https://www.tiktok.com') }}" target="_blank" rel="noopener" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
                 </div>
             </div>
         </div>

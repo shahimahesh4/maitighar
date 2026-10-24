@@ -18,6 +18,9 @@ class OrderConfirmationService
 
         $items = $order->items->map(function ($item): string {
             $name = $item->product?->name ?? 'Product';
+            if (! empty($item->options_text)) {
+                $name .= ' ('.$item->options_text.')';
+            }
 
             return $name.' × '.$item->quantity.' — '.Money::format($item->total_amount);
         })->implode("\n");
@@ -47,10 +50,11 @@ class OrderConfirmationService
                     'Shipping method' => $order->shipping_method ?: 'Standard delivery',
                     'Payment method' => $this->paymentLabel((string) $order->payment_method),
                     'Payment status' => ucfirst((string) $order->payment_status),
-                    'Subtotal' => Money::format($subtotal),
-                    'Discount' => Money::format($order->discount_amount),
-                    'Shipping' => Money::format($order->shipping_amount),
-                    'Order total' => Money::format($order->grand_total),
+                    'Currency' => strtoupper($order->currency ?: 'AUD').' (Australian Dollars)',
+                    'Subtotal' => Money::format($subtotal, $order->currency).' '.strtoupper($order->currency ?: 'AUD'),
+                    'Discount' => Money::format($order->discount_amount, $order->currency).' '.strtoupper($order->currency ?: 'AUD'),
+                    'Shipping' => Money::format($order->shipping_amount, $order->currency).' '.strtoupper($order->currency ?: 'AUD'),
+                    'Order total' => Money::format($order->grand_total, $order->currency).' '.strtoupper($order->currency ?: 'AUD'),
                 ],
                 'View your order',
                 route('my-order-details', ['order' => $order->id]),
@@ -68,10 +72,6 @@ class OrderConfirmationService
         return match ($method) {
             'cod' => 'Cash on delivery',
             'bank_transfer' => 'Bank transfer',
-            'qr_payment' => 'QR payment',
-            'esewa' => 'eSewa',
-            'khalti' => 'Khalti',
-            'stripe' => 'Card / Stripe',
             default => ucfirst(str_replace('_', ' ', $method)),
         };
     }

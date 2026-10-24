@@ -5,13 +5,13 @@ namespace Tests\Feature;
 use App\Models\Order;
 use App\Models\PaymentTransaction;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PaymentVoucherAuthorizationTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_only_super_admin_and_admin_can_view_private_payment_receipts(): void
     {

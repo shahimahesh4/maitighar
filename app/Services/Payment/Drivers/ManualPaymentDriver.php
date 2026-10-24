@@ -8,7 +8,6 @@ use App\Services\Payment\DataObjects\HealthResult;
 use App\Services\Payment\DataObjects\PaymentResponse;
 use App\Services\Payment\DataObjects\RefundResponse;
 use App\Services\Payment\DataObjects\WebhookResult;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Http\Request;
@@ -51,8 +50,7 @@ class ManualPaymentDriver extends AbstractGatewayDriver
             Textarea::make('settings.instructions')->label('Customer Instructions'),
             TextInput::make('settings.account_name')->label('Account Name'),
             TextInput::make('settings.account_number')->label('Account Number'),
-            TextInput::make('settings.bank_name')->label('Bank / Wallet Name'),
-            FileUpload::make('settings.qr_image')->label('Payment QR Code')->image()->disk('public')->directory('payment-qr'),
+            TextInput::make('settings.bank_name')->label('Bank Name'),
         ];
     }
 

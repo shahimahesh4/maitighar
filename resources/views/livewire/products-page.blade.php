@@ -1,42 +1,22 @@
 <div
-    class="kba-catalog-page mx-auto w-[calc(100%-32px)] max-w-[1150px] py-8"
     x-data="{ filtersOpen: false }"
     x-on:keydown.escape.window="filtersOpen = false"
 >
-    <!-- Breadcrumb -->
-    <nav class="kba-catalog-breadcrumb flex mb-6 text-xs text-gray-500 dark:text-slate-400 font-medium" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-2">
-            <li class="inline-flex items-center">
-                <a wire:navigate href="/" class="inline-flex items-center hover:text-[#EC0205]">
-                    <i class="bi bi-house-door-fill mr-1.5 text-sm"></i>
-                    Home
-                </a>
-            </li>
-            <li>
-                <div class="flex items-center">
-                    <i class="bi bi-chevron-right mx-1 text-gray-400 dark:text-slate-650 text-[10px]"></i>
-                    <span class="text-gray-800 dark:text-white font-semibold">Products</span>
-                </div>
-            </li>
-        </ol>
-    </nav>
-
-    <!-- Header Block -->
-    <div class="kba-catalog-hero mb-4 text-left">
-        <div>
-            <span class="kba-catalog-eyebrow"><i class="bi bi-gem"></i> Authentic Nepali Handicrafts</span>
-            <h1 class="text-3xl font-extrabold tracking-tight text-gray-800 dark:text-white sm:text-4xl">All Products</h1>
-            <p class="text-sm text-gray-500 dark:text-slate-400 mt-2">Explore our authentic collection of traditional Nepali handicrafts, cultural treasures, festive essentials, and heritage creations handmade with love.</p>
-            <div class="kba-catalog-assurances" aria-label="Shopping benefits">
-                <span><i class="bi bi-patch-check"></i> Quality selected</span>
-                <span><i class="bi bi-truck"></i> Reliable delivery</span>
-                <span><i class="bi bi-headset"></i> Helpful support</span>
-            </div>
+    <!-- Full-Width Catalog Hero Header -->
+    <section class="kba-catalog-hero-full" aria-labelledby="catalog-title">
+        <div class="kba-catalog-hero-inner">
+            <nav class="kba-catalog-breadcrumb" aria-label="Breadcrumb">
+                <a wire:navigate href="/"><i class="bi bi-house-door-fill mr-1.5"></i>Home</a>
+                <i class="bi bi-chevron-right text-[10px] opacity-60"></i>
+                <span class="text-white font-medium">Products</span>
+            </nav>
+            <h1 id="catalog-title">All Products</h1>
+            <p>Explore authentic Nepali handicrafts, cultural treasures, and heritage creations handmade with love.</p>
         </div>
-        <div class="kba-catalog-hero-stat"><strong>{{ $products->total() }}</strong><span>Products available</span></div>
-    </div>
+    </section>
 
-    <div class="mb-5 flex items-center justify-between gap-4 lg:hidden">
+    <div class="kba-catalog-page mx-auto w-[calc(100%-32px)] max-w-[1320px] py-6 sm:py-8">
+        <div class="mb-5 flex items-center justify-between gap-4 lg:hidden">
         <button type="button" x-on:click="filtersOpen = true" class="inline-flex items-center gap-2 rounded-xl border border-[#0C1E8C] bg-blue-50 px-4 py-2.5 text-sm font-bold text-[#0C1E8C] shadow-sm" aria-controls="product-filter-drawer" x-bind:aria-expanded="filtersOpen">
             <i class="bi bi-funnel-fill"></i>
             Filter
@@ -104,9 +84,9 @@
                         <span>Max Range:</span>
                         <span>{{ \App\Support\Money::format($price_range ?: $priceMaximum) }}</span>
                     </div>
-                    <input type="range" wire:model.live="price_range" min="0" max="{{ $priceMaximum }}" step="100" class="kba-price-range w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                    <input type="range" wire:model.live="price_range" min="0" max="{{ $priceMaximum }}" step="5" class="kba-price-range w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer">
                     <div class="flex justify-between text-xs text-gray-400">
-                        <span>Rs. 0</span>
+                        <span>{{ \App\Support\Money::format(0) }}</span>
                         <span>{{ \App\Support\Money::format($priceMaximum) }}</span>
                     </div>
                 </div>
@@ -161,21 +141,48 @@
                                     <img src="{{ $product->getThumbnailUrl() }}" alt="{{ $product->name }}" width="360" height="360" loading="lazy" decoding="async">
                                 </a>
 
-                                <button type="button" wire:click.prevent="addToCart({{ $product->id }})" class="kba-quick-cart" aria-label="Add {{ $product->name }} to cart" title="Add to bag">
-                                    <i wire:loading.remove wire:target="addToCart({{ $product->id }})" class="bi bi-bag-plus"></i>
+                                <div class="kba-product-action-bar">
+                                    <button type="button" 
+                                            wire:click.prevent="toggleWishlist({{ $product->id }})" 
+                                            class="kba-action-btn kba-action-wishlist {{ in_array($product->id, $wishlistProductIds ?? []) ? 'is-active' : '' }}" 
+                                            title="Add to Wishlist" 
+                                            aria-label="Wishlist {{ $product->name }}">
+                                        <i class="bi {{ in_array($product->id, $wishlistProductIds ?? []) ? 'bi-heart-fill text-red-500' : 'bi-heart' }}"></i>
+                                    </button>
+                                    <button type="button" 
+                                            wire:click.prevent="addToCart({{ $product->id }})" 
+                                            class="kba-action-btn kba-action-cart" 
+                                            title="Add to Bag" 
+                                            aria-label="Add {{ $product->name }} to bag">
+                                        <i wire:loading.remove wire:target="addToCart({{ $product->id }})" class="bi bi-bag"></i>
+                                        <i wire:loading wire:target="addToCart({{ $product->id }})" class="bi bi-arrow-repeat kba-spin"></i>
+                                    </button>
+                                    <button type="button" 
+                                            @click.prevent="$dispatch('open-quick-view', { productId: {{ $product->id }} })" 
+                                            class="kba-action-btn kba-action-quickview" 
+                                            title="Quick View" 
+                                            aria-label="Quick view {{ $product->name }}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <button type="button" wire:click.prevent="addToCart({{ $product->id }})" class="kba-hover-add-to-cart" aria-label="Add {{ $product->name }} to cart">
+                                    <i wire:loading.remove wire:target="addToCart({{ $product->id }})" class="bi bi-cart3"></i>
                                     <i wire:loading wire:target="addToCart({{ $product->id }})" class="bi bi-arrow-repeat kba-spin"></i>
+                                    Add to Cart
                                 </button>
                             </div>
 
                             <div class="kba-product-info">
                                 <a wire:navigate href="{{ route('product-details', $product->slug) }}" class="kba-product-title">{{ $product->name }}</a>
-                                <div class="kba-rating" role="img" aria-label="Rated {{ $product->average_rating ?? 0 }} out of 5">
+                                <div class="kba-rating" role="img" aria-label="Rated {{ $product->average_rating ?: 5 }} out of 5">
                                     @for($star = 1; $star <= 5; $star++)
-                                        <i class="bi {{ $star <= round($product->average_rating ?? 0) ? 'bi-star-fill' : 'bi-star' }}" aria-hidden="true"></i>
+                                        <i class="bi {{ $star <= round((float) ($product->average_rating ?: 5)) ? 'bi-star-fill' : 'bi-star' }}" aria-hidden="true"></i>
                                     @endfor
                                 </div>
                                 <div class="kba-price">
-                                    @if($product->discount_percentage)
+                                    @if($product->isVariable())
+                                        <strong>{{ $product->getFormattedPriceRange() }}</strong>
+                                    @elseif($product->discount_percentage)
                                         <del>{{ \App\Support\Money::format($product->regular_price) }}</del>
                                         <strong>{{ \App\Support\Money::format($product->sale_price) }}</strong>
                                     @else
@@ -196,4 +203,5 @@
             @endif
         </div>
     </div>
+</div>
 </div>

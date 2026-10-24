@@ -88,6 +88,10 @@
                         <span class="font-semibold text-slate-700 uppercase">{{ str_replace('_', ' ', $order->shipping_method ?? 'standard') }}</span>
                     </div>
                     <div class="flex justify-between">
+                        <span class="text-slate-400">Currency:</span>
+                        <span class="font-bold text-slate-700 uppercase">{{ strtoupper($order->currency ?: 'AUD') }} (Australian Dollars)</span>
+                    </div>
+                    <div class="flex justify-between">
                         <span class="text-slate-400">Order Status:</span>
                         <span class="font-semibold text-slate-700 uppercase">{{ $order->status }}</span>
                     </div>
@@ -111,10 +115,13 @@
                     @foreach ($order->items as $item)
                         <tr>
                             <td class="py-4">
-                                <span class="font-bold text-slate-800 text-sm block">{{ $item->product->name }}</span>
+                                <span class="font-bold text-slate-800 text-sm block">{{ $item->product->name ?? 'Product' }}</span>
+                                @if($item->options_text)
+                                    <span class="text-xs text-slate-500 block mt-0.5 font-medium">{{ $item->options_text }}</span>
+                                @endif
                                 <span class="text-[10px] text-slate-400 mt-0.5 block">{{ $item->product->brand->name ?? 'Brand' }}</span>
                             </td>
-                            <td class="py-4 text-center font-mono text-[11px] text-slate-500">{{ $item->product->sku ?? '-' }}</td>
+                            <td class="py-4 text-center font-mono text-[11px] text-slate-500">{{ $item->variation_sku ?: ($item->product->sku ?? '-') }}</td>
                             <td class="py-4 text-right">{{ \App\Support\Money::format($item->unit_amount) }}</td>
                             <td class="py-4 text-center font-semibold text-slate-800">{{ $item->quantity }}</td>
                             <td class="py-4 text-right font-bold text-slate-800">{{ \App\Support\Money::format($item->total_amount) }}</td>
@@ -156,9 +163,9 @@
                 </div>
 
                 <div class="flex justify-between sm:justify-end sm:gap-12 pt-3 border-t border-slate-100 items-center">
-                    <span class="text-sm font-bold text-slate-800">Total Due:</span>
-                    <span class="text-lg font-black text-[#EC0205] w-32 block text-right">
-                        {{ \App\Support\Money::format($order->grand_total) }}
+                    <span class="text-sm font-bold text-slate-800">Total Due (AUD):</span>
+                    <span class="text-lg font-black text-[#EC0205] w-36 block text-right">
+                        {{ \App\Support\Money::format($order->grand_total, $order->currency) }} {{ strtoupper($order->currency ?: 'AUD') }}
                     </span>
                 </div>
             </div>

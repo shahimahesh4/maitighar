@@ -1,5 +1,5 @@
-<div class="min-h-[70vh] bg-slate-50 py-8 sm:py-11">
-    <div class="mx-auto w-[calc(100%-32px)] max-w-[1150px]">
+<div class="min-h-[70vh] bg-slate-50 py-4 sm:py-6">
+    <div class="mx-auto w-[calc(100%-32px)] max-w-[1320px]">
         <nav class="mb-5 flex items-center gap-2 text-[11px] text-slate-500" aria-label="Breadcrumb">
             <a wire:navigate href="{{ route('index') }}" class="inline-flex items-center gap-1.5 font-semibold transition hover:text-[#EC0205]"><i class="bi bi-house-door"></i>Home</a>
             <i class="bi bi-chevron-right text-[9px] text-slate-300"></i>

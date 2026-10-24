@@ -15,6 +15,7 @@ class Product extends Model
         'category_id',
         'brand_id',
         'name',
+        'product_type',
         'slug',
         'images',
         'main_image',
@@ -26,6 +27,7 @@ class Product extends Model
         'regular_price',
         'sale_price',
         'discount_percentage',
+        'stock_quantity',
         'specifications',
         'delivery_policy',
         'shipping_returns',
@@ -57,6 +59,7 @@ class Product extends Model
         'regular_price' => 'decimal:2',
         'sale_price' => 'decimal:2',
         'discount_percentage' => 'integer',
+        'stock_quantity' => 'integer',
     ];
 
     /**
@@ -110,8 +113,45 @@ class Product extends Model
         )));
     }
 
+    /**
+     * Generate the next sequential SKU based on the store's configured prefix.
+     * E.g. MG-AUS-001, MG-AUS-002, MG-AUS-003, ...
+     */
+    public static function generateNextSku(?string $prefix = null): string
+    {
+        $prefix = $prefix ?: (string) Setting::get('sku_prefix', 'MG-AUS-');
+
+        $skus = static::query()
+            ->where('sku', 'like', $prefix . '%')
+            ->pluck('sku');
+
+        $maxNumber = 0;
+        foreach ($skus as $sku) {
+            if (preg_match('/^' . preg_quote($prefix, '/') . '(\d+)$/', (string) $sku, $matches)) {
+                $num = (int) $matches[1];
+                if ($num > $maxNumber) {
+                    $maxNumber = $num;
+                }
+            }
+        }
+
+        $nextNumber = $maxNumber + 1;
+        do {
+            $candidate = $prefix . str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+            $nextNumber++;
+        } while (static::where('sku', $candidate)->exists());
+
+        return $candidate;
+    }
+
     protected static function booted(): void
     {
+        static::creating(function (self $product): void {
+            if (blank($product->sku)) {
+                $product->sku = static::generateNextSku();
+            }
+        });
+
         static::saving(function (self $product): void {
             $salePrice = (float) ($product->sale_price ?? $product->price ?? 0);
             $regularPrice = (float) ($product->regular_price ?? $product->old_price ?? $salePrice);
@@ -209,4 +249,117 @@ class Product extends Model
     {
         return $this->hasMany(InventoryLog::class);
     }
+
+    public function productAttributes()
+    {
+        return $this->hasMany(ProductAttribute::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function attributes()
+    {
+        return $this->belongsToMany(Attribute::class, 'product_attributes')
+            ->withPivot(['id', 'is_visible', 'is_variation', 'sort_order'])
+            ->withTimestamps()
+            ->orderBy('product_attributes.sort_order')
+            ->orderBy('product_attributes.id');
+    }
+
+    public function variations()
+    {
+        return $this->hasMany(ProductVariation::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function enabledVariations()
+    {
+        return $this->hasMany(ProductVariation::class)->where('is_enabled', true)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function isSimple(): bool
+    {
+        return ($this->product_type ?? 'simple') === 'simple';
+    }
+
+    public function isVariable(): bool
+    {
+        return ($this->product_type ?? 'simple') === 'variable';
+    }
+
+    public function getMinPriceAttribute(): float
+    {
+        if ($this->isVariable()) {
+            $min = $this->enabledVariations->min(fn ($v) => (float) ($v->sale_price ?: $v->regular_price ?: 0));
+            if ($min !== null && $min > 0) {
+                return (float) $min;
+            }
+        }
+
+        return (float) ($this->sale_price ?: $this->price ?: 0);
+    }
+
+    public function getMaxPriceAttribute(): float
+    {
+        if ($this->isVariable()) {
+            $max = $this->enabledVariations->max(fn ($v) => (float) ($v->sale_price ?: $v->regular_price ?: 0));
+            if ($max !== null && $max > 0) {
+                return (float) $max;
+            }
+        }
+
+        return (float) ($this->sale_price ?: $this->price ?: 0);
+    }
+
+    public function hasPriceRange(): bool
+    {
+        if (! $this->isVariable()) {
+            return false;
+        }
+
+        $min = $this->min_price;
+        $max = $this->max_price;
+
+        return $min > 0 && $max > 0 && round($min, 2) !== round($max, 2);
+    }
+
+    public function getFormattedPriceRange(): string
+    {
+        if ($this->isVariable()) {
+            $min = $this->min_price;
+            $max = $this->max_price;
+
+            if ($min > 0 && $max > 0 && round($min, 2) !== round($max, 2)) {
+                return \App\Support\Money::format($min) . ' – ' . \App\Support\Money::format($max);
+            }
+
+            if ($min > 0) {
+                return \App\Support\Money::format($min);
+            }
+        }
+
+        return \App\Support\Money::format($this->sale_price);
+    }
+
+    public function syncPriceAndStockFromVariations(): void
+    {
+        if (! $this->isVariable()) {
+            return;
+        }
+
+        $variations = $this->variations()->where('is_enabled', true)->get();
+        if ($variations->isEmpty()) {
+            return;
+        }
+
+        $minSale = $variations->min(fn ($v) => (float) ($v->sale_price ?: $v->regular_price ?: 0));
+        $maxRegular = $variations->max(fn ($v) => (float) ($v->regular_price ?: $v->sale_price ?: 0));
+        $totalStock = $variations->sum('stock_quantity');
+
+        $this->sale_price = $minSale ?: $this->sale_price;
+        $this->regular_price = $maxRegular ?: $this->regular_price;
+        $this->price = $this->sale_price;
+        $this->stock_quantity = $totalStock;
+        $this->in_stock = $totalStock > 0 || $variations->contains(fn ($v) => ! $v->manage_stock);
+
+        $this->saveQuietly();
+    }
 }
+
