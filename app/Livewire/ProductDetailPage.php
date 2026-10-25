@@ -56,7 +56,8 @@ class ProductDetailPage extends Component
 
     public function mount(string $slug): void
     {
-        $this->product = Product::where('slug', $slug)
+        $this->product = Product::storefront()
+            ->where('slug', $slug)
             ->with([
                 'approvedReviews.user',
                 'category',

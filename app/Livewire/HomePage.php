@@ -32,6 +32,9 @@ class HomePage extends Component
             'timer' => 2500,
             'toast' => true,
         ]);
+
+        // Keep the Swiper-managed product card DOM intact after a cart update.
+        $this->skipRender();
     }
 
     public function toggleWishlist(int $productId): void
@@ -77,64 +80,38 @@ class HomePage extends Component
     {
         $sliders = HomeSlider::active()->get();
 
-        $new_arrivals = Product::query()
+        $new_arrivals = Product::storefront()
             ->with(['brand', 'category'])
             ->withAvg('approvedReviews', 'rating')
             ->withCount('approvedReviews')
-            ->where('is_active', true)
             ->latest()
             ->take(8)
             ->get();
 
-        $sale_products = Product::query()
+        $featured_products = Product::storefront()
             ->with(['brand', 'category'])
             ->withAvg('approvedReviews', 'rating')
             ->withCount('approvedReviews')
-            ->where('is_active', true)
-            ->where('on_sale', true)
+            ->where('is_featured', true)
             ->latest()
             ->take(12)
             ->get();
 
-        $trending_products = Product::query()
+        $trending_products = Product::storefront()
             ->with(['brand', 'category'])
             ->withAvg('approvedReviews', 'rating')
             ->withCount('approvedReviews')
-            ->where('is_active', true)
             ->where('is_featured', true)
             ->take(3)
             ->get();
 
-        if ($trending_products->count() < 3) {
-            $trending_products = Product::query()
-                ->with(['brand', 'category'])
-                ->withAvg('approvedReviews', 'rating')
-                ->withCount('approvedReviews')
-                ->where('is_active', true)
-                ->latest()
-                ->take(3)
-                ->get();
-        }
-
-        $top_selling_products = Product::query()
+        $top_selling_products = Product::storefront()
             ->with(['brand', 'category'])
             ->withAvg('approvedReviews', 'rating')
             ->withCount('approvedReviews')
-            ->where('is_active', true)
             ->where('on_sale', true)
             ->take(3)
             ->get();
-
-        if ($top_selling_products->count() < 3) {
-            $top_selling_products = Product::query()
-                ->with(['brand', 'category'])
-                ->withAvg('approvedReviews', 'rating')
-                ->withCount('approvedReviews')
-                ->where('is_active', true)
-                ->oldest()
-                ->take(3)
-                ->get();
-        }
 
         $culturalClothing = Category::query()
             ->where(fn ($query) => $query
@@ -146,7 +123,6 @@ class HomePage extends Component
             ? $culturalClothing->children()
                 ->where('is_active', true)
                 ->orderBy('name')
-                ->take(3)
                 ->get()
             : collect();
 
@@ -157,7 +133,7 @@ class HomePage extends Component
         return view('livewire.home-page', compact(
             'sliders',
             'new_arrivals',
-            'sale_products',
+            'featured_products',
             'wishlistProductIds',
             'trending_products',
             'top_selling_products',

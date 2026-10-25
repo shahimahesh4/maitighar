@@ -116,15 +116,14 @@ class ProductsPage extends Component
 
     public function render(): View
     {
-        $highestPrice = (float) Product::query()->where('is_active', true)->max('sale_price');
+        $highestPrice = (float) Product::storefront()->max('sale_price');
         $priceMaximum = max(50, (int) (ceil($highestPrice / 10) * 10));
         if ((float) $this->price_range > $priceMaximum) {
             $this->price_range = $priceMaximum;
         }
 
-        $products = Product::query()
-            ->withAvg('approvedReviews', 'rating')
-            ->where('is_active', true);
+        $products = Product::storefront()
+            ->withAvg('approvedReviews', 'rating');
 
         $brands = Brand::where('is_active', 1)->get(['id', 'name', 'slug']);
 

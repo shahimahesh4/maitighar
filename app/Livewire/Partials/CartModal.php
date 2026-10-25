@@ -6,7 +6,6 @@ use App\Helpers\CartManagement;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use Illuminate\View\View;
-use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CartModal extends Component
@@ -21,10 +20,9 @@ class CartModal extends Component
 
     public int $total_items = 0;
 
-    #[On('product-added-to-cart')]
     public function showModal(int $product_id, int $quantity = 1, ?int $variation_id = null): void
     {
-        $prod = Product::find($product_id);
+        $prod = Product::storefront()->find($product_id);
         if (! $prod) {
             return;
         }

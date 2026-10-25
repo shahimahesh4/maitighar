@@ -19,7 +19,7 @@ Route::prefix('v1')->group(function (): void {
     })->name('api.v1.settings');
 
     Route::get('/products', function () {
-        return Product::query()->where('is_active', true)->latest()->paginate(24)->through(fn (Product $product): array => [
+        return Product::storefront()->latest()->paginate(24)->through(fn (Product $product): array => [
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,

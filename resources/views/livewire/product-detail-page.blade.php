@@ -163,7 +163,7 @@
                             <p class="text-3xl font-extrabold text-[#EC0205]">
                                 {{ \App\Support\Money::format($product->sale_price) }}
                             </p>
-                            @if($product->discount_percentage)
+                            @if($product->on_sale && $product->discount_percentage)
                                 <del class="pb-1 text-base font-semibold text-gray-400">{{ \App\Support\Money::format($product->regular_price) }}</del>
                                 <span class="mb-1 rounded-full bg-red-50 px-2 py-1 text-xs font-bold text-red-600">
                                     {{ $product->discount_percentage }}% OFF

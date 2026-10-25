@@ -8,7 +8,7 @@
             <nav class="kba-catalog-breadcrumb" aria-label="Breadcrumb">
                 <a wire:navigate href="/"><i class="bi bi-house-door-fill mr-1.5"></i>Home</a>
                 <i class="bi bi-chevron-right text-[10px] opacity-60"></i>
-                <span class="text-white font-medium">Products</span>
+                <span class="font-medium text-slate-700">Products</span>
             </nav>
             <h1 id="catalog-title">All Products</h1>
             <p>Explore authentic Nepali handicrafts, cultural treasures, and heritage creations handmade with love.</p>
@@ -131,7 +131,7 @@
                     @foreach ($products as $product)
                         <article class="kba-product-card" wire:key="product-card-{{ $product->id }}">
                             <div class="kba-product-image-wrap">
-                                @if($product->discount_percentage)
+                                @if($product->on_sale && $product->discount_percentage)
                                     <span class="kba-sale-badge">-{{ $product->discount_percentage }}%</span>
                                 @elseif($product->on_sale)
                                     <span class="kba-sale-badge">Sale</span>
@@ -182,7 +182,7 @@
                                 <div class="kba-price">
                                     @if($product->isVariable())
                                         <strong>{{ $product->getFormattedPriceRange() }}</strong>
-                                    @elseif($product->discount_percentage)
+                                    @elseif($product->on_sale && $product->discount_percentage)
                                         <del>{{ \App\Support\Money::format($product->regular_price) }}</del>
                                         <strong>{{ \App\Support\Money::format($product->sale_price) }}</strong>
                                     @else

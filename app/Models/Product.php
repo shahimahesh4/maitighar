@@ -60,6 +60,10 @@ class Product extends Model
         'sale_price' => 'decimal:2',
         'discount_percentage' => 'integer',
         'stock_quantity' => 'integer',
+        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
+        'in_stock' => 'boolean',
+        'on_sale' => 'boolean',
     ];
 
     /**
@@ -162,8 +166,17 @@ class Product extends Model
                 : null;
             $product->price = $product->sale_price;
             $product->old_price = $product->discount_percentage ? $product->regular_price : null;
-            $product->on_sale = $product->discount_percentage !== null;
         });
+    }
+
+    /**
+     * Limit a query to products that customers can browse and purchase.
+     */
+    public function scopeStorefront($query)
+    {
+        return $query
+            ->where('is_active', true)
+            ->where('in_stock', true);
     }
 
     public function resolveImageUrl(?string $image): string

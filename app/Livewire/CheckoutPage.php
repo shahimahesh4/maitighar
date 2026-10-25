@@ -256,7 +256,7 @@ class CheckoutPage extends Component
         $validatedCartItems = [];
         $recalculatedSubtotal = 0.0;
         foreach ($this->cart_items as $item) {
-            $product = Product::where('id', $item['product_id'])->where('is_active', true)->first();
+            $product = Product::storefront()->where('id', $item['product_id'])->first();
             if (! $product) {
                 session()->flash('error', 'One or more items in your cart are no longer available.');
 

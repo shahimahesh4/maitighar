@@ -36,7 +36,7 @@
                         <!-- Left Column: Product Images -->
                         <div class="flex flex-col gap-3">
                             <div class="relative w-full aspect-square rounded-2xl bg-slate-50 border border-slate-100 overflow-hidden flex items-center justify-center p-4">
-                                @if($product->discount_percentage)
+                                @if($product->on_sale && $product->discount_percentage)
                                     <span class="absolute top-3 left-3 bg-[#EC0205] text-white text-[11px] font-extrabold uppercase px-2.5 py-1 rounded-full shadow-sm z-10">
                                         -{{ $product->discount_percentage }}%
                                     </span>

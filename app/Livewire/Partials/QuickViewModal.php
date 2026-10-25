@@ -27,7 +27,8 @@ class QuickViewModal extends Component
     #[On('open-quick-view')]
     public function openModal(int $productId): void
     {
-        $product = Product::with(['category', 'brand'])
+        $product = Product::storefront()
+            ->with(['category', 'brand'])
             ->withAvg('approvedReviews', 'rating')
             ->find($productId);
 

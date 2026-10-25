@@ -153,6 +153,102 @@ export function initRevSliders() {
     });
 }
 
+/**
+ * Use the same Swiper slide engine as the homepage hero for Cultural Clothing cards.
+ */
+export function initCulturalCategoryCarousels() {
+    document.querySelectorAll('.kba-cultural-swiper:not(.cultural-swiper-initialized)').forEach((container) => {
+        const slideCount = container.querySelectorAll('.swiper-slide').length;
+
+        if (slideCount < 2) return;
+
+        container.classList.add('cultural-swiper-initialized');
+
+        const region = container.closest('.kba-cultural-collection__products');
+        const shouldLoop = slideCount > 3;
+        const autoplayDelay = parseInt(container.dataset.autoplaySpeed, 10) || 3200;
+        const transitionSpeed = parseInt(container.dataset.transitionSpeed, 10) || 800;
+
+        container.__culturalSwiper = new Swiper(container, {
+            modules: [Autoplay, Navigation, Keyboard, A11y],
+            slidesPerView: 3,
+            spaceBetween: 22,
+            speed: transitionSpeed,
+            loop: shouldLoop,
+            grabCursor: shouldLoop,
+            keyboard: {
+                enabled: true,
+                onlyInViewport: true,
+            },
+            autoplay: shouldLoop && !window.matchMedia('(prefers-reduced-motion: reduce)').matches ? {
+                delay: autoplayDelay,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            } : false,
+            navigation: {
+                nextEl: region?.querySelector('.kba-cultural-carousel-nav--next'),
+                prevEl: region?.querySelector('.kba-cultural-carousel-nav--previous'),
+            },
+            breakpoints: {
+                0: { slidesPerView: 1.35, spaceBetween: 12 },
+                721: { slidesPerView: 3, spaceBetween: 14 },
+                1101: { slidesPerView: 3, spaceBetween: 22 },
+            },
+        });
+    });
+}
+
+/**
+ * New Arrivals shares the same Swiper-based slide experience as category cards.
+ */
+export function initProductCarousels() {
+    document.querySelectorAll('.kba-product-swiper:not(.product-swiper-initialized), .kba-sale-product-swiper:not(.product-swiper-initialized)').forEach((container) => {
+        const slideCount = container.querySelectorAll('.swiper-slide').length;
+
+        if (slideCount < 2) return;
+
+        container.classList.add('product-swiper-initialized');
+
+        const region = container.closest('.kba-product-carousel');
+        const shouldAutoSlide = slideCount > 4;
+        const autoplayDelay = parseInt(container.dataset.autoplaySpeed, 10) || 4000;
+        const transitionSpeed = parseInt(container.dataset.transitionSpeed, 10) || 800;
+
+        container.__productSwiper = new Swiper(container, {
+            modules: [Autoplay, Navigation, Keyboard, A11y],
+            slidesPerView: 4,
+            spaceBetween: 24,
+            speed: transitionSpeed,
+            // Product cards contain Livewire controls. Rewind keeps the continuous
+            // carousel experience without cloning or moving those interactive nodes.
+            loop: false,
+            rewind: shouldAutoSlide,
+            grabCursor: shouldAutoSlide,
+            preventClicks: false,
+            preventClicksPropagation: false,
+            touchStartPreventDefault: false,
+            keyboard: {
+                enabled: true,
+                onlyInViewport: true,
+            },
+            autoplay: shouldAutoSlide && !window.matchMedia('(prefers-reduced-motion: reduce)').matches ? {
+                delay: autoplayDelay,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            } : false,
+            navigation: {
+                nextEl: region?.querySelector('.kba-product-carousel-nav--next'),
+                prevEl: region?.querySelector('.kba-product-carousel-nav--previous'),
+            },
+            breakpoints: {
+                0: { slidesPerView: 1.15, spaceBetween: 13 },
+                821: { slidesPerView: 3, spaceBetween: 24 },
+                1025: { slidesPerView: 4, spaceBetween: 24 },
+            },
+        });
+    });
+}
+
 // Global helper for preview modal and external controls
 window.replaySliderAnimation = function (containerEl) {
     const container = typeof containerEl === 'string' ? document.querySelector(containerEl) : containerEl;
@@ -185,16 +281,26 @@ window.sliderNext = function (containerEl) {
 // Auto-run on DOM ready and Livewire navigation
 if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initRevSliders);
+        document.addEventListener('DOMContentLoaded', () => {
+            initRevSliders();
+            initCulturalCategoryCarousels();
+            initProductCarousels();
+        });
     } else {
         initRevSliders();
+        initCulturalCategoryCarousels();
+        initProductCarousels();
     }
 
     document.addEventListener('livewire:navigated', () => {
         initRevSliders();
+        initCulturalCategoryCarousels();
+        initProductCarousels();
     });
 
     document.addEventListener('livewire:initialized', () => {
         initRevSliders();
+        initCulturalCategoryCarousels();
+        initProductCarousels();
     });
 }

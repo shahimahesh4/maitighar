@@ -85,7 +85,7 @@
             <!-- Logo & Brand -->
             <div class="kba-store-logo flex items-center flex-shrink-0">
                 <a wire:navigate href="{{ route('index') }}" class="flex items-center" aria-label="Maitighar home">
-                    <img src="{{ asset('images/logo.png') }}" alt="Maitighar" class="h-10 sm:h-11 md:h-12 lg:h-14 xl:h-16 w-auto object-contain transition-all drop-shadow-sm hover:scale-105 duration-200">
+                    <img src="{{ asset('images/logo.png') }}" alt="Maitighar" class="h-10 sm:h-11 md:h-12 lg:h-14 xl:h-16 w-auto object-contain transition-all hover:scale-105 duration-200">
                 </a>
             </div>
 

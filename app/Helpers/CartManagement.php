@@ -40,7 +40,7 @@ class CartManagement
                 2
             );
         } else {
-            $product = Product::find($product_id);
+            $product = Product::storefront()->find($product_id);
             if (! $product) {
                 return self::getTotalQuantity();
             }

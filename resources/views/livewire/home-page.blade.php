@@ -41,7 +41,7 @@
         </div>
     </section>
 
-    <section class="kba-products-section" id="gallery" x-data="{ isScrolling: false, autoTimer: null, init() { this.$nextTick(() => this.startAuto('newArrivalsTrack')); }, startAuto(ref) { this.stopAuto(); const track = this.$refs[ref]; if (!track || track.scrollWidth <= track.clientWidth || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; this.autoTimer = window.setInterval(() => this.scrollProducts(ref, 1), 4000); }, stopAuto() { if (this.autoTimer) { window.clearInterval(this.autoTimer); this.autoTimer = null; } }, scrollProducts(ref, direction) { if (this.isScrolling) return; const track = this.$refs[ref]; const card = track.querySelector('.kba-product-card'); if (!card) return; const max = track.scrollWidth - track.clientWidth; const start = track.scrollLeft; if (direction > 0 && start >= max - 2) { track.scrollTo({ left: 0, behavior: 'smooth' }); return; } this.isScrolling = true; const gap = parseFloat(getComputedStyle(track).gap) || 0; const target = Math.max(0, Math.min(max, start + ((card.getBoundingClientRect().width + gap) * direction))); const startedAt = performance.now(); const animate = (now) => { const progress = Math.min((now - startedAt) / 420, 1); track.scrollLeft = start + ((target - start) * (1 - Math.pow(1 - progress, 4))); if (progress < 1) requestAnimationFrame(animate); else this.isScrolling = false; }; requestAnimationFrame(animate); } }" @mouseenter="stopAuto()" @mouseleave="startAuto('newArrivalsTrack')" @focusin="stopAuto()" @focusout="startAuto('newArrivalsTrack')">
+    <section class="kba-products-section" id="gallery">
         <div class="kba-section-heading">
             <span></span>
             <h2>New Arrivals</h2>
@@ -49,12 +49,13 @@
         </div>
 
         <div class="kba-product-carousel">
-            <button type="button" class="kba-product-carousel-nav kba-product-carousel-nav--previous" @click="scrollProducts('newArrivalsTrack', -1)" aria-label="Show previous new arrivals">
+            <button type="button" class="kba-product-carousel-nav kba-product-carousel-nav--previous" aria-label="Show previous new arrivals">
                 <i class="bi bi-chevron-left" aria-hidden="true"></i>
             </button>
-            <div x-ref="newArrivalsTrack" class="kba-product-grid kba-carousel-track" tabindex="0" aria-label="New arrival products">
+            <div class="swiper kba-product-swiper" data-autoplay-speed="4000" data-transition-speed="800" aria-label="New arrival products">
+                <div class="swiper-wrapper kba-product-grid kba-carousel-track">
             @forelse ($new_arrivals as $product)
-                <article class="kba-product-card" wire:key="new-arrival-product-{{ $product->id }}">
+                <article class="swiper-slide kba-product-card" wire:key="new-arrival-product-{{ $product->id }}">
                     <div class="kba-product-image-wrap">
                         @if($product->on_sale)
                             <span class="kba-sale-badge">-{{ (($product->id % 3) + 1) * 10 + 3 }}%</span>
@@ -94,7 +95,7 @@
                         <div class="kba-price">
                             @if($product->isVariable())
                                 <strong>{{ $product->getFormattedPriceRange() }}</strong>
-                            @elseif($product->discount_percentage)
+                            @elseif($product->on_sale && $product->discount_percentage)
                                 <del>{{ \App\Support\Money::format($product->regular_price) }}</del>
                                 <strong>{{ \App\Support\Money::format($product->sale_price) }}</strong>
                             @else
@@ -106,8 +107,9 @@
             @empty
                 <div class="kba-empty-products"><i class="bi bi-gem"></i><p>New handcrafted products are being prepared.</p><a wire:navigate href="{{ route('all-products') }}">Browse the shop</a></div>
             @endforelse
+                </div>
             </div>
-            <button type="button" class="kba-product-carousel-nav kba-product-carousel-nav--next" @click="scrollProducts('newArrivalsTrack', 1)" aria-label="Show more new arrivals">
+            <button type="button" class="kba-product-carousel-nav kba-product-carousel-nav--next" aria-label="Show more new arrivals">
                 <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </button>
         </div>
@@ -117,77 +119,57 @@
         </div>
     </section>
 
-    <section class="kba-cultural-collection" aria-labelledby="cultural-collection-title">
+    <section class="kba-cultural-collection kba-cultural-collection--women" aria-labelledby="cultural-collection-title">
         <div class="kba-cultural-collection__copy">
             <p><span></span> Traditional Nepali <span></span></p>
-            <h2 id="cultural-collection-title">Cultural <em>Dress</em></h2>
+            <h2 id="cultural-collection-title">Cultural <em>Dress</em><span>For Women</span></h2>
             <div class="kba-cultural-collection__divider"><i></i></div>
-            <h3>Rooted in Heritage,<br>Worn with Pride.</h3>
+            <h3>Designed to celebrate heritage with modern grace, each piece is finished with the care of Nepali artisans.</h3>
             <a wire:navigate href="{{ route('all-products') }}" class="kba-cultural-collection__cta">Explore Collection <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
         </div>
 
-        <div class="kba-cultural-collection__products" aria-label="Cultural Clothing subcategories">
+        <div class="kba-cultural-collection__products"
+             aria-label="Cultural Clothing subcategories">
+            @if ($cultural_subcategories->count() > 3)
+                <button type="button" class="kba-cultural-carousel-nav kba-cultural-carousel-nav--previous" aria-label="Show previous Cultural Clothing subcategories">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                </button>
+            @endif
+            <div class="swiper kba-cultural-swiper" data-autoplay-speed="3200" data-transition-speed="800">
+                <div class="swiper-wrapper kba-cultural-collection__track">
             @foreach ($cultural_subcategories as $subcategory)
-                <a wire:navigate href="{{ route('all-products', ['selected_categories' => [$subcategory->id]]) }}" class="kba-cultural-product" wire:key="cultural-subcategory-{{ $subcategory->id }}">
-                    <img src="{{ $subcategory->getImageUrl() }}" alt="{{ $subcategory->name }}" loading="lazy" decoding="async">
+                <a wire:navigate href="{{ route('all-products', ['selected_categories' => [$subcategory->id]]) }}" class="swiper-slide kba-cultural-product" wire:key="cultural-subcategory-{{ $subcategory->id }}">
+                    <div class="kba-cultural-product__image">
+                        <img src="{{ $subcategory->getImageUrl() }}" alt="{{ $subcategory->name }}" loading="lazy" decoding="async">
+                    </div>
                     <span>{{ $subcategory->name }}</span>
                 </a>
             @endforeach
-        </div>
-    </section>
-
-    <section class="kba-related-showcase" id="related-products" aria-labelledby="related-products-title">
-        <div class="kba-related-showcase__inner">
-            <aside class="kba-related-intro">
-                <span>Related products</span>
-                <h2 id="related-products-title">You May<br><em>Also Like</em></h2>
-                <p>Explore more handcrafted treasures from our Nepali collection.</p>
-                <ul>
-                    <li><i class="bi bi-flower1"></i><span><strong>Authentic Craft</strong><small>100% Nepali Handmade</small></span></li>
-                    <li><i class="bi bi-gem"></i><span><strong>Premium Quality</strong><small>Timeless &amp; durable</small></span></li>
-                    <li><i class="bi bi-gift"></i><span><strong>Perfect for Gifting</strong><small>Share the Nepali heritage</small></span></li>
-                </ul>
-            </aside>
-            <div class="kba-related-products">
-                <a wire:navigate href="{{ route('all-products') }}" class="kba-related-view-all">View All Products <i class="bi bi-arrow-right"></i></a>
-                <div class="kba-related-grid">
-                    @forelse ($new_arrivals->take(4) as $product)
-                        <article class="kba-related-card" wire:key="related-product-{{ $product->id }}">
-                            <div class="kba-related-card__image">
-                                @if($product->on_sale)<span>-{{ (($product->id % 3) + 1) * 10 + 3 }}%</span>@endif
-                                <button type="button" wire:click.prevent="toggleWishlist({{ $product->id }})" class="{{ in_array($product->id, $wishlistProductIds ?? []) ? 'is-active' : '' }}" aria-label="Wishlist {{ $product->name }}"><i class="bi {{ in_array($product->id, $wishlistProductIds ?? []) ? 'bi-heart-fill' : 'bi-heart' }}"></i></button>
-                                <a wire:navigate href="{{ route('product-details', $product->slug) }}"><img src="{{ $product->getThumbnailUrl() }}" alt="{{ $product->name }}" loading="lazy" decoding="async"></a>
-                            </div>
-                            <div class="kba-related-card__body">
-                                <a wire:navigate href="{{ route('product-details', $product->slug) }}">{{ $product->name }}</a>
-                                @php $cardRating = round((float) ($product->average_rating ?: 5)); @endphp
-                                <div class="kba-related-rating" role="img" aria-label="Rated {{ $cardRating }} out of 5">@for($star = 1; $star <= 5; $star++)<i class="bi {{ $star <= $cardRating ? 'bi-star-fill' : 'bi-star' }}"></i>@endfor <small>({{ $product->approved_reviews_count ?? 0 }})</small></div>
-                                <div class="kba-related-price">@if($product->isVariable())<strong>{{ $product->getFormattedPriceRange() }}</strong>@elseif($product->discount_percentage)<del>{{ \App\Support\Money::format($product->regular_price) }}</del><strong>{{ \App\Support\Money::format($product->sale_price) }}</strong>@else<strong>{{ \App\Support\Money::format($product->sale_price) }}</strong>@endif</div>
-                                <button type="button" wire:click.prevent="addToCart({{ $product->id }})"><i wire:loading.remove wire:target="addToCart({{ $product->id }})" class="bi bi-cart3"></i><i wire:loading wire:target="addToCart({{ $product->id }})" class="bi bi-arrow-repeat kba-spin"></i> Add to Cart</button>
-                            </div>
-                        </article>
-                    @empty
-                        <div class="kba-empty-products"><i class="bi bi-gem"></i><p>New handcrafted products are being prepared.</p><a wire:navigate href="{{ route('all-products') }}">Browse the shop</a></div>
-                    @endforelse
                 </div>
             </div>
+            @if ($cultural_subcategories->count() > 3)
+                <button type="button" class="kba-cultural-carousel-nav kba-cultural-carousel-nav--next" aria-label="Show more Cultural Clothing subcategories">
+                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                </button>
+            @endif
         </div>
     </section>
 
-    <section class="kba-products-section kba-sale-section" id="on-sale" x-data="{ isScrolling: false, autoTimer: null, init() { this.$nextTick(() => this.startAuto('saleProductsTrack')); }, startAuto(ref) { this.stopAuto(); const track = this.$refs[ref]; if (!track || track.scrollWidth <= track.clientWidth || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; this.autoTimer = window.setInterval(() => this.scrollProducts(ref, 1), 4000); }, stopAuto() { if (this.autoTimer) { window.clearInterval(this.autoTimer); this.autoTimer = null; } }, scrollProducts(ref, direction) { if (this.isScrolling) return; const track = this.$refs[ref]; const card = track.querySelector('.kba-product-card'); if (!card) return; const max = track.scrollWidth - track.clientWidth; const start = track.scrollLeft; if (direction > 0 && start >= max - 2) { track.scrollTo({ left: 0, behavior: 'smooth' }); return; } this.isScrolling = true; const gap = parseFloat(getComputedStyle(track).gap) || 0; const target = Math.max(0, Math.min(max, start + ((card.getBoundingClientRect().width + gap) * direction))); const startedAt = performance.now(); const animate = (now) => { const progress = Math.min((now - startedAt) / 420, 1); track.scrollLeft = start + ((target - start) * (1 - Math.pow(1 - progress, 4))); if (progress < 1) requestAnimationFrame(animate); else this.isScrolling = false; }; requestAnimationFrame(animate); } }" @mouseenter="stopAuto()" @mouseleave="startAuto('saleProductsTrack')" @focusin="stopAuto()" @focusout="startAuto('saleProductsTrack')">
+    <section class="kba-products-section kba-sale-section" id="on-sale">
         <div class="kba-section-heading">
             <span></span>
-            <h2>On-Sale Products</h2>
+            <h2>Featured Products</h2>
             <span></span>
         </div>
 
         <div class="kba-product-carousel">
-            <button type="button" class="kba-product-carousel-nav kba-product-carousel-nav--previous" @click="scrollProducts('saleProductsTrack', -1)" aria-label="Show previous sale products">
+            <button type="button" class="kba-product-carousel-nav kba-product-carousel-nav--previous" aria-label="Show previous sale products">
                 <i class="bi bi-chevron-left" aria-hidden="true"></i>
             </button>
-            <div x-ref="saleProductsTrack" class="kba-product-grid kba-carousel-track" tabindex="0" aria-label="Sale products">
-            @forelse ($sale_products as $product)
-                <article class="kba-product-card" wire:key="sale-product-{{ $product->id }}">
+            <div class="swiper kba-sale-product-swiper" data-autoplay-speed="4000" data-transition-speed="800" aria-label="On-sale products">
+                <div class="swiper-wrapper kba-product-grid kba-carousel-track">
+            @forelse ($featured_products as $product)
+                <article class="swiper-slide kba-product-card" wire:key="sale-product-{{ $product->id }}">
                     <div class="kba-product-image-wrap">
                         <span class="kba-sale-badge">-{{ (($product->id % 3) + 1) * 10 + 3 }}%</span>
                         <a wire:navigate href="{{ route('product-details', $product->slug) }}" class="kba-product-image">
@@ -248,7 +230,7 @@
                 </article>
             @empty
                 @foreach($new_arrivals->where('on_sale', true)->take(2) as $product)
-                    <article class="kba-product-card" wire:key="fallback-sale-{{ $product->id }}">
+                    <article class="swiper-slide kba-product-card" wire:key="fallback-sale-{{ $product->id }}">
                         <div class="kba-product-image-wrap">
                             <span class="kba-sale-badge">Sale</span>
                             <a wire:navigate href="{{ route('product-details', $product->slug) }}" class="kba-product-image">
@@ -275,14 +257,88 @@
                     </article>
                 @endforeach
             @endforelse
+                </div>
             </div>
-            <button type="button" class="kba-product-carousel-nav kba-product-carousel-nav--next" @click="scrollProducts('saleProductsTrack', 1)" aria-label="Show more sale products">
+            <button type="button" class="kba-product-carousel-nav kba-product-carousel-nav--next" aria-label="Show more sale products">
                 <i class="bi bi-chevron-right" aria-hidden="true"></i>
             </button>
         </div>
 
         <div class="kba-shop-all-wrap">
             <a wire:navigate href="{{ route('all-products') }}" class="kba-shop-all">View All Products <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </section>
+
+    <section class="kba-cultural-collection kba-cultural-collection--mens" aria-labelledby="cultural-collection-repeat-title">
+        <div class="kba-cultural-collection__copy">
+            <p><span></span> Traditional Nepali <span></span></p>
+            <h2 id="cultural-collection-repeat-title">Cultural <em>Dress</em><span>For Men</span></h2>
+            <div class="kba-cultural-collection__divider"><i></i></div>
+            <h3>Crafted for timeless presence, each piece carries the distinction of Nepali tradition and the confidence of modern style.</h3>
+            <a wire:navigate href="{{ route('all-products') }}" class="kba-cultural-collection__cta">Explore Collection <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </div>
+
+        <div class="kba-cultural-collection__products" aria-label="Cultural Clothing subcategories">
+            @if ($cultural_subcategories->count() > 3)
+                <button type="button" class="kba-cultural-carousel-nav kba-cultural-carousel-nav--previous" aria-label="Show previous Cultural Clothing subcategories">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                </button>
+            @endif
+            <div class="swiper kba-cultural-swiper" data-autoplay-speed="3200" data-transition-speed="800">
+                <div class="swiper-wrapper kba-cultural-collection__track">
+                    @foreach ($cultural_subcategories as $subcategory)
+                        <a wire:navigate href="{{ route('all-products', ['selected_categories' => [$subcategory->id]]) }}" class="swiper-slide kba-cultural-product" wire:key="cultural-subcategory-after-sale-{{ $subcategory->id }}">
+                            <div class="kba-cultural-product__image">
+                                <img src="{{ $subcategory->getImageUrl() }}" alt="{{ $subcategory->name }}" loading="lazy" decoding="async">
+                            </div>
+                            <span>{{ $subcategory->name }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+            @if ($cultural_subcategories->count() > 3)
+                <button type="button" class="kba-cultural-carousel-nav kba-cultural-carousel-nav--next" aria-label="Show more Cultural Clothing subcategories">
+                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                </button>
+            @endif
+        </div>
+    </section>
+
+    <section class="kba-related-showcase" id="related-products" aria-labelledby="related-products-title">
+        <div class="kba-related-showcase__inner">
+            <aside class="kba-related-intro">
+                <span>Related products</span>
+                <h2 id="related-products-title">You May<br><em>Also Like</em></h2>
+                <p>Explore more handcrafted treasures from our Nepali collection.</p>
+                <ul>
+                    <li><i class="bi bi-flower1"></i><span><strong>Authentic Craft</strong><small>100% Nepali Handmade</small></span></li>
+                    <li><i class="bi bi-gem"></i><span><strong>Premium Quality</strong><small>Timeless &amp; durable</small></span></li>
+                    <li><i class="bi bi-gift"></i><span><strong>Perfect for Gifting</strong><small>Share the Nepali heritage</small></span></li>
+                </ul>
+            </aside>
+            <div class="kba-related-products">
+                <a wire:navigate href="{{ route('all-products') }}" class="kba-related-view-all">View All Products <i class="bi bi-arrow-right"></i></a>
+                <div class="kba-related-grid">
+                    @forelse ($new_arrivals->take(4) as $product)
+                        <article class="kba-related-card" wire:key="related-product-{{ $product->id }}">
+                            <div class="kba-related-card__image">
+                                @if($product->on_sale)<span>-{{ (($product->id % 3) + 1) * 10 + 3 }}%</span>@endif
+                                <button type="button" wire:click.prevent="toggleWishlist({{ $product->id }})" class="{{ in_array($product->id, $wishlistProductIds ?? []) ? 'is-active' : '' }}" aria-label="Wishlist {{ $product->name }}"><i class="bi {{ in_array($product->id, $wishlistProductIds ?? []) ? 'bi-heart-fill' : 'bi-heart' }}"></i></button>
+                                <a wire:navigate href="{{ route('product-details', $product->slug) }}"><img src="{{ $product->getThumbnailUrl() }}" alt="{{ $product->name }}" loading="lazy" decoding="async"></a>
+                            </div>
+                            <div class="kba-related-card__body">
+                                <a wire:navigate href="{{ route('product-details', $product->slug) }}">{{ $product->name }}</a>
+                                @php $cardRating = round((float) ($product->average_rating ?: 5)); @endphp
+                                <div class="kba-related-rating" role="img" aria-label="Rated {{ $cardRating }} out of 5">@for($star = 1; $star <= 5; $star++)<i class="bi {{ $star <= $cardRating ? 'bi-star-fill' : 'bi-star' }}"></i>@endfor <small>({{ $product->approved_reviews_count ?? 0 }})</small></div>
+                                <div class="kba-related-price">@if($product->isVariable())<strong>{{ $product->getFormattedPriceRange() }}</strong>@elseif($product->on_sale && $product->discount_percentage)<del>{{ \App\Support\Money::format($product->regular_price) }}</del><strong>{{ \App\Support\Money::format($product->sale_price) }}</strong>@else<strong>{{ \App\Support\Money::format($product->sale_price) }}</strong>@endif</div>
+                                <button type="button" wire:click.prevent="addToCart({{ $product->id }})"><i wire:loading.remove wire:target="addToCart({{ $product->id }})" class="bi bi-cart3"></i><i wire:loading wire:target="addToCart({{ $product->id }})" class="bi bi-arrow-repeat kba-spin"></i> Add to Cart</button>
+                            </div>
+                        </article>
+                    @empty
+                        <div class="kba-empty-products"><i class="bi bi-gem"></i><p>New handcrafted products are being prepared.</p><a wire:navigate href="{{ route('all-products') }}">Browse the shop</a></div>
+                    @endforelse
+                </div>
+            </div>
         </div>
     </section>
 
@@ -303,7 +359,7 @@
                         @foreach($trending_products as $p)
                             <div class="flex items-center gap-3 py-3 first:pt-1 last:pb-1">
                                 <a wire:navigate href="{{ route('product-details', $p->slug) }}" class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-stone-100/80 dark:bg-slate-800/80 flex items-center justify-center p-2 flex-shrink-0 group overflow-hidden border border-stone-200/50">
-                                    @if($p->discount_percentage)
+                                    @if($p->on_sale && $p->discount_percentage)
                                         <span class="absolute top-1 left-1 bg-[#EC0205] text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm z-10 leading-none">
                                             -{{ $p->discount_percentage }}%
                                         </span>
@@ -323,7 +379,7 @@
                                         <span class="text-[10px] text-stone-400">({{ $p->approved_reviews_count ?: 9 }} Review{{ ($p->approved_reviews_count ?: 9) > 1 ? 's' : '' }})</span>
                                     </div>
                                     <div class="mt-1 flex items-baseline gap-1.5 whitespace-nowrap overflow-x-hidden">
-                                        @if($p->discount_percentage)
+                                        @if($p->on_sale && $p->discount_percentage)
                                             <span class="text-[11px] sm:text-xs font-bold text-[#EC0205] whitespace-nowrap leading-none tracking-tight">{{ \App\Support\Money::format($p->sale_price) }}</span>
                                             <del class="text-[10px] sm:text-[11px] font-normal text-stone-400 whitespace-nowrap leading-none tracking-tight">{{ \App\Support\Money::format($p->regular_price) }}</del>
                                         @else
@@ -366,7 +422,7 @@
                         @foreach($top_selling_products as $p)
                             <div class="flex items-center gap-3 py-3 first:pt-1 last:pb-1">
                                 <a wire:navigate href="{{ route('product-details', $p->slug) }}" class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-stone-100/80 dark:bg-slate-800/80 flex items-center justify-center p-2 flex-shrink-0 group overflow-hidden border border-stone-200/50">
-                                    @if($p->discount_percentage)
+                                    @if($p->on_sale && $p->discount_percentage)
                                         <span class="absolute top-1 left-1 bg-[#EC0205] text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-sm z-10 leading-none">
                                             -{{ $p->discount_percentage }}%
                                         </span>
@@ -386,7 +442,7 @@
                                         <span class="text-[10px] text-stone-400">({{ $p->approved_reviews_count ?: 8 }} Review{{ ($p->approved_reviews_count ?: 8) > 1 ? 's' : '' }})</span>
                                     </div>
                                     <div class="mt-1 flex items-baseline gap-1.5 whitespace-nowrap overflow-x-hidden">
-                                        @if($p->discount_percentage)
+                                        @if($p->on_sale && $p->discount_percentage)
                                             <span class="text-[11px] sm:text-xs font-bold text-[#EC0205] whitespace-nowrap leading-none tracking-tight">{{ \App\Support\Money::format($p->sale_price) }}</span>
                                             <del class="text-[10px] sm:text-[11px] font-normal text-stone-400 whitespace-nowrap leading-none tracking-tight">{{ \App\Support\Money::format($p->regular_price) }}</del>
                                         @else
