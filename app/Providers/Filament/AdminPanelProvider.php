@@ -39,8 +39,8 @@ class AdminPanelProvider extends PanelProvider
                 isRequired: app(CommunicationService::class)->emailVerificationEnabled(),
             )
             ->brandName('Maitighar')
-            ->brandLogo(asset('images/logo.png'))
-            ->darkModeBrandLogo(asset('images/logo.png'))
+            ->brandLogo(asset('images/logo.webp'))
+            ->darkModeBrandLogo(asset('images/logo.webp'))
             ->brandLogoHeight('3.5rem')
             ->favicon(asset('favicon.ico'))
             ->userMenuItems([

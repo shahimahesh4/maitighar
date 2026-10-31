@@ -1,5 +1,5 @@
 @push('head')
-    <link rel="preload" as="image" href="{{ asset('images/banners/palpali_dhaka_collection_banner.png') }}" fetchpriority="high">
+    <link rel="preload" as="image" href="{{ asset('images/banners/palpali_dhaka_collection_banner.webp') }}" fetchpriority="high">
 @endpush
 
 <div class="kba-home bg-[#f8fafc]/50">
@@ -399,7 +399,7 @@
                 <a wire:navigate 
                    href="{{ route('all-products') }}" 
                    class="group block relative w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-200/90 dark:border-slate-800 bg-[#e7d8c6]/20 flex-1 flex flex-col justify-center">
-                    <img src="{{ asset('images/banners/maitighar_meaningful_essentials_banner.jpg') }}" 
+                    <img src="{{ asset('images/banners/maitighar_meaningful_essentials_banner.webp') }}" 
                          alt="Maitighar - Meaningful Everyday Essentials" 
                          width="1024"
                          height="653"

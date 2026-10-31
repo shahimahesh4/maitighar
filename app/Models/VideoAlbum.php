@@ -40,7 +40,7 @@ class VideoAlbum extends Model
     public function getCoverUrlAttribute(): string
     {
         if ($this->cover_image) return $this->resolveFileUrl($this->cover_image);
-        return collect($this->videoItems())->pluck('thumbnail_url')->filter()->first() ?: asset('images/kba/about-us-academy.png');
+        return collect($this->videoItems())->pluck('thumbnail_url')->filter()->first() ?: asset('images/kba/about-us-academy.webp');
     }
 
     public function videoItems(): array
@@ -54,7 +54,7 @@ class VideoAlbum extends Model
                 return ['type' => 'youtube', 'title' => $title, 'source_url' => 'https://www.youtube-nocookie.com/embed/'.$id.'?autoplay=1&rel=0', 'thumbnail_url' => filled($video['thumbnail'] ?? null) ? $this->resolveFileUrl($video['thumbnail']) : 'https://i.ytimg.com/vi/'.$id.'/hqdefault.jpg'];
             }
             if (blank($video['video_file'] ?? null)) return null;
-            return ['type' => 'upload', 'title' => $title, 'source_url' => $this->resolveFileUrl($video['video_file']), 'thumbnail_url' => filled($video['thumbnail'] ?? null) ? $this->resolveFileUrl($video['thumbnail']) : asset('images/kba/about-us-academy.png')];
+            return ['type' => 'upload', 'title' => $title, 'source_url' => $this->resolveFileUrl($video['video_file']), 'thumbnail_url' => filled($video['thumbnail'] ?? null) ? $this->resolveFileUrl($video['thumbnail']) : asset('images/kba/about-us-academy.webp')];
         })->filter()->values()->all();
     }
 

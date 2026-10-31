@@ -141,7 +141,17 @@ class ProductVariation extends Model
                 return url($this->image);
             }
             if (str_starts_with($this->image, 'images/')) {
+                $webpImage = preg_replace('/\.(?:jpe?g|png)$/i', '.webp', $this->image);
+                if ($webpImage && is_file(public_path($webpImage))) {
+                    return asset($webpImage);
+                }
+
                 return asset($this->image);
+            }
+
+            $webpImage = preg_replace('/\.(?:jpe?g|png)$/i', '.webp', $this->image);
+            if ($webpImage && Storage::disk('public')->exists($webpImage)) {
+                return Storage::disk('public')->url($webpImage);
             }
 
             return Storage::disk('public')->url($this->image);

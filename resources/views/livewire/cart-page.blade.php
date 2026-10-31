@@ -5,12 +5,12 @@
             <i class="bi bi-chevron-right text-[9px] text-slate-300"></i><span class="font-bold text-slate-800">Shopping bag</span>
         </nav>
 
-        <header class="relative mb-7 overflow-hidden rounded-[26px] border border-blue-900/30 bg-gradient-to-r from-[#091b38] via-[#0C1E8C] to-[#071355] px-5 py-7 text-white shadow-[0_18px_45px_rgba(12,30,140,.18)] sm:px-8 sm:py-8">
-            <span class="pointer-events-none absolute -right-10 -top-24 h-60 w-60 rounded-full border border-white/10"></span>
-            <span class="pointer-events-none absolute -bottom-28 right-32 h-52 w-52 rounded-full border border-white/10"></span>
+        <header class="relative mb-7 overflow-hidden rounded-[26px] border border-slate-200 bg-white px-5 py-5 text-slate-900 shadow-[0_18px_45px_rgba(15,23,42,.08)] sm:px-8 sm:py-6">
+            <span class="pointer-events-none absolute -right-10 -top-24 h-60 w-60 rounded-full border border-slate-300/70"></span>
+            <span class="pointer-events-none absolute -bottom-28 right-32 h-52 w-52 rounded-full border border-slate-300/70"></span>
             <div class="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-                <div><p class="mb-2 text-[10px] font-extrabold uppercase tracking-[.22em] text-red-400">Your selection</p><h1 class="text-2xl font-extrabold tracking-tight sm:text-3xl">Shopping bag</h1><p class="mt-2 max-w-xl text-xs leading-5 text-white/75">Review your products, adjust quantities, and continue to secure checkout.</p></div>
-                @if(!empty($cart_items))<span class="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold backdrop-blur-sm"><i class="bi bi-bag-check-fill text-white"></i>{{ $cartQuantity }} {{ Str::plural('item', $cartQuantity) }}</span>@endif
+                <div><p class="mb-2 text-[10px] font-extrabold uppercase tracking-[.22em] text-[#EC0205]">Your selection</p><h1 class="text-2xl font-extrabold leading-[.9] tracking-tight sm:text-3xl">Shopping bag</h1><p class="mt-2 max-w-xl text-xs leading-5 text-slate-600">Review your products, adjust quantities, and continue to secure checkout.</p></div>
+                @if(!empty($cart_items))<span class="inline-flex w-fit items-center gap-2 rounded-full border border-slate-300 bg-white/85 px-4 py-2 text-xs font-bold text-slate-700 shadow-sm backdrop-blur-sm"><i class="bi bi-bag-check-fill text-[#EC0205]"></i>{{ $cartQuantity }} {{ Str::plural('item', $cartQuantity) }}</span>@endif
             </div>
         </header>
 
@@ -37,12 +37,11 @@
                             @endphp
                             <article wire:key="cart-item-{{ $itemKey }}" class="group relative overflow-hidden rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[#0C1E8C]/30 hover:shadow-md sm:p-5">
                                 <div class="flex gap-4 sm:gap-5">
-                                    <div class="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-[19px] border border-slate-200 bg-slate-50 p-2 sm:h-28 sm:w-28"><img src="{{ $item['image_url'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}'" alt="{{ $item['name'] }}" class="h-full w-full object-contain transition duration-300 group-hover:scale-105"></div>
+                                    <div class="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-[28px] border border-slate-200 bg-slate-50 p-2 sm:h-28 sm:w-28"><img src="{{ $item['image_url'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.webp') }}'" alt="{{ $item['name'] }}" class="h-full w-full rounded-[20px] object-contain transition duration-300 group-hover:scale-105"></div>
                                     <div class="min-w-0 flex-1">
                                         <div class="flex items-start justify-between gap-3">
                                             <div class="min-w-0">
-                                                <p class="text-[9px] font-extrabold uppercase tracking-[.16em] text-[#0C1E8C]">Authentic Heritage</p>
-                                                <h3 class="mt-1 line-clamp-2 text-sm font-extrabold leading-snug text-slate-900 sm:text-base">{{ $item['name'] }}</h3>
+                                                <h3 class="line-clamp-2 text-sm font-extrabold leading-snug text-slate-900 sm:text-base">{{ $item['name'] }}</h3>
                                                 @if(!empty($item['options_text']))
                                                     <p class="mt-1 inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-700">
                                                         <i class="bi bi-tag-fill text-[9px] text-slate-400"></i>{{ $item['options_text'] }}
@@ -52,11 +51,11 @@
                                             </div>
                                             <button type="button" wire:click="removeItem('{{ $itemKey }}')" wire:loading.attr="disabled" wire:target="removeItem('{{ $itemKey }}')" class="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-transparent text-slate-400 transition hover:border-red-100 hover:bg-red-50 hover:text-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400 disabled:opacity-50" aria-label="Remove {{ $item['name'] }} from bag" title="Remove product"><i class="bi bi-trash3"></i></button>
                                         </div>
-                                        <div class="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-3 sm:flex-row sm:items-end sm:justify-between">
-                                            <div><span class="mb-1.5 block text-[9px] font-bold uppercase tracking-wider text-slate-400">Quantity</span><div class="inline-flex h-9 items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-inner">
-                                                <button type="button" wire:click="decrementQty('{{ $itemKey }}')" wire:loading.attr="disabled" wire:target="decrementQty('{{ $itemKey }}'),incrementQty('{{ $itemKey }}')" class="grid h-full w-9 place-items-center text-slate-500 transition hover:bg-slate-200 hover:text-[#0C1E8C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0C1E8C]" aria-label="Decrease {{ $item['name'] }} quantity"><i class="bi bi-dash-lg"></i></button>
-                                                <span class="min-w-9 border-x border-slate-200 text-center text-xs font-extrabold text-slate-900" aria-live="polite">{{ $item['quantity'] }}</span>
-                                                <button type="button" wire:click="incrementQty('{{ $itemKey }}')" wire:loading.attr="disabled" wire:target="decrementQty('{{ $itemKey }}'),incrementQty('{{ $itemKey }}')" class="grid h-full w-9 place-items-center text-slate-500 transition hover:bg-slate-200 hover:text-[#0C1E8C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0C1E8C]" aria-label="Increase {{ $item['name'] }} quantity"><i class="bi bi-plus-lg"></i></button>
+                                        <div class="mt-1 flex flex-col gap-3 border-t border-slate-100 pt-2 sm:flex-row sm:items-end sm:justify-between">
+                                            <div><span class="mb-1 block text-[9px] font-bold uppercase tracking-wider text-slate-400">Quantity</span><div class="inline-flex h-[30px] items-center overflow-hidden rounded-md border border-slate-200 bg-slate-50 shadow-inner">
+                                                <button type="button" wire:click="decrementQty('{{ $itemKey }}')" wire:loading.attr="disabled" wire:target="decrementQty('{{ $itemKey }}'),incrementQty('{{ $itemKey }}')" class="grid h-full w-[30px] place-items-center text-[10px] text-slate-500 transition hover:bg-slate-200 hover:text-[#0C1E8C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0C1E8C]" aria-label="Decrease {{ $item['name'] }} quantity"><i class="bi bi-dash-lg"></i></button>
+                                                <span class="min-w-[30px] border-x border-slate-200 text-center text-[10px] font-extrabold text-slate-900" aria-live="polite">{{ $item['quantity'] }}</span>
+                                                <button type="button" wire:click="incrementQty('{{ $itemKey }}')" wire:loading.attr="disabled" wire:target="decrementQty('{{ $itemKey }}'),incrementQty('{{ $itemKey }}')" class="grid h-full w-[30px] place-items-center text-[10px] text-slate-500 transition hover:bg-slate-200 hover:text-[#0C1E8C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0C1E8C]" aria-label="Increase {{ $item['name'] }} quantity"><i class="bi bi-plus-lg"></i></button>
                                             </div></div>
                                             <div class="text-left sm:text-right"><span class="block text-[9px] font-bold uppercase tracking-wider text-slate-400">Item total</span><strong class="mt-1 block text-base font-extrabold text-[#EC0205]">{{ \App\Support\Money::format($item['total_amount']) }}</strong></div>
                                         </div>
@@ -70,7 +69,7 @@
 
                 <aside class="space-y-4 lg:sticky lg:top-[104px]">
                     <section class="overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-sm">
-                        <div class="relative overflow-hidden bg-gradient-to-br from-[#091b38] via-[#0C1E8C] to-[#071355] px-6 py-6 text-white"><span class="absolute -right-8 -top-12 h-32 w-32 rounded-full border border-white/10"></span><p class="text-[9px] font-extrabold uppercase tracking-[.2em] text-red-400">Order overview</p><div class="mt-2 flex items-end justify-between gap-3"><h2 class="text-lg font-extrabold">Summary</h2><span class="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold">{{ $cartQuantity }} {{ Str::plural('item', $cartQuantity) }}</span></div></div>
+                        <div class="relative overflow-hidden border-b border-slate-200 bg-white px-6 py-6 text-slate-900"><span class="absolute -right-8 -top-12 h-32 w-32 rounded-full border border-slate-300/70"></span><p class="text-[9px] font-extrabold uppercase tracking-[.2em] text-[#EC0205]">Order overview</p><div class="mt-2 flex items-end justify-between gap-3"><h2 class="text-lg font-extrabold">Summary</h2><span class="rounded-full border border-slate-300 bg-white/85 px-3 py-1 text-[10px] font-bold text-slate-700 shadow-sm">{{ $cartQuantity }} {{ Str::plural('item', $cartQuantity) }}</span></div></div>
                         <div class="p-6">
                             <dl class="space-y-3.5 text-xs"><div class="flex items-center justify-between gap-4"><dt class="text-slate-500">Products subtotal</dt><dd class="font-bold text-slate-900">{{ \App\Support\Money::format($grand_total) }}</dd></div><div class="flex items-center justify-between gap-4"><dt class="text-slate-500">Delivery</dt><dd class="font-bold text-slate-600">Calculated at checkout</dd></div></dl>
                             <div class="my-5 border-t border-dashed border-slate-200"></div>

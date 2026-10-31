@@ -27,12 +27,6 @@ class HomePage extends Component
 
         $this->dispatch('product-added-to-cart', product_id: $product_id, quantity: 1);
 
-        $this->alert('success', 'Product added to your bag.', [
-            'position' => 'top-end',
-            'timer' => 2500,
-            'toast' => true,
-        ]);
-
         // Keep the Swiper-managed product card DOM intact after a cart update.
         $this->skipRender();
     }

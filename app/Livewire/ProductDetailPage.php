@@ -257,11 +257,6 @@ class ProductDetailPage extends Component
             $this->dispatch('product-added-to-cart', product_id: $this->product->id, quantity: (int) $this->quantity);
         }
 
-        $this->alert('success', 'Product added to the cart successfully!', [
-            'position' => 'top-end',
-            'timer' => 3000,
-            'toast' => true,
-        ]);
     }
 
     public function submitReview(): void

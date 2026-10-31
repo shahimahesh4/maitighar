@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\VideoAlbum;
 use App\Observers\OptimizeModelImages;
 use App\Services\Payment\PaymentGatewayManager;
+use Filament\Forms\Components\FileUpload;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Event;
@@ -44,6 +45,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Keep the same clear remove control on every admin upload field. This
+        // covers products, galleries, sliders, page banners, profiles, and
+        // media-library uploads without relying on individual resource forms.
+        FileUpload::configureUsing(
+            fn (FileUpload $upload): FileUpload => $upload
+                ->deletable()
+                ->removeUploadedFileButtonPosition('right'),
+        );
+
         // Livewire navigation reuses the existing stylesheet. Re-preloading that
         // CSS on every navigated response creates Chrome's "preloaded but not
         // used" warning, so retain Vite's module preloads but skip CSS preloads.

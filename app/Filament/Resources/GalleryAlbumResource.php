@@ -88,7 +88,7 @@ class GalleryAlbumResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->columns([
-            Tables\Columns\ImageColumn::make('cover_image')->label('Cover')->disk('public')->square()->defaultImageUrl(asset('images/kba/about-us-academy.png')),
+            Tables\Columns\ImageColumn::make('cover_image')->label('Cover')->disk('public')->square()->defaultImageUrl(asset('images/kba/about-us-academy.webp')),
             Tables\Columns\TextColumn::make('title')->searchable()->sortable()->description(fn (GalleryAlbum $record) => $record->slug),
             Tables\Columns\TextColumn::make('image_count')->label('Photos')->badge()->color('warning'),
             Tables\Columns\TextColumn::make('sort_order')->label('Order')->sortable(),

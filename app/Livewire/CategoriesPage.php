@@ -12,7 +12,11 @@ class CategoriesPage extends Component
 {
     public function render(): View
     {
-        $categories = Category::where('is_active', 1)->get();
+        $categories = Category::query()
+            ->where('is_active', 1)
+            ->withCount('products')
+            ->orderBy('name')
+            ->get();
 
         return view('livewire.categories-page', compact('categories'));
     }

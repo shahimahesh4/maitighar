@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -194,10 +195,34 @@ class Product extends Model
         }
 
         if (str_starts_with($image, 'images/')) {
+            $webpImage = $this->webpSibling($image);
+
+            if ($webpImage) {
+                return asset($webpImage);
+            }
+
             return asset($image);
         }
 
+        $webpImage = $this->webpSibling($image);
+
+        if ($webpImage) {
+            return asset('storage/'.$webpImage);
+        }
+
         return asset('storage/'.$image);
+    }
+
+    private function webpSibling(string $image): ?string
+    {
+        $webpImage = preg_replace('/\.(?:jpe?g|png)$/i', '.webp', $image);
+        if (! $webpImage || $webpImage === $image) {
+            return null;
+        }
+
+        return str_starts_with($image, 'images/')
+            ? (is_file(public_path($webpImage)) ? $webpImage : null)
+            : (Storage::disk('public')->exists($webpImage) ? $webpImage : null);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PageResource\Pages;
 use App\Models\Page;
+use App\Services\ImageOptimizationService;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
@@ -15,6 +16,8 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class PageResource extends Resource
 {
@@ -92,18 +95,36 @@ class PageResource extends Resource
                     FileUpload::make('thumbnail_image')
                         ->label('Featured image')
                         ->image()
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                        ->maxSize(2048)
                         ->disk('public')
                         ->directory('pages/thumbnails')
                         ->visibility('public')
-                        ->imageEditor(),
+                        ->imageResizeMode('contain')
+                        ->imageResizeTargetWidth('1200')
+                        ->imageResizeTargetHeight('1200')
+                        ->imageResizeUpscale(false)
+                        ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                            ->storeAsWebp($file->getRealPath(), 'public', 'pages/thumbnails', 1200, 1200))
+                        ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
+                        ->helperText('JPG, PNG, or WebP up to 2 MB. Saved as optimized WebP (maximum 1200×1200px).'),
 
                     FileUpload::make('banner_image')
                         ->label('Banner image')
                         ->image()
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                        ->maxSize(2048)
                         ->disk('public')
                         ->directory('pages/banners')
                         ->visibility('public')
-                        ->imageEditor(),
+                        ->imageResizeMode('contain')
+                        ->imageResizeTargetWidth('1920')
+                        ->imageResizeTargetHeight('900')
+                        ->imageResizeUpscale(false)
+                        ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                            ->storeAsWebp($file->getRealPath(), 'public', 'pages/banners', 1920, 900))
+                        ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
+                        ->helperText('JPG, PNG, or WebP up to 2 MB. Saved as optimized WebP (maximum 1920×900px).'),
                 ])->columns(2),
 
                 Section::make('SEO')->schema([

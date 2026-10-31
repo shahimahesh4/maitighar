@@ -134,19 +134,23 @@ export function initRevSliders() {
             },
             on: {
                 init: function () {
-                    const activeSlide = this.slides[this.activeIndex];
-                    if (activeSlide) {
-                        animateSlideLayers(activeSlide);
-                    }
+                    window.setTimeout(() => {
+                        const activeSlide = this.slides[this.activeIndex];
+                        if (activeSlide) animateSlideLayers(activeSlide);
+                    }, 80);
                 },
-                slideChangeTransitionStart: function () {
+                slideChangeTransitionEnd: function () {
                     const activeSlide = this.slides[this.activeIndex];
-                    if (activeSlide) {
-                        animateSlideLayers(activeSlide);
-                    }
+                    if (activeSlide) animateSlideLayers(activeSlide);
                 },
             },
         });
+
+        // Covers cases where Swiper initializes before its init hook is observed.
+        window.setTimeout(() => {
+            const activeSlide = swiper.slides[swiper.activeIndex];
+            if (activeSlide) animateSlideLayers(activeSlide);
+        }, 120);
 
         // Store Swiper instance on element for external controls (like Preview Modal)
         container.__revSwiper = swiper;

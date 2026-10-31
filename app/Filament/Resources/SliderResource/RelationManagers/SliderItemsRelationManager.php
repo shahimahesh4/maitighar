@@ -148,6 +148,24 @@ class SliderItemsRelationManager extends RelationManager
                                     ->placeholder('e.g., With Dual Opening Lid')
                                     ->maxLength(255),
                             ]),
+
+                            Grid::make(2)->schema([
+                                TextInput::make('text_content.main_title_font_size')
+                                    ->label('Main Title Font Size')
+                                    ->numeric()
+                                    ->minValue(16)
+                                    ->maxValue(160)
+                                    ->suffix('px')
+                                    ->helperText('Optional. Leave blank to use the responsive default size.'),
+
+                                TextInput::make('text_content.second_title_font_size')
+                                    ->label('Subtitle Font Size')
+                                    ->numeric()
+                                    ->minValue(12)
+                                    ->maxValue(100)
+                                    ->suffix('px')
+                                    ->helperText('Optional. Leave blank to use the responsive default size.'),
+                            ]),
                         ]),
 
                     // Tab B: Background

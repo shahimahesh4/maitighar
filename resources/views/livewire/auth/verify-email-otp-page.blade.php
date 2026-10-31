@@ -2,7 +2,7 @@
     <div class="kba-login-shell" style="max-width: 920px;">
         <aside class="kba-login-story">
             <div class="kba-login-story-content">
-                <img src="{{ asset('images/logo.png') }}" alt="Maitighar" class="kba-login-logo">
+                <img src="{{ asset('images/logo.webp') }}" alt="Maitighar" class="kba-login-logo">
                 <span class="kba-login-kicker">One last step</span>
                 <h1>Verify your email address.</h1>
                 <p>We sent a six-digit security code to {{ auth()->user()->email }}.</p>

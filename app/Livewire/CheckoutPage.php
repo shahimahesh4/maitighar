@@ -554,7 +554,7 @@ class CheckoutPage extends Component
     private function resolveImageUrl(?string $image): string
     {
         return match (true) {
-            blank($image) => asset('images/logo.png'),
+            blank($image) => asset('images/logo.webp'),
             str_starts_with($image, 'http://'), str_starts_with($image, 'https://') => $image,
             str_starts_with($image, '/') => url($image),
             str_starts_with($image, 'images/') => asset($image),

@@ -290,6 +290,13 @@ const updateMobileChromeOnScroll = () => {
     lastScrollY = currentY;
 };
 
+const updateStoreHeaderOnScroll = () => {
+    const header = document.querySelector('[data-kba-store-header]');
+    if (!header) return;
+
+    header.classList.toggle('is-condensed', window.scrollY > 80);
+};
+
 if (!window.__kbaMobileShellBound) {
     window.__kbaMobileShellBound = true;
 
@@ -322,7 +329,10 @@ if (!window.__kbaMobileShellBound) {
 
     window.addEventListener('scroll', () => {
         if (!scrollTicking) {
-            window.requestAnimationFrame(updateMobileChromeOnScroll);
+            window.requestAnimationFrame(() => {
+                updateMobileChromeOnScroll();
+                updateStoreHeaderOnScroll();
+            });
             scrollTicking = true;
         }
     }, { passive: true });
@@ -336,6 +346,7 @@ if (!window.__kbaMobileShellBound) {
 const initializePageUi = () => {
     setMobileMenu(false);
     resetMobileChrome();
+    updateStoreHeaderOnScroll();
     initializeGalleries();
     initializeHomeSliders();
     initializeVideoGalleries();

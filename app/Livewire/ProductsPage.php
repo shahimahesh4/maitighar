@@ -68,11 +68,6 @@ class ProductsPage extends Component
 
         $this->dispatch('product-added-to-cart', product_id: $product_id, quantity: 1);
 
-        $this->alert('success', 'Product added to the cart successfully!', [
-            'position' => 'top-end',
-            'timer' => 3000,
-            'toast' => true,
-        ]);
     }
 
     public function toggleWishlist(int $productId): void

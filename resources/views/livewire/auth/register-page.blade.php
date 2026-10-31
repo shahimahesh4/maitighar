@@ -2,7 +2,7 @@
     <div class="kba-login-shell kba-register-shell">
         <aside class="kba-login-story kba-register-story">
             <div class="kba-login-story-content">
-                <img src="{{ asset('images/logo.png') }}" alt="Maitighar" class="kba-login-logo">
+                <img src="{{ asset('images/logo.webp') }}" alt="Maitighar" class="kba-login-logo">
                 <span class="kba-login-kicker">Welcome to Maitighar</span>
                 <h1>Nepalese Heritage with Love</h1>
                 <p>Create your account for a personalized shopping experience and a special place for your favourite heritage items and services.</p>

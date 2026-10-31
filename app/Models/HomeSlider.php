@@ -51,7 +51,7 @@ class HomeSlider extends Model
     private function resolveImageUrl(?string $path): string
     {
         if (blank($path)) {
-            return asset('images/kba/beauty-girl.png');
+            return asset('images/kba/beauty-girl.webp');
         }
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
             return $path;

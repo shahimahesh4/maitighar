@@ -6,41 +6,41 @@
             <span class="font-bold text-slate-800">Checkout</span>
         </nav>
 
-        <header class="relative mb-7 overflow-hidden rounded-[28px] bg-gradient-to-br from-[#091b38] via-[#0C1E8C] to-[#071355] px-5 py-7 text-white shadow-[0_20px_50px_rgba(12,30,140,.18)] sm:px-8 sm:py-8 lg:px-10">
-            <span class="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full border border-white/10"></span>
-            <span class="pointer-events-none absolute -bottom-32 right-28 h-64 w-64 rounded-full border border-white/10"></span>
+        <header class="relative mb-7 overflow-hidden rounded-[28px] border-2 border-slate-300 bg-white px-5 py-5 text-slate-900 shadow-[0_20px_50px_rgba(15,23,42,.08)] sm:px-8 sm:py-6 lg:px-10">
+            <span class="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full border border-slate-200"></span>
+            <span class="pointer-events-none absolute -bottom-32 right-28 h-64 w-64 rounded-full border border-slate-200"></span>
 
-            <div class="relative grid gap-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div class="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
                 <div class="flex items-start gap-4">
-                    <span class="hidden h-14 w-14 shrink-0 place-items-center rounded-2xl border border-white/15 bg-white/10 text-xl text-red-400 shadow-inner sm:grid"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
+                    <span class="hidden h-12 w-12 shrink-0 place-items-center rounded-2xl border border-red-100 bg-red-50 text-lg text-[#EC0205] shadow-inner sm:grid"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
                     <div>
-                        <p class="mb-2 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[.22em] text-red-400"><i class="bi bi-lock-fill sm:hidden" aria-hidden="true"></i> Secure checkout</p>
+                        <p class="mb-1 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[.22em] text-red-400"><i class="bi bi-lock-fill sm:hidden" aria-hidden="true"></i> Secure checkout</p>
                         <h1 class="text-2xl font-extrabold tracking-tight sm:text-3xl lg:text-[34px]">Complete your order</h1>
-                        <p class="mt-2 max-w-xl text-xs leading-5 text-white/65 sm:text-sm">Confirm your delivery details, select a trusted payment method, and review everything before placing your order.</p>
+                        <p class="mt-2 max-w-xl text-xs leading-5 text-slate-600 sm:text-sm">Confirm your delivery details, select a trusted payment method, and review everything before placing your order.</p>
                     </div>
                 </div>
 
-                <ol class="grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-2 rounded-2xl border border-white/10 bg-black/10 px-3 py-3 backdrop-blur-sm sm:min-w-[390px] sm:px-5" aria-label="Checkout progress">
-                    <li class="flex items-center gap-2 text-[#bde1c5]">
-                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-emerald-400/15 text-xs ring-1 ring-emerald-300/30"><i class="bi bi-check-lg" aria-hidden="true"></i></span>
+                <ol class="grid grid-cols-[auto_1fr_auto_1fr_auto] items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 sm:min-w-[390px] sm:px-5" aria-label="Checkout progress">
+                    <li class="flex items-center gap-2 text-emerald-700">
+                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-emerald-100 text-xs ring-1 ring-emerald-200"><i class="bi bi-check-lg" aria-hidden="true"></i></span>
                         <span class="hidden text-[9px] font-bold uppercase tracking-wider sm:block">Cart</span>
                     </li>
-                    <span class="h-px bg-white/20" aria-hidden="true"></span>
-                    <li class="flex items-center justify-center gap-2 text-white" aria-current="step">
+                    <span class="h-px bg-slate-200" aria-hidden="true"></span>
+                    <li class="flex items-center justify-center gap-2 text-slate-900" aria-current="step">
                         <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#EC0205] text-xs font-extrabold text-white shadow-[0_0_0_4px_rgba(236,2,5,.2)]">2</span>
                         <span class="hidden text-[9px] font-bold uppercase tracking-wider sm:block">Checkout</span>
                     </li>
-                    <span class="h-px bg-white/20" aria-hidden="true"></span>
-                    <li class="flex items-center justify-end gap-2 text-white/50">
-                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/15 bg-white/5 text-xs font-bold">3</span>
+                    <span class="h-px bg-slate-200" aria-hidden="true"></span>
+                    <li class="flex items-center justify-end gap-2 text-slate-400">
+                        <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-slate-200 bg-white text-xs font-bold">3</span>
                         <span class="hidden text-[9px] font-bold uppercase tracking-wider sm:block">Complete</span>
                     </li>
                 </ol>
             </div>
 
-            <div class="relative mt-6 grid grid-cols-3 divide-x divide-white/10 border-t border-white/10 pt-4 text-center sm:flex sm:justify-start sm:gap-0 sm:text-left">
+            <div class="relative mt-4 grid grid-cols-3 divide-x divide-slate-200 border-t border-slate-200 pt-3 text-center sm:flex sm:justify-start sm:gap-0 sm:text-left">
                 @foreach ([['bi-shield-check', 'Protected data'], ['bi-truck', 'Delivery options'], ['bi-headset', 'Customer support']] as [$icon, $label])
-                    <span class="flex items-center justify-center gap-2 px-2 text-[9px] font-bold uppercase tracking-wide text-white/60 first:pl-0 sm:justify-start sm:px-5 sm:first:pl-0"><i class="bi {{ $icon }} text-sm text-red-400" aria-hidden="true"></i>{{ $label }}</span>
+                    <span class="flex items-center justify-center gap-2 px-2 text-[9px] font-bold uppercase tracking-wide text-slate-500 first:pl-0 sm:justify-start sm:px-5 sm:first:pl-0"><i class="bi {{ $icon }} text-sm text-[#EC0205]" aria-hidden="true"></i>{{ $label }}</span>
                 @endforeach
             </div>
         </header>
@@ -148,12 +148,12 @@
 
             <aside class="space-y-4 lg:sticky lg:top-6">
                 <section class="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
-                    <div class="bg-gradient-to-br from-[#091b38] to-[#0C1E8C] px-6 py-5 text-white"><p class="text-[10px] font-bold uppercase tracking-[.18em] text-red-400">Order review</p><div class="mt-2 flex items-center justify-between"><h2 class="text-lg font-extrabold">Your order</h2><span class="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold">{{ $cartQuantity }} items</span></div></div>
+                    <div class="border-b border-slate-200 bg-slate-50 px-6 py-5 text-slate-900"><p class="text-[10px] font-bold uppercase tracking-[.18em] text-red-500">Order review</p><div class="mt-2 flex items-center justify-between"><h2 class="text-lg font-extrabold">Your order</h2><span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-bold text-slate-700">{{ $cartQuantity }} items</span></div></div>
                     <ul class="max-h-64 divide-y divide-slate-100 overflow-y-auto px-5">
                         @foreach($checkoutItems as $item)
                             <li class="flex items-center gap-3 py-4">
                                 <span class="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border bg-slate-50 p-1">
-                                    <img src="{{ $item['image_url'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}'" alt="{{ $item['name'] }}" class="h-full w-full object-contain">
+                                    <img src="{{ $item['image_url'] }}" onerror="this.onerror=null;this.src='{{ asset('images/logo.webp') }}'" alt="{{ $item['name'] }}" class="h-full w-full object-contain">
                                     <b class="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-[#EC0205] px-1 text-[9px] text-white">{{ $item['quantity'] }}</b>
                                 </span>
                                 <span class="min-w-0 flex-1">

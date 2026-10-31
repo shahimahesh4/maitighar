@@ -9,13 +9,13 @@
         <meta property="og:type" content="{{ $ogType ?? 'website' }}">
         <meta property="og:title" content="{{ $title ?? 'Maitighar - Nepalese Heritage with Love' }}">
         <meta property="og:description" content="{{ $metaDescription ?? 'Maitighar - Nepalese Heritage with Love. Authentic Nepalese heritage, culture, and craftsmanship.' }}">
-        <meta property="og:image" content="{{ $ogImage ?? asset('images/logo.png') }}">
+        <meta property="og:image" content="{{ $ogImage ?? asset('images/logo.webp') }}">
         <meta property="og:url" content="{{ $canonicalUrl ?? url()->current() }}">
         <meta property="og:site_name" content="Maitighar">
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="{{ $title ?? 'Maitighar - Nepalese Heritage with Love' }}">
         <meta name="twitter:description" content="{{ $metaDescription ?? 'Maitighar - Nepalese Heritage with Love. Authentic Nepalese heritage, culture, and craftsmanship.' }}">
-        <meta name="twitter:image" content="{{ $ogImage ?? asset('images/logo.png') }}">
+        <meta name="twitter:image" content="{{ $ogImage ?? asset('images/logo.webp') }}">
         <link rel="canonical" href="{{ $canonicalUrl ?? url()->current() }}">
         <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
@@ -45,8 +45,8 @@
                         '@id' => $siteUrl.'/#organization',
                         'name' => 'Maitighar',
                         'url' => $siteUrl,
-                        'logo' => asset('images/logo.png'),
-                        'image' => asset('images/logo.png'),
+                        'logo' => asset('images/logo.webp'),
+                        'image' => asset('images/logo.webp'),
                         'description' => 'Maitighar - Nepalese Heritage with Love. Authentic craftsmanship, services, and handcrafted collections.',
                         'telephone' => '+61432685546',
                         'email' => 'maitigharaustralia@gmail.com',

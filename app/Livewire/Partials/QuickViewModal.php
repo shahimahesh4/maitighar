@@ -83,11 +83,6 @@ class QuickViewModal extends Component
         $this->dispatch('update-cart-count', total_count: $total_count);
         $this->dispatch('product-added-to-cart', product_id: $this->product->id, quantity: $this->quantity);
 
-        $this->alert('success', "{$this->quantity} item(s) added to your bag.", [
-            'position' => 'top-end',
-            'timer' => 2500,
-            'toast' => true,
-        ]);
 
         $this->closeModal();
     }

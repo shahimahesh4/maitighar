@@ -40,7 +40,7 @@
         <!-- Header -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-8 border-b border-slate-100">
             <div class="flex items-center gap-3">
-                <img src="{{ asset('images/logo.png') }}" alt="Maitighar" class="h-12 w-12 rounded-xl object-contain shadow-sm">
+                <img src="{{ asset('images/logo.webp') }}" alt="Maitighar" class="h-12 w-12 rounded-xl object-contain shadow-sm">
                 <div>
                     <h1 class="text-2xl font-black tracking-tight text-[#EC0205]">Maitighar</h1>
                     <p class="text-xs text-slate-400 mt-1">Nepalese Heritage with Love</p>

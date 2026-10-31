@@ -2,7 +2,7 @@
     <div class="kba-login-shell kba-recovery-shell">
         <aside class="kba-login-story kba-recovery-story">
             <div class="kba-login-story-content">
-                <img src="{{ asset('images/logo.png') }}" alt="Maitighar" class="kba-login-logo">
+                <img src="{{ asset('images/logo.webp') }}" alt="Maitighar" class="kba-login-logo">
                 <span class="kba-login-kicker">Account recovery</span>
                 <h1>We’ll help you get back in.</h1>
                 <p>Enter the email connected to your account and we’ll send you a secure link to create a new password.</p>

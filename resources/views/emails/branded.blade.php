@@ -7,7 +7,7 @@
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f8fafc">
 <tr><td align="center" style="padding:32px 12px">
     <table role="presentation" width="640" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:640px">
-        <tr><td align="center" style="padding:0 0 20px"><img src="{{ asset('images/logo.png') }}" width="82" alt="{{ $store['name'] }}" style="display:block;width:82px;height:auto"></td></tr>
+        <tr><td align="center" style="padding:0 0 20px"><img src="{{ asset('images/logo.webp') }}" width="82" alt="{{ $store['name'] }}" style="display:block;width:82px;height:auto"></td></tr>
         <tr><td style="overflow:hidden;border:1px solid #e2e8f0;border-radius:24px;background:#ffffff;box-shadow:0 18px 48px rgba(12,30,140,.08)">
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr><td style="padding:42px 42px 38px;background:#0C1E8C;text-align:center;color:#fff">

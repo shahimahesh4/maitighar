@@ -49,7 +49,7 @@
                     <div class="divide-y divide-slate-100">
                         @foreach($order->items as $item)
                             <article wire:key="order-item-{{ $item->id }}" class="flex items-center gap-4 px-4 py-4 sm:px-6">
-                                <span class="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-1.5"><img src="{{ $item->product?->getImageUrl() ?? asset('images/logo.png') }}" alt="{{ $item->product?->name ?? 'Product' }}" class="h-full w-full object-contain"></span>
+                                <span class="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-1.5"><img src="{{ $item->product?->getImageUrl() ?? asset('images/logo.webp') }}" alt="{{ $item->product?->name ?? 'Product' }}" class="h-full w-full object-contain"></span>
                                 <div class="min-w-0 flex-1">
                                     <h3 class="line-clamp-2 text-xs font-extrabold leading-5 text-slate-900">{{ $item->product?->name ?? 'Product unavailable' }}</h3>
                                     @if(!empty($item->options_text))

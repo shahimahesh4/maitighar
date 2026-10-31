@@ -58,7 +58,7 @@ class GalleryAlbum extends Model
     {
         $path = $this->cover_image ?: collect($this->images)->filter()->first();
 
-        return $path ? $this->resolveImageUrl($path) : asset('images/kba/about-us-academy.png');
+        return $path ? $this->resolveImageUrl($path) : asset('images/kba/about-us-academy.webp');
     }
 
     public function imageItems(): array

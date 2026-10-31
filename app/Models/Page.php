@@ -42,7 +42,7 @@ class Page extends Model
     public function getThumbnailUrl(): string
     {
         if (! filled($this->thumbnail_image)) {
-            return asset('images/logo.png');
+            return asset('images/logo.webp');
         }
 
         if (str_starts_with($this->thumbnail_image, 'http://') || str_starts_with($this->thumbnail_image, 'https://')) {

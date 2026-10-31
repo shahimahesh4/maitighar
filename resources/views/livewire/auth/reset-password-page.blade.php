@@ -2,7 +2,7 @@
     <div class="kba-login-shell kba-recovery-shell">
         <aside class="kba-login-story kba-recovery-story">
             <div class="kba-login-story-content">
-                <img src="{{ asset('images/logo.png') }}" alt="Maitighar" class="kba-login-logo">
+                <img src="{{ asset('images/logo.webp') }}" alt="Maitighar" class="kba-login-logo">
                 <span class="kba-login-kicker">Create a new password</span>
                 <h1>Fresh start, same account.</h1>
                 <p>Choose a secure new password to restore access to your orders, wishlist, and account details.</p>

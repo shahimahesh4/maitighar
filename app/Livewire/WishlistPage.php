@@ -48,11 +48,6 @@ class WishlistPage extends Component
         Wishlist::where('user_id', auth()->id())->where('product_id', $productId)->delete();
         $this->dispatch('update-wishlist-count');
 
-        $this->alert('success', 'Added to cart and removed from wishlist!', [
-            'position' => 'top-end',
-            'timer' => 3000,
-            'toast' => true,
-        ]);
     }
 
     public function render(): View

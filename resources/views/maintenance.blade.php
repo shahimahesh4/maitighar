@@ -25,7 +25,7 @@
 </head>
 <body>
     <main role="main" aria-labelledby="maintenance-title">
-        <img class="logo" src="{{ asset('images/logo.png') }}" alt="{{ $storeName }}">
+        <img class="logo" src="{{ asset('images/logo.webp') }}" alt="{{ $storeName }}">
         <p class="eyebrow">Website maintenance</p>
         <h1 id="maintenance-title">{{ $title }}</h1>
         <p class="message">{{ $message }}</p>

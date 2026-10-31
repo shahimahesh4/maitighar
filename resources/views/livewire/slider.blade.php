@@ -82,14 +82,64 @@
                             {{-- ========================================= --}}
                             {{-- TYPE 2: ANIMATED CONTENT BANNER (REVOLUTION) --}}
                             {{-- ========================================= --}}
+                            @php
+                                $copy = $item->text_content ?? [];
+                                $mainTitleSize = is_numeric($copy['main_title_font_size'] ?? null)
+                                    ? min(160, max(16, (int) $copy['main_title_font_size']))
+                                    : null;
+                                $subtitleSize = is_numeric($copy['second_title_font_size'] ?? null)
+                                    ? min(100, max(12, (int) $copy['second_title_font_size']))
+                                    : null;
+                            @endphp
                             <div class="rev-content-banner w-full h-full relative flex items-center"
                                  style="{{ $item->background_style }}">
+
+                                <div class="rev-editorial-wash absolute inset-0 pointer-events-none"></div>
 
                                 {{-- Optional Background Overlay if image background --}}
                                 @if(($bg['type'] ?? '') === 'image' && !empty($bg['overlay_opacity']) && $bg['overlay_opacity'] > 0)
                                     <div class="absolute inset-0 bg-black pointer-events-none"
                                          style="opacity: {{ ($bg['overlay_opacity'] ?? 40) / 100 }};"></div>
                                 @endif
+
+                                <div class="rev-slider-inner rev-editorial-inner relative z-10 w-full">
+                                    <div class="rev-editorial-copy">
+                                        <p class="rev-editorial-eyebrow rev-layer"
+                                           data-effect="slide_right"
+                                           data-delay="{{ $animations['eyebrow']['delay'] ?? 0.1 }}"
+                                           data-duration="{{ $animations['eyebrow']['duration'] ?? 0.65 }}">
+                                            <span></span>Maitighar<span></span>
+                                        </p>
+
+                                        <h1 class="rev-editorial-title rev-layer"
+                                            @if($mainTitleSize) style="--rev-desktop-title-size: {{ $mainTitleSize }}px" @endif
+                                            data-effect="slide_right"
+                                            data-delay="{{ $animations['title']['delay'] ?? 0.2 }}"
+                                            data-duration="{{ $animations['title']['duration'] ?? 0.8 }}">
+                                            {{ $copy['main_title'] ?? $item->title }}
+                                        </h1>
+
+                                        @if(filled($copy['second_title'] ?? null))
+                                            <h2 class="rev-editorial-subtitle rev-layer"
+                                                @if($subtitleSize) style="--rev-desktop-subtitle-size: {{ $subtitleSize }}px" @endif
+                                                data-effect="slide_right"
+                                                data-delay="{{ $animations['subtitle']['delay'] ?? 0.35 }}"
+                                                data-duration="{{ $animations['subtitle']['duration'] ?? 0.7 }}">
+                                                {{ $copy['second_title'] }}
+                                            </h2>
+                                        @endif
+
+                                        <div class="rev-editorial-divider rev-layer"
+                                             data-effect="slide_right" data-delay="0.45" data-duration="0.6"><i></i></div>
+
+                                        <a href="{{ $item->link_url ?: route('all-products') }}"
+                                           @if($item->open_in_new_tab) target="_blank" rel="noopener noreferrer" @endif
+                                           class="rev-editorial-cta rev-layer"
+                                           data-effect="slide_right" data-delay="0.55" data-duration="0.7">
+                                            Explore Collection <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         @endif
 
