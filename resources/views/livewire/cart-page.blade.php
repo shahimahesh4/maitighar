@@ -15,11 +15,11 @@
         </header>
 
         @if(empty($cart_items))
-            <section class="relative mx-auto max-w-3xl overflow-hidden rounded-[30px] border border-slate-200 bg-white px-6 py-14 text-center shadow-[0_16px_45px_rgba(12,30,140,.06)] sm:px-12 sm:py-16">
+            <section class="relative w-full overflow-hidden rounded-[30px] border border-slate-200 bg-white px-6 py-14 text-center shadow-[0_16px_45px_rgba(12,30,140,.06)] sm:px-12 sm:py-16">
                 <span class="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-red-50"></span>
                 <span class="relative mx-auto grid h-20 w-20 place-items-center rounded-[24px] border border-red-100 bg-red-50 text-3xl text-[#EC0205] shadow-sm"><i class="bi bi-bag-heart"></i></span>
                 <h2 class="relative mt-6 text-xl font-extrabold text-slate-900">Your bag is ready for something beautiful</h2>
-                <p class="relative mx-auto mt-3 max-w-md text-xs leading-5 text-slate-500">Explore authentic products selected by Maitighar and save your favourites here.</p>
+                <p class="relative !mx-auto mt-3 max-w-md text-xs leading-5 text-slate-500">Explore authentic products selected by Maitighar and save your favourites here.</p>
                 <a wire:navigate href="{{ route('all-products') }}" class="relative mt-7 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#EC0205] to-[#C90204] px-6 py-3 text-xs font-extrabold text-white shadow-lg shadow-red-600/25 transition hover:-translate-y-0.5 hover:from-[#C90204] hover:to-[#A80203] hover:shadow-xl">Explore products <i class="bi bi-arrow-right"></i></a>
             </section>
         @else

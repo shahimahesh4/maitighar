@@ -1,21 +1,5 @@
 <div class="kba-auth-page kba-register-page">
-    <div class="kba-login-shell kba-register-shell">
-        <aside class="kba-login-story kba-register-story">
-            <div class="kba-login-story-content">
-                <img src="{{ asset('images/logo.webp') }}" alt="Maitighar" class="kba-login-logo">
-                <span class="kba-login-kicker">Welcome to Maitighar</span>
-                <h1>Nepalese Heritage with Love</h1>
-                <p>Create your account for a personalized shopping experience and a special place for your favourite heritage items and services.</p>
-                <div class="kba-login-benefits">
-                    <span><i class="bi bi-gem"></i> Curated authentic collections</span>
-                    <span><i class="bi bi-heart"></i> A personal wishlist</span>
-                    <span><i class="bi bi-box-seam"></i> Easy orders and tracking</span>
-                </div>
-            </div>
-            <div class="kba-login-orbit kba-login-orbit-one"></div>
-            <div class="kba-login-orbit kba-login-orbit-two"></div>
-        </aside>
-
+    <div class="kba-login-shell kba-register-shell kba-register-shell--single">
         <section class="kba-login-form-panel kba-register-form-panel">
             <div class="kba-login-form-heading">
                 <span>Become a member</span>
@@ -89,7 +73,7 @@
 
                 <label class="kba-register-terms">
                     <input type="checkbox" required>
-                    <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</span>
+                    <span>I agree to the <a wire:navigate href="{{ route('pages.show', ['page' => 'terms-of-service']) }}">Terms of Service</a> and <a wire:navigate href="{{ route('pages.show', ['page' => 'privacy-policy']) }}">Privacy Policy</a>.</span>
                 </label>
 
                 <button type="submit" class="kba-auth-submit" wire:loading.attr="disabled" wire:target="save">

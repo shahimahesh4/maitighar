@@ -1,21 +1,5 @@
 <div class="kba-auth-page">
-    <div class="kba-login-shell">
-        <aside class="kba-login-story">
-            <div class="kba-login-story-content">
-                <img src="{{ asset('images/logo.webp') }}" alt="Maitighar" class="kba-login-logo">
-                <span class="kba-login-kicker">Welcome to Maitighar</span>
-                <h1>Nepalese Heritage with Love</h1>
-                <p>Sign in to manage your orders, save favourites, and discover authentic Nepali collections selected by Maitighar.</p>
-                <div class="kba-login-benefits">
-                    <span><i class="bi bi-check2-circle"></i> Track every order</span>
-                    <span><i class="bi bi-check2-circle"></i> Save your favourites</span>
-                    <span><i class="bi bi-check2-circle"></i> Enjoy a faster checkout</span>
-                </div>
-            </div>
-            <div class="kba-login-orbit kba-login-orbit-one"></div>
-            <div class="kba-login-orbit kba-login-orbit-two"></div>
-        </aside>
-
+    <div class="kba-login-shell kba-login-shell--single">
         <section class="kba-login-form-panel">
             <div class="kba-login-form-heading">
                 <span>Welcome back</span>

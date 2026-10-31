@@ -64,7 +64,8 @@ p { margin: 0 !important; line-height: 1.5 !important; }
     .kba-store-header { box-shadow: 0 12px 28px rgba(15, 23, 42, .13); }
     .kba-store-utility {
         position: relative;
-        overflow: hidden;
+        z-index: 3;
+        overflow: visible;
         min-height: 42px;
         display: flex;
         align-items: center;
@@ -2044,6 +2045,8 @@ p { margin: 0 !important; line-height: 1.5 !important; }
     box-shadow: 0 28px 70px rgba(12, 30, 140, .08);
 }
 
+.kba-login-shell--single { width: min(520px, 100%); grid-template-columns: 1fr; }
+
 .kba-login-story {
     position: relative;
     isolation: isolate;
@@ -2093,7 +2096,7 @@ p { margin: 0 !important; line-height: 1.5 !important; }
     font-weight: 700;
     line-height: .98;
     letter-spacing: -.02em;
-    text-transform: uppercase;
+    text-transform: none;
 }
 .kba-login-story p {
     max-width: 330px;
@@ -2240,6 +2243,7 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 /* Registration page */
 .kba-register-page { padding-top: 54px; padding-bottom: 54px; }
 .kba-register-shell { width: min(1040px, 100%); min-height: 650px; grid-template-columns: .88fr 1.12fr; }
+.kba-register-shell.kba-register-shell--single { width: min(720px, 100%); grid-template-columns: 1fr; }
 .kba-register-story {
     background:
         radial-gradient(circle at 82% 18%, rgba(236, 2, 5, .15), transparent 26%),
@@ -2545,6 +2549,7 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 /* Password recovery */
 .kba-recovery-page { padding-top: 58px; padding-bottom: 58px; }
 .kba-recovery-shell { width: min(930px, 100%); min-height: 510px; grid-template-columns: .9fr 1.1fr; }
+.kba-recovery-shell.kba-recovery-shell--single { width: min(520px, 100%); grid-template-columns: 1fr; }
 .kba-recovery-story h1 { max-width: 350px; font-size: 50px; }
 .kba-recovery-form-panel { padding: 52px 54px 42px; }
 .kba-auth-success {

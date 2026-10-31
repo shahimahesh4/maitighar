@@ -1,21 +1,5 @@
 <div class="kba-auth-page kba-recovery-page">
-    <div class="kba-login-shell kba-recovery-shell">
-        <aside class="kba-login-story kba-recovery-story">
-            <div class="kba-login-story-content">
-                <img src="{{ asset('images/logo.webp') }}" alt="Maitighar" class="kba-login-logo">
-                <span class="kba-login-kicker">Account recovery</span>
-                <h1>We’ll help you get back in.</h1>
-                <p>Enter the email connected to your account and we’ll send you a secure link to create a new password.</p>
-                <div class="kba-login-benefits">
-                    <span><i class="bi bi-shield-check"></i> Secure reset link</span>
-                    <span><i class="bi bi-envelope-check"></i> Delivered to your email</span>
-                    <span><i class="bi bi-clock"></i> Link expires automatically</span>
-                </div>
-            </div>
-            <div class="kba-login-orbit kba-login-orbit-one"></div>
-            <div class="kba-login-orbit kba-login-orbit-two"></div>
-        </aside>
-
+    <div class="kba-login-shell kba-recovery-shell kba-recovery-shell--single">
         <section class="kba-login-form-panel kba-recovery-form-panel">
             <div class="kba-login-form-heading">
                 <span>Password assistance</span>
