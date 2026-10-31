@@ -37,7 +37,7 @@ class HomeSliderSeeder extends Seeder
         ];
 
         // Clean up outdated placeholder slides
-        HomeSlider::whereIn('name', ['Brand introduction', 'Professional training', 'Authentic crafts'])->delete();
+        HomeSlider::whereIn('name', ['Brand introduction', 'Professional learning', 'Authentic crafts'])->delete();
 
         foreach ($slides as $slide) {
             HomeSlider::updateOrCreate(

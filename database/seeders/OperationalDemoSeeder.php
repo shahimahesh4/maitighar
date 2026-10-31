@@ -33,8 +33,8 @@ class OperationalDemoSeeder extends Seeder
 
         $trainer = User::updateOrCreate(['email' => 'trainer@maitighar.test'], [
             'name' => 'Anisha Shrestha', 'phone' => '9800000002', 'password' => 'password',
-            'email_verified_at' => now(), 'role' => 'trainer', 'job_title' => 'Senior Beauty Trainer',
-            'department' => 'Academy Training', 'employee_id' => 'MG-TRN-001', 'joining_date' => '2024-03-01',
+            'email_verified_at' => now(), 'role' => 'mentor', 'job_title' => 'Senior Heritage Mentor',
+            'department' => 'Heritage Experiences', 'employee_id' => 'MG-TRN-001', 'joining_date' => '2024-03-01',
             'employment_type' => 'Full time', 'admin_permissions' => ['services', 'content'],
             'city' => 'Bhairahawa', 'state' => 'Lumbini Province',
         ]);
@@ -121,7 +121,7 @@ class OperationalDemoSeeder extends Seeder
         if ($academyPage) {
             foreach ([
                 ['How long are academy courses?', 'Course duration varies by program. Contact our team for the current schedule and recommended learning path.'],
-                ['Are tools provided during training?', 'Core tools are available for guided academy practice. Your trainer will explain any personal kit requirements before the course begins.'],
+                ['Are tools provided for learning sessions?', 'Core tools are available for guided academy practice. Your mentor will explain any personal kit requirements before the session begins.'],
                 ['Can beginners apply?', 'Yes. Several academy programs are designed specifically for beginners with no previous professional experience.'],
             ] as $index => [$question, $answer]) {
                 $academyPage->faqs()->updateOrCreate(['question' => $question], ['answer' => '<p>'.$answer.'</p>', 'status' => 'published', 'sort_order' => $index + 1]);
@@ -141,7 +141,7 @@ class OperationalDemoSeeder extends Seeder
             Storage::disk('public')->put($mediaPath, file_get_contents($source));
         }
         if (Storage::disk('public')->exists($mediaPath)) {
-            MediaAsset::updateOrCreate(['disk' => 'public', 'path' => $mediaPath], ['media_folder_id' => $folder->id, 'name' => 'About Us Academy', 'mime_type' => 'image/png', 'size' => Storage::disk('public')->size($mediaPath), 'alt_text' => 'Maitighar Nepalese Heritage with Love', 'caption' => 'Maitighar - Nepalese Heritage with Love.']);
+            MediaAsset::updateOrCreate(['disk' => 'public', 'path' => $mediaPath], ['media_folder_id' => $folder->id, 'name' => 'About Us', 'mime_type' => 'image/png', 'size' => Storage::disk('public')->size($mediaPath), 'alt_text' => 'Maitighar Nepalese Heritage with Love', 'caption' => 'Maitighar - Nepalese Heritage with Love.']);
         }
     }
 }

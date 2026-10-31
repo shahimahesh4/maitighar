@@ -22,7 +22,7 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
             ['name' => 'Makeup', 'slug' => 'makeup', 'image' => 'images/kba/makeup-brush.jpeg'],
             ['name' => 'Skin Care', 'slug' => 'skin-care', 'image' => 'images/kba/facial-serum.jpeg'],
             ['name' => 'Hair Removal', 'slug' => 'hair-removal', 'image' => 'images/kba/hair-remover.jpeg'],
-            ['name' => 'Beauty Tools', 'slug' => 'beauty-tools', 'image' => 'images/kba/skin-brush.jpeg'],
+            ['name' => 'Heritage Tools', 'slug' => 'heritage-tools', 'image' => 'images/kba/skin-brush.jpeg'],
         ])->mapWithKeys(function (array $data) {
             $category = Category::updateOrCreate(
                 ['slug' => $data['slug']],
@@ -35,7 +35,7 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
         $products = [
             ['Bamboo Stainless Steel Bottle -500ML', 'skin-care', 22.00, 'makeup-brush.jpeg', 'MG-AUS-001', 'A versatile premium bamboo stainless steel bottle with double-wall insulation.'],
             ['Bamboo Clicker Pen', 'makeup', 18.50, 'eye-brushes.jpeg', 'MG-AUS-002', 'Eco-friendly smooth writing bamboo clicker pen handcrafted from seasoned bamboo.'],
-            ['Handle Bamboo Baskets', 'beauty-tools', 15.00, 'skin-brush.jpeg', 'MG-AUS-003', 'Handwoven natural bamboo basket with sturdy handle for home storage and gifting.'],
+            ['Handle Bamboo Baskets', 'heritage-tools', 15.00, 'skin-brush.jpeg', 'MG-AUS-003', 'Handwoven natural bamboo basket with sturdy handle for home storage and gifting.'],
             ['Bamboo Bookmarks with Design 15 cm', 'skin-care', 26.00, 'crack-removal-cream.jpeg', 'MG-AUS-004', 'Laser-engraved natural bamboo bookmarks featuring traditional Nepali art motifs.'],
             ['Hair Remover', 'hair-removal', 28.50, 'hair-remover.jpeg', 'MG-AUS-005', 'Gentle, convenient hair-removal care for smooth-looking skin at home.'],
             ['Facial Serum', 'skin-care', 34.00, 'facial-serum.jpeg', 'MG-AUS-006', 'A lightweight facial serum that hydrates and supports a brighter, refreshed complexion.'],
@@ -64,7 +64,7 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
                     'on_sale' => false,
                     'meta_title' => $name.' | Maitighar',
                     'meta_description' => $description,
-                    'meta_keywords' => strtolower($name.', Maitighar, beauty products, Australia'),
+                    'meta_keywords' => strtolower($name.', Maitighar, heritage products, Australia'),
                 ]
             );
         }
@@ -78,15 +78,15 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
                 'images/kba/beauty-girl.png',
             ],
             [
-                'Academy Training',
+                'Heritage Experiences',
                 'academy-training',
-                '<h2>Maitighar Training & Services</h2><ul><li>Professional beauty and heritage skill training</li><li>Safe and well-equipped arrangements for learners</li><li>Direct guidance from experienced mentors</li><li>Certificate of completion</li><li>Portfolio development</li><li>Career preparation and counselling</li></ul>',
+                '<h2>Maitighar Experiences & Services</h2><ul><li>Professional heritage skill development</li><li>Safe and well-equipped arrangements for learners</li><li>Direct guidance from experienced mentors</li><li>Recognition of participation</li><li>Portfolio development</li><li>Career preparation and counselling</li></ul>',
                 'images/logo.png',
             ],
             [
                 'Videos',
                 'videos',
-                '<p>Training, heritage, beauty-service, and special moments from Maitighar will be published here.</p>',
+                '<p>Heritage, personal care, and special moments from Maitighar will be published here.</p>',
                 'images/kba/beauty-girl.png',
             ],
             [
@@ -108,8 +108,8 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
                     'meta_title' => $title.' | Maitighar',
                     'meta_description' => match ($slug) {
                         'about-us' => 'Meet Maitighar—Nepalese Heritage with Love, professional services, authentic craftsmanship, and dedicated mentorship.',
-                        'academy-training' => 'Explore hands-on beauty and heritage training with experienced trainers, professional certification, and career guidance at Maitighar.',
-                        'videos' => 'Watch training, heritage, beauty-service, and special event videos from Maitighar.',
+                        'academy-training' => 'Explore hands-on heritage learning with experienced mentors, recognition of participation, and career guidance at Maitighar.',
+                        'videos' => 'Watch heritage, personal-care, and special event videos from Maitighar.',
                         'contact-us' => 'Contact Maitighar for courses, salon services, appointments, and product enquiries.',
                         default => Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($content))), 155),
                     },

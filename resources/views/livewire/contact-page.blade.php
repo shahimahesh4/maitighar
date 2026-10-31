@@ -1,7 +1,8 @@
 <div class="kba-contact-page kba-cms-page">
-    <section class="kba-cms-hero" aria-labelledby="contact-page-title">
+    <section class="kba-cms-hero" aria-labelledby="contact-page-title" style="--kba-contact-hero-image: url('{{ $contactBannerUrl }}');">
         <div class="kba-cms-hero-inner">
             <div class="kba-cms-hero-copy">
+                <nav class="kba-page-breadcrumbs" aria-label="Breadcrumb"><a wire:navigate href="{{ route('index') }}"><i class="bi bi-house-door" aria-hidden="true"></i>Home</a><i class="bi bi-chevron-right" aria-hidden="true"></i><span aria-current="page">Contact Us</span></nav>
                 <h1 id="contact-page-title">Contact Us</h1>
                 <p>Questions about our products, orders, or custom requests? Our friendly team is ready to help.</p>
             </div>

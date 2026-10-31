@@ -57,7 +57,7 @@ HTML,
 
         foreach ([
             ['How long do I have to request a return?', 'Return requests should be made within 7 days of receiving the order.'],
-            ['Can I return an opened beauty product?', 'For hygiene and safety reasons, opened, used, or tested beauty and personal-care products cannot normally be returned.'],
+            ['Can I return an opened personal-care product?', 'For hygiene and safety reasons, opened, used, or tested personal-care products cannot normally be returned.'],
             ['What should I do if my order arrives damaged?', 'Contact us within 48 hours and include your order number with clear photographs of the item, packaging, and delivery label.'],
         ] as $index => [$question, $answer]) {
             $page->faqs()->updateOrCreate(

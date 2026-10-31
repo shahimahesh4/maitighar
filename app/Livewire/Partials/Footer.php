@@ -56,7 +56,7 @@ class Footer extends Component
     {
         return [
             ['label' => 'Shop products', 'url' => route('all-products')],
-            ['label' => 'Training & Courses', 'url' => route('pages.show', 'academy-training')],
+            ['label' => 'Heritage Experiences', 'url' => route('pages.show', 'academy-training')],
             ['label' => 'Photo gallery', 'url' => route('gallery.index')],
             ['label' => 'Video gallery', 'url' => route('videos.index')],
             ['label' => 'About Maitighar', 'url' => route('pages.show', 'about-us')],

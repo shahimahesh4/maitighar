@@ -30,7 +30,7 @@
                     <a wire:navigate href="{{ route('wishlist') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-[#0C1E8C]"><i class="bi bi-heart"></i><span>Wishlist</span></a>
                     <a wire:navigate href="{{ route('support-tickets') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-[#0C1E8C]"><i class="bi bi-headset"></i><span>Support tickets</span></a>
                     @if($user->role === 'student')
-                        <a href="#student" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-[#0C1E8C]"><i class="bi bi-mortarboard"></i><span>My training</span></a>
+                        <a href="#student" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-[#0C1E8C]"><i class="bi bi-mortarboard"></i><span>My learning</span></a>
                     @endif
                 </nav>
                 <div class="mt-3 space-y-3 border-t border-slate-100 px-2 py-4 text-left text-slate-500">

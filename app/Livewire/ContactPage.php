@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\ContactMessage;
+use App\Models\Page;
 use App\Models\Setting;
 use App\Services\CommunicationService;
 use App\Traits\GoogleRecaptcha;
@@ -125,7 +126,10 @@ class ContactPage extends Component
 
     public function render(): View
     {
+        $contactPage = Page::query()->where('slug', 'contact-us')->first();
+
         return view('livewire.contact-page', [
+            'contactBannerUrl' => $contactPage?->getBannerUrl() ?? asset('images/kba/about-us-academy.png'),
             'storeEmail' => Setting::get('store_email', 'maitigharaustralia@gmail.com'),
             'storePhone' => Setting::get('store_phone', '+61 432 685 546'),
             'storeAddress' => Setting::get('store_address', '2/75 Dartbrook Road, Auburn NSW, Sydney, NSW 2144'),

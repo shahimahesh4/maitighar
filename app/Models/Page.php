@@ -16,6 +16,7 @@ class Page extends Model
         'title',
         'slug',
         'content',
+        'about_info_boxes',
         'thumbnail_image',
         'banner_image',
         'meta_title',
@@ -26,6 +27,7 @@ class Page extends Model
     ];
 
     protected $casts = [
+        'about_info_boxes' => 'array',
         'sort_order' => 'integer',
     ];
 

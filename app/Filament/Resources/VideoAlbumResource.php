@@ -36,14 +36,14 @@ class VideoAlbumResource extends Resource
                     ])->columns(2),
                 ]),
                 Forms\Components\Tabs\Tab::make('Videos')->icon('heroicon-o-video-camera')->badge(fn (?VideoAlbum $record) => $record?->video_count ?? 0)->schema([
-                    Forms\Components\Section::make('Album videos')->description('Add as many YouTube links or uploaded video files as needed. Drag items to reorder them.')->schema([
+                    Forms\Components\Section::make('Video upload options')->description('Add YouTube videos by link or upload MP4, WebM, and MOV files directly. Drag items to reorder the public gallery.')->schema([
                         Forms\Components\Repeater::make('videos')->label('Videos')->reorderable()->collapsible()->cloneable()->itemLabel(fn (array $state): ?string => $state['title'] ?? 'New video')->schema([
                             Forms\Components\TextInput::make('title')->required()->maxLength(180),
-                            Forms\Components\Select::make('type')->options(['youtube' => 'YouTube link', 'upload' => 'Upload video'])->default('youtube')->required()->live(),
-                            Forms\Components\TextInput::make('youtube_url')->label('YouTube video URL')->url()->placeholder('https://www.youtube.com/watch?v=...')->visible(fn (Forms\Get $get): bool => $get('type') !== 'upload')->required(fn (Forms\Get $get): bool => $get('type') !== 'upload')->columnSpanFull(),
-                            Forms\Components\FileUpload::make('video_file')->label('Video file')->disk('public')->directory('videos/files')->visibility('public')->acceptedFileTypes(['video/mp4', 'video/webm', 'video/quicktime'])->maxSize(204800)->visible(fn (Forms\Get $get): bool => $get('type') === 'upload')->required(fn (Forms\Get $get): bool => $get('type') === 'upload')->downloadable()->columnSpanFull(),
+                            Forms\Components\Select::make('type')->label('Video source')->options(['youtube' => 'Manual YouTube link', 'upload' => 'Upload video file'])->default('youtube')->required()->live()->helperText('Choose whether this video comes from YouTube or is uploaded to the website.'),
+                            Forms\Components\TextInput::make('youtube_url')->label('Manual YouTube video link')->url()->placeholder('https://www.youtube.com/watch?v=...')->helperText('Paste a YouTube watch, short, or share URL. This video will appear automatically in the public gallery.')->visible(fn (Forms\Get $get): bool => $get('type') !== 'upload')->required(fn (Forms\Get $get): bool => $get('type') !== 'upload')->columnSpanFull(),
+                            Forms\Components\FileUpload::make('video_file')->label('Upload video file')->disk('public')->directory('videos/files')->visibility('public')->acceptedFileTypes(['video/mp4', 'video/webm', 'video/quicktime'])->maxSize(204800)->visible(fn (Forms\Get $get): bool => $get('type') === 'upload')->required(fn (Forms\Get $get): bool => $get('type') === 'upload')->downloadable()->openable()->helperText('Accepted: MP4, WebM, or MOV. Maximum file size: 200 MB.')->columnSpanFull(),
                             Forms\Components\FileUpload::make('thumbnail')->label('Custom thumbnail')->image()->disk('public')->directory('videos/thumbnails')->visibility('public')->imageEditor()->imageEditorAspectRatios(['16:9'])->maxSize(8192)->helperText('Optional for YouTube. Recommended for uploaded videos.')->columnSpanFull(),
-                        ])->columns(2)->defaultItems(1)->addActionLabel('Add another video')->columnSpanFull(),
+                        ])->columns(2)->defaultItems(1)->addActionLabel('Add video')->columnSpanFull(),
                     ]),
                 ]),
                 Forms\Components\Tabs\Tab::make('Publishing')->icon('heroicon-o-globe-alt')->schema([

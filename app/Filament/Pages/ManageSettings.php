@@ -4,7 +4,9 @@ namespace App\Filament\Pages;
 
 use App\Models\Setting;
 use App\Services\Ai\GeminiService;
+use App\Services\ImageOptimizationService;
 use Filament\Actions\Action;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -16,6 +18,8 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ManageSettings extends Page
 {
@@ -97,6 +101,8 @@ class ManageSettings extends Page
             'services_cta_title' => Setting::get('services_cta_title', 'Experience Nepalese Heritage with Love.'),
             'services_cta_text' => Setting::get('services_cta_text', 'Talk with our team about your questions, orders, and appointments.'),
             'services_cta_label' => Setting::get('services_cta_label', 'Contact Maitighar'),
+            'photo_gallery_banner_image' => Setting::get('photo_gallery_banner_image', ''),
+            'video_gallery_banner_image' => Setting::get('video_gallery_banner_image', ''),
         ]);
     }
 
@@ -220,6 +226,47 @@ class ManageSettings extends Page
                                         TextInput::make('services_cta_title')->label('Heading')->required(),
                                         Textarea::make('services_cta_text')->label('Supporting text')->rows(2)->required()->columnSpanFull(),
                                         TextInput::make('services_cta_label')->label('Button label')->required(),
+                                    ])->columns(2),
+                            ]),
+
+                        Tabs\Tab::make('Gallery Banners')
+                            ->icon('heroicon-o-photo')
+                            ->schema([
+                                Section::make('Photo & Video Gallery Headers')
+                                    ->description('Upload a separate full-width banner for each gallery page. The same image-overlay header style is used on About Us and Contact Us.')
+                                    ->schema([
+                                        FileUpload::make('photo_gallery_banner_image')
+                                            ->label('Photo Gallery banner image')
+                                            ->image()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->maxSize(2048)
+                                            ->disk('public')
+                                            ->directory('settings/gallery-banners')
+                                            ->visibility('public')
+                                            ->imageResizeMode('contain')
+                                            ->imageResizeTargetWidth('1920')
+                                            ->imageResizeTargetHeight('900')
+                                            ->imageResizeUpscale(false)
+                                            ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                                                ->storeAsWebp($file->getRealPath(), 'public', 'settings/gallery-banners', 1920, 900))
+                                            ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
+                                            ->helperText('JPG, PNG, or WebP up to 2 MB. Optimized to WebP at a maximum of 1920 × 900px.'),
+                                        FileUpload::make('video_gallery_banner_image')
+                                            ->label('Video Gallery banner image')
+                                            ->image()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->maxSize(2048)
+                                            ->disk('public')
+                                            ->directory('settings/gallery-banners')
+                                            ->visibility('public')
+                                            ->imageResizeMode('contain')
+                                            ->imageResizeTargetWidth('1920')
+                                            ->imageResizeTargetHeight('900')
+                                            ->imageResizeUpscale(false)
+                                            ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                                                ->storeAsWebp($file->getRealPath(), 'public', 'settings/gallery-banners', 1920, 900))
+                                            ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
+                                            ->helperText('JPG, PNG, or WebP up to 2 MB. Optimized to WebP at a maximum of 1920 × 900px.'),
                                     ])->columns(2),
                             ]),
 

@@ -294,7 +294,9 @@ const updateStoreHeaderOnScroll = () => {
     const header = document.querySelector('[data-kba-store-header]');
     if (!header) return;
 
-    header.classList.toggle('is-condensed', window.scrollY > 80);
+    // Keep the desktop navigation at a fixed height. Resizing a sticky header
+    // while scrolling can shift the page underneath it and appear as shaking.
+    header.classList.remove('is-condensed');
 };
 
 if (!window.__kbaMobileShellBound) {

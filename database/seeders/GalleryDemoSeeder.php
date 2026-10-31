@@ -34,8 +34,8 @@ class GalleryDemoSeeder extends Seeder
         }
 
         $albums = [
-            ['Maitighar Heritage Collection', 'academy-life-training', 'A glimpse into artisan craftsmanship, authentic traditions, and heritage collections at Maitighar.', ['academy', 'eyes', 'brushes', 'skin', 'beauty'], 1],
-            ['Traditional Handcrafts & Art', 'professional-beauty-work', 'Explore traditional artistry, exquisite handcrafted garments, jewelry, and ethnic lifestyle collections.', ['beauty', 'brushes', 'eyes', 'skin', 'serum'], 2],
+            ['Maitighar Heritage Collection', 'academy-life-learning', 'A glimpse into artisan craftsmanship, authentic traditions, and heritage collections at Maitighar.', ['heritage', 'craft', 'artisans', 'culture'], 1],
+            ['Traditional Handcrafts & Art', 'professional-artistry', 'Explore traditional artistry, exquisite handcrafted garments, jewelry, and ethnic lifestyle collections.', ['heritage', 'craft', 'artistry', 'culture'], 2],
             ['Maitighar Living & Essentials', 'products-studio-essentials', 'A curated look at ethnic lifestyle, home decor, traditional accessories, and cultural collections.', ['serum', 'cream', 'hair', 'brushes', 'eyes', 'skin'], 3],
         ];
 

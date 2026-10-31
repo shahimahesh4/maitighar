@@ -91,9 +91,74 @@ class PageResource extends Resource
                         ]),
                 ]),
 
+                Section::make('Gallery page header')
+                    ->description('The page title and Header banner image control the public gallery header. Manage photo gallery albums and video albums in their dedicated Website menu items.')
+                    ->visible(fn (Forms\Get $get): bool => in_array($get('slug'), ['gallery', 'videos'], true))
+                    ->schema([
+                        Forms\Components\Placeholder::make('gallery_header_note')
+                            ->label('Dynamic gallery page')
+                            ->content('Use the Page Title above for the public header title, and use Header banner image below for the full-width image. The page meta description is shown as the gallery introduction.'),
+                    ]),
+
+                Section::make('About Us information cards')
+                    ->description('Add the Mission, Vision, Why Choose Us, or other information cards. Cards display three per row on desktop.')
+                    ->visible(fn (Forms\Get $get): bool => $get('slug') === 'about-us')
+                    ->schema([
+                        Forms\Components\Repeater::make('about_info_boxes')
+                            ->label('Information cards')
+                            ->schema([
+                                Select::make('icon')
+                                    ->options([
+                                        'bi-compass' => 'Compass — Mission',
+                                        'bi-eye' => 'Eye — Vision',
+                                        'bi-patch-check' => 'Badge check — Quality',
+                                        'bi-heart' => 'Heart — Care',
+                                        'bi-heart-fill' => 'Filled heart — Love',
+                                        'bi-gem' => 'Gem — Craftsmanship',
+                                        'bi-award' => 'Award — Excellence',
+                                        'bi-trophy' => 'Trophy — Achievement',
+                                        'bi-people' => 'People — Community',
+                                        'bi-person-heart' => 'Person heart — Personal care',
+                                        'bi-globe2' => 'Globe — Heritage',
+                                        'bi-flower1' => 'Flower — Heritage',
+                                        'bi-palette' => 'Palette — Creativity',
+                                        'bi-brush' => 'Brush — Artistry',
+                                        'bi-bag-heart' => 'Bag heart — Thoughtful products',
+                                        'bi-box-seam' => 'Box — Products',
+                                        'bi-mortarboard' => 'Graduation cap — Learning',
+                                        'bi-book' => 'Book — Learning',
+                                        'bi-lightbulb' => 'Light bulb — Inspiration',
+                                        'bi-shield-check' => 'Shield check — Trust',
+                                        'bi-hand-thumbs-up' => 'Thumbs up — Service',
+                                        'bi-stars' => 'Stars — Special',
+                                        'bi-sun' => 'Sun — Warmth',
+                                        'bi-tree' => 'Tree — Sustainability',
+                                        'bi-pin-map' => 'Map pin — Nepal',
+                                        'bi-house-heart' => 'Home heart — Belonging',
+                                    ])
+                                    ->required()
+                                    ->default('bi-patch-check'),
+                                TextInput::make('title')
+                                    ->required()
+                                    ->maxLength(80),
+                                Textarea::make('description')
+                                    ->required()
+                                    ->rows(4)
+                                    ->maxLength(600)
+                                    ->columnSpanFull(),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(0)
+                            ->addActionLabel('Add information card')
+                            ->reorderable()
+                            ->collapsible()
+                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? 'New information card')
+                            ->helperText('Use three cards for one full desktop row, or add more cards to create additional rows.'),
+                    ]),
+
                 Section::make('Media')->schema([
                     FileUpload::make('thumbnail_image')
-                        ->label('Featured image')
+                        ->label('Feature section image')
                         ->image()
                         ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                         ->maxSize(2048)
@@ -107,10 +172,10 @@ class PageResource extends Resource
                         ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
                             ->storeAsWebp($file->getRealPath(), 'public', 'pages/thumbnails', 1200, 1200))
                         ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
-                        ->helperText('JPG, PNG, or WebP up to 2 MB. Saved as optimized WebP (maximum 1200×1200px).'),
+                        ->helperText('Used in the feature section within the page content. JPG, PNG, or WebP up to 2 MB; saved as optimized WebP (maximum 1200×1200px).'),
 
                     FileUpload::make('banner_image')
-                        ->label('Banner image')
+                        ->label('Header banner image')
                         ->image()
                         ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                         ->maxSize(2048)
@@ -124,7 +189,7 @@ class PageResource extends Resource
                         ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
                             ->storeAsWebp($file->getRealPath(), 'public', 'pages/banners', 1920, 900))
                         ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
-                        ->helperText('JPG, PNG, or WebP up to 2 MB. Saved as optimized WebP (maximum 1920×900px).'),
+                        ->helperText('Used in the full-width page header. JPG, PNG, or WebP up to 2 MB; saved as optimized WebP (maximum 1920×900px).'),
                 ])->columns(2),
 
                 Section::make('SEO')->schema([

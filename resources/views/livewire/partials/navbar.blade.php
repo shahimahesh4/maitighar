@@ -19,9 +19,9 @@
                     <span>Find Store</span>
                 </a>
                 <span class="text-white/20 hidden lg:inline text-[11px]">|</span>
-                <a wire:navigate href="{{ route('contact') }}" class="hidden lg:flex items-center gap-1.5 text-white/85 hover:text-white transition-colors">
-                    <i class="bi bi-question-circle text-[11px] sm:text-[12px] text-white/70"></i>
-                    <span>Help Center</span>
+                <a wire:navigate href="{{ route('support-tickets') }}" class="hidden lg:flex items-center gap-1.5 text-white/85 hover:text-white transition-colors">
+                    <i class="bi bi-headset text-[11px] sm:text-[12px] text-white/70"></i>
+                    <span>Help Desk</span>
                 </a>
             </div>
 
@@ -96,30 +96,9 @@
                     Home
                 </a>
 
-                <!-- Shop Dropdown -->
-                <div class="relative group" x-data="{ open: false, timeout: null }" :class="{ 'is-open': open }"
-                     @mouseenter="clearTimeout(timeout); open = true"
-                     @mouseleave="timeout = setTimeout(() => { open = false }, 250)"
-                     @click.outside="open = false">
-                    <button type="button" @click="open = !open" :aria-expanded="open.toString()" aria-haspopup="menu" class="px-3 py-1 rounded-lg font-semibold inline-flex items-center gap-1 transition-all focus:outline-none {{ request()->routeIs('all-products', 'product-details', 'product-categories') ? 'bg-white text-[#EC0205] font-bold' : 'text-white/90 hover:text-white hover:bg-white/10' }}">
-                        <span>Shop</span>
-                        <i class="bi bi-chevron-down kba-store-dropdown-chevron text-[9px] text-white/80 transition-transform" :class="{ 'rotate-180': open }"></i>
-                    </button>
-                    <div x-show="open" x-cloak
-                         x-transition:enter="transition ease-out duration-150"
-                         x-transition:enter-start="opacity-0 translate-y-1"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         x-transition:leave="transition ease-in duration-100"
-                         x-transition:leave-start="opacity-100 translate-y-0"
-                         x-transition:leave-end="opacity-0 translate-y-1"
-                         class="absolute left-0 top-full pt-1.5 w-52 z-50">
-                        <div class="rounded-xl bg-white border border-slate-200 shadow-xl py-2 text-slate-800">
-                            <a wire:navigate href="{{ route('all-products') }}" class="block px-4 py-2 text-xs font-bold text-[#EA0202] hover:bg-red-50 border-b border-slate-100 transition-colors">All Products</a>
-                            <a wire:navigate href="{{ route('product-categories') }}" class="block px-4 py-2 text-xs text-slate-700 hover:text-[#EA0202] hover:bg-slate-50 font-semibold transition-colors">Categories</a>
-                            <a wire:navigate href="{{ route('all-products', ['on_sale' => 1]) }}" class="block px-4 py-2 text-xs text-slate-700 hover:text-[#EA0202] hover:bg-slate-50 font-semibold transition-colors">On Sale Offers</a>
-                        </div>
-                    </div>
-                </div>
+                <a wire:navigate href="{{ route('all-products') }}" class="px-3 py-1 rounded-lg font-semibold transition-all {{ request()->routeIs('all-products', 'product-details', 'product-categories') ? 'bg-white text-[#EC0205] font-bold' : 'text-white/90 hover:text-white hover:bg-white/10' }}">
+                    Products
+                </a>
 
                 <!-- About Us -->
                 <a wire:navigate href="{{ route('pages.show', 'about-us') }}" class="px-3 py-1 rounded-lg font-semibold transition-all {{ request()->is('about-us') ? 'bg-white text-[#EC0205] font-bold' : 'text-white/90 hover:text-white hover:bg-white/10' }}">

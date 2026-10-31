@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GalleryApiController;
 use App\Models\Product;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Route;
@@ -30,4 +31,9 @@ Route::prefix('v1')->group(function (): void {
             'in_stock' => (bool) $product->in_stock,
         ]);
     })->name('api.v1.products');
+
+    Route::get('/photo-gallery', [GalleryApiController::class, 'photoAlbums'])->name('api.v1.photo-gallery.index');
+    Route::get('/photo-gallery/{slug}', [GalleryApiController::class, 'photoAlbum'])->name('api.v1.photo-gallery.show');
+    Route::get('/video-gallery', [GalleryApiController::class, 'videoAlbums'])->name('api.v1.video-gallery.index');
+    Route::get('/video-gallery/{slug}', [GalleryApiController::class, 'videoAlbum'])->name('api.v1.video-gallery.show');
 });

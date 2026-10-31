@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\GalleryAlbum;
+use App\Models\Page;
+use App\Models\Setting;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class GalleryController extends Controller
 {
@@ -22,7 +26,14 @@ class GalleryController extends Controller
             $albums = GalleryAlbum::published()->paginate(12);
         }
 
-        return view('gallery.index', compact('albums'));
+        $galleryPage = Page::published()->where('slug', 'gallery')->first();
+        $photoGalleryTitle = $galleryPage?->title ?: 'Our Photo Gallery';
+        $photoGalleryDescription = $galleryPage?->meta_description ?: 'Explore handcrafted artistry, cultural showcases, and memorable moments from Maitighar.';
+        $photoGalleryBannerUrl = filled($galleryPage?->banner_image)
+            ? $galleryPage->getBannerUrl()
+            : $this->bannerUrl('photo_gallery_banner_image', $albums->first()?->cover_url);
+
+        return view('gallery.index', compact('albums', 'photoGalleryBannerUrl', 'photoGalleryTitle', 'photoGalleryDescription'));
     }
 
     public function show(GalleryAlbum $album)
@@ -40,5 +51,18 @@ class GalleryController extends Controller
         );
 
         return view('gallery.show', compact('album', 'images'));
+    }
+
+    private function bannerUrl(string $settingKey, ?string $fallback = null): string
+    {
+        $path = (string) Setting::get($settingKey, '');
+
+        if (filled($path)) {
+            return Str::startsWith($path, ['http://', 'https://'])
+                ? $path
+                : Storage::disk('public')->url($path);
+        }
+
+        return $fallback ?: asset('images/kba/about-us-academy.png');
     }
 }

@@ -1,17 +1,15 @@
-<x-layouts.app title="Video Gallery | Maitighar" meta-description="Watch artisan craft making, cultural demonstrations, product showcases, and special moments from Maitighar.">
+<x-layouts.app :title="$videoGalleryTitle.' | Maitighar'" :meta-description="$videoGalleryDescription">
     <div class="kba-gallery-page kba-video-gallery-page">
-        <section class="kba-gallery-hero kba-video-gallery-hero">
-            <div class="kba-gallery-hero-orb" aria-hidden="true"></div>
-            <div class="kba-gallery-hero-inner">
-                <nav class="kba-page-breadcrumbs" aria-label="Breadcrumb"><a wire:navigate href="{{ route('index') }}"><i class="bi bi-house-door" aria-hidden="true"></i>Home</a><i class="bi bi-chevron-right"></i><span aria-current="page">Video Gallery</span></nav>
-                <span class="kba-cms-eyebrow"><i class="bi bi-play-circle"></i> Watch, learn and discover</span>
-                <h1>Our Video Gallery</h1>
-                <p>Explore artisan craft demonstrations, cultural traditions, product showcases, and inspiring moments from Maitighar.</p>
-                <div class="kba-gallery-summary"><span><strong>{{ $albums->total() }}</strong> {{ Str::plural('album', $albums->total()) }}</span><i></i><span>YouTube &amp; studio videos</span></div>
+        <section class="kba-cms-hero kba-gallery-page-hero" aria-labelledby="video-gallery-heading" style="--kba-gallery-page-hero-image: url('{{ $videoGalleryBannerUrl }}');">
+            <div class="kba-cms-hero-inner">
+                <div class="kba-cms-hero-copy">
+                    <nav class="kba-page-breadcrumbs" aria-label="Breadcrumb"><a wire:navigate href="{{ route('index') }}"><i class="bi bi-house-door" aria-hidden="true"></i>Home</a><i class="bi bi-chevron-right"></i><span aria-current="page">Video Gallery</span></nav>
+                    <h1 id="video-gallery-heading">{{ $videoGalleryTitle }}</h1>
+                </div>
             </div>
         </section>
         <main class="kba-gallery-albums">
-            <header class="kba-gallery-section-head"><div><span>Video collections</span><h2>Explore our stories in motion</h2></div><p>Select an album to watch all related videos in a beautiful popup player.</p></header>
+            <header class="kba-gallery-section-head"><div><span>Video collections</span><h2>Explore our stories in motion</h2></div><p>{{ $videoGalleryDescription }} Browse {{ $albums->total() }} {{ Str::plural('album', $albums->total()) }}.</p></header>
             @forelse($albums as $album)
                 @if($loop->first)<div class="kba-album-grid">@endif
                 <a wire:navigate href="{{ route('videos.show', $album) }}" class="kba-album-card kba-video-album-card">
