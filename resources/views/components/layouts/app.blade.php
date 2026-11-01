@@ -1,3 +1,19 @@
+@php
+    $setting = static fn (string $key, mixed $default = null): mixed => \App\Models\Setting::get($key, $default);
+    $storeName = (string) $setting('store_name', 'Maitighar');
+    $defaultTitle = (string) $setting('seo_meta_title', 'Maitighar - Nepalese Heritage with Love');
+    $defaultDescription = (string) $setting('seo_meta_description', 'Maitighar - Nepalese Heritage with Love. Authentic Nepalese heritage, culture, and craftsmanship.');
+    $defaultKeywords = (string) $setting('seo_meta_keywords', 'Nepalese heritage, Nepalese crafts, Maitighar, Australia');
+    $storeLogoPath = (string) $setting('store_logo', '');
+    $faviconPath = (string) $setting('store_favicon', '');
+    $ogImagePath = (string) $setting('store_og_image', '');
+    $storeLogoUrl = $storeLogoPath !== '' ? \Illuminate\Support\Facades\Storage::disk('public')->url($storeLogoPath) : asset('images/logo.webp');
+    $faviconUrl = $faviconPath !== '' ? \Illuminate\Support\Facades\Storage::disk('public')->url($faviconPath) : asset('favicon-32x32.png');
+    $defaultOgImage = $ogImagePath !== '' ? \Illuminate\Support\Facades\Storage::disk('public')->url($ogImagePath) : $storeLogoUrl;
+    $pageTitle = $title ?? $defaultTitle;
+    $pageDescription = $metaDescription ?? $defaultDescription;
+    $pageOgImage = $ogImage ?? $defaultOgImage;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -5,23 +21,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="theme-color" content="#EC0205">
         <meta name="robots" content="{{ $robots ?? (request()->routeIs('login', 'register', 'forgot-password', 'password.reset', 'verification.*', 'dashboard', 'profile.*', 'support-tickets', 'my-orders', 'my-order-details', 'checkout', 'success', 'cancelled') ? 'noindex, nofollow' : 'index, follow') }}">
-        <meta name="description" content="{{ $metaDescription ?? 'Maitighar - Nepalese Heritage with Love. Authentic Nepalese heritage, culture, and craftsmanship.' }}">
+        <meta name="description" content="{{ $pageDescription }}">
+        @if($defaultKeywords !== '')<meta name="keywords" content="{{ $defaultKeywords }}">@endif
         <meta property="og:type" content="{{ $ogType ?? 'website' }}">
-        <meta property="og:title" content="{{ $title ?? 'Maitighar - Nepalese Heritage with Love' }}">
-        <meta property="og:description" content="{{ $metaDescription ?? 'Maitighar - Nepalese Heritage with Love. Authentic Nepalese heritage, culture, and craftsmanship.' }}">
-        <meta property="og:image" content="{{ $ogImage ?? asset('images/logo.webp') }}">
+        <meta property="og:title" content="{{ $pageTitle }}">
+        <meta property="og:description" content="{{ $pageDescription }}">
+        <meta property="og:image" content="{{ $pageOgImage }}">
         <meta property="og:url" content="{{ $canonicalUrl ?? url()->current() }}">
-        <meta property="og:site_name" content="Maitighar">
+        <meta property="og:site_name" content="{{ $storeName }}">
         <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="{{ $title ?? 'Maitighar - Nepalese Heritage with Love' }}">
-        <meta name="twitter:description" content="{{ $metaDescription ?? 'Maitighar - Nepalese Heritage with Love. Authentic Nepalese heritage, culture, and craftsmanship.' }}">
-        <meta name="twitter:image" content="{{ $ogImage ?? asset('images/logo.webp') }}">
+        <meta name="twitter:title" content="{{ $pageTitle }}">
+        <meta name="twitter:description" content="{{ $pageDescription }}">
+        <meta name="twitter:image" content="{{ $pageOgImage }}">
         <link rel="canonical" href="{{ $canonicalUrl ?? url()->current() }}">
-        <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+        <link rel="icon" href="{{ $faviconUrl }}" sizes="any">
+        <link rel="apple-touch-icon" href="{{ $faviconUrl }}">
 
-        <title>{{ $title ?? 'Maitighar - Nepalese Heritage with Love' }}</title>
+        <title>{{ $pageTitle }}</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,13 +59,13 @@
                     [
                         '@type' => ['Store', 'EducationalOrganization'],
                         '@id' => $siteUrl.'/#organization',
-                        'name' => 'Maitighar',
+                        'name' => $storeName,
                         'url' => $siteUrl,
-                        'logo' => asset('images/logo.webp'),
-                        'image' => asset('images/logo.webp'),
-                        'description' => 'Maitighar - Nepalese Heritage with Love. Authentic craftsmanship, services, and handcrafted collections.',
-                        'telephone' => '+61432685546',
-                        'email' => 'maitigharaustralia@gmail.com',
+                        'logo' => $storeLogoUrl,
+                        'image' => $defaultOgImage,
+                        'description' => $defaultDescription,
+                        'telephone' => (string) $setting('store_phone', '+61432685546'),
+                        'email' => (string) $setting('store_email', 'maitigharaustralia@gmail.com'),
                         'priceRange' => 'AUD',
                         'address' => [
                             '@type' => 'PostalAddress',
@@ -68,7 +84,7 @@
                         '@type' => 'WebSite',
                         '@id' => $siteUrl.'/#website',
                         'url' => $siteUrl,
-                        'name' => 'Maitighar',
+                        'name' => $storeName,
                         'publisher' => ['@id' => $siteUrl.'/#organization'],
                         'inLanguage' => 'en',
                     ],

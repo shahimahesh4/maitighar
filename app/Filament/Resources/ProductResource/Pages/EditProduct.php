@@ -13,7 +13,9 @@ class EditProduct extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()->label('Move to Trash'),
+            Actions\RestoreAction::make(),
+            Actions\ForceDeleteAction::make()->label('Permanently Delete'),
         ];
     }
 

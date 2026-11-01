@@ -49,6 +49,12 @@ class ManageSettings extends Page
             'store_email' => Setting::get('store_email', 'maitigharaustralia@gmail.com'),
             'store_phone' => Setting::get('store_phone', '+61 432 685 546'),
             'store_address' => Setting::get('store_address', '2/75 Dartbrook Road, Auburn NSW, Sydney, NSW 2144'),
+            'store_logo' => Setting::get('store_logo', ''),
+            'store_favicon' => Setting::get('store_favicon', ''),
+            'store_og_image' => Setting::get('store_og_image', ''),
+            'seo_meta_title' => Setting::get('seo_meta_title', 'Maitighar - Nepalese Heritage with Love'),
+            'seo_meta_description' => Setting::get('seo_meta_description', 'Maitighar - Nepalese Heritage with Love. Authentic Nepalese heritage, culture, and craftsmanship.'),
+            'seo_meta_keywords' => Setting::get('seo_meta_keywords', 'Nepalese heritage, Nepalese crafts, Maitighar, Australia'),
             'default_currency' => Setting::get('default_currency', 'AUD'),
             'currency_symbol' => Setting::get('currency_symbol', '$'),
             'sku_prefix' => Setting::get('sku_prefix', 'MG-AUS-'),
@@ -61,6 +67,17 @@ class ManageSettings extends Page
             'maintenance_mode' => (bool) Setting::get('maintenance_mode', false),
             'maintenance_title' => Setting::get('maintenance_title', 'Maitighar update is underway'),
             'maintenance_message' => Setting::get('maintenance_message', 'We are polishing the website to bring you a better experience. Please check back soon.'),
+            'coming_soon_topline_left' => Setting::get('coming_soon_topline_left', 'From Nepal, with Love'),
+            'coming_soon_topline_right' => Setting::get('coming_soon_topline_right', 'Australia'),
+            'coming_soon_logo' => Setting::get('coming_soon_logo', ''),
+            'coming_soon_eyebrow' => Setting::get('coming_soon_eyebrow', 'Nepalese Heritage with Love'),
+            'coming_soon_heading' => Setting::get('coming_soon_heading', 'Coming Soon'),
+            'coming_soon_subheading' => Setting::get('coming_soon_subheading', 'A beautiful new chapter is coming.'),
+            'coming_soon_description' => Setting::get('coming_soon_description', 'Nepalese heritage, culture, and craftsmanship — soon at home in Australia.'),
+            'coming_soon_facebook_label' => Setting::get('coming_soon_facebook_label', 'Follow us on Facebook'),
+            'coming_soon_values' => Setting::get('coming_soon_values', ['Nepalese Heritage', 'Culture', 'Craftsmanship']),
+            'coming_soon_footer_text' => Setting::get('coming_soon_footer_text', '© 2026 Maiti Ghar · Made with heritage and heart'),
+            'coming_soon_footer_credit' => Setting::get('coming_soon_footer_credit', 'Crafted by Siddhi Tech Nepal'),
             'admin_notification_email' => Setting::get('admin_notification_email', 'maitigharaustralia@gmail.com'),
             'email_from_name' => Setting::get('email_from_name', 'Maitighar'),
             'email_footer' => Setting::get('email_footer', 'Maitighar - Nepalese Heritage with Love.'),
@@ -82,25 +99,6 @@ class ManageSettings extends Page
             'google_recaptcha_site_key' => Setting::get('google_recaptcha_site_key', ''),
             'google_recaptcha_secret_key' => Setting::get('google_recaptcha_secret_key', ''),
             'google_analytics_id' => Setting::get('google_analytics_id', ''),
-            'services_hero_eyebrow' => Setting::get('services_hero_eyebrow', 'Maitighar Studio'),
-            'services_hero_title' => Setting::get('services_hero_title', 'Heritage & Services,'),
-            'services_hero_accent' => Setting::get('services_hero_accent', 'made personal.'),
-            'services_hero_intro' => Setting::get('services_hero_intro', 'From authentic Nepali heritage creations to personalized services, Maitighar brings you tradition and elegance with heartfelt care.'),
-            'services_primary_cta_label' => Setting::get('services_primary_cta_label', 'Book an appointment'),
-            'services_catalog_eyebrow' => Setting::get('services_catalog_eyebrow', 'Our offerings'),
-            'services_catalog_title' => Setting::get('services_catalog_title', 'Find your perfect service & product'),
-            'services_catalog_intro' => Setting::get('services_catalog_intro', 'Choose an option to see details, who it is perfect for, and how to order or book.'),
-            'services_promise_eyebrow' => Setting::get('services_promise_eyebrow', 'The Maitighar Experience'),
-            'services_promise_title' => Setting::get('services_promise_title', 'Authentic craft. Thoughtful care.'),
-            'services_promises' => Setting::get('services_promises', [
-                ['title' => 'Personal consultation', 'description' => 'We begin by understanding your requirements, needs, and desired result.'],
-                ['title' => 'Trained professionals', 'description' => 'Experienced artisans and artists deliver considered, technique-led service.'],
-                ['title' => 'Hygiene & Quality first', 'description' => 'Clean practices, authentic Nepali quality, and a comfortable experience.'],
-            ]),
-            'services_cta_eyebrow' => Setting::get('services_cta_eyebrow', 'Ready when you are'),
-            'services_cta_title' => Setting::get('services_cta_title', 'Experience Nepalese Heritage with Love.'),
-            'services_cta_text' => Setting::get('services_cta_text', 'Talk with our team about your questions, orders, and appointments.'),
-            'services_cta_label' => Setting::get('services_cta_label', 'Contact Maitighar'),
             'photo_gallery_banner_image' => Setting::get('photo_gallery_banner_image', ''),
             'video_gallery_banner_image' => Setting::get('video_gallery_banner_image', ''),
         ]);
@@ -129,6 +127,71 @@ class ManageSettings extends Page
                                             ->maxLength(255),
                                         Textarea::make('store_address')
                                             ->rows(3)
+                                            ->columnSpanFull(),
+                                    ])->columns(2),
+
+                                Section::make('Brand Assets')
+                                    ->description('These uploads are used across the storefront, browser tabs, search previews, and social sharing cards.')
+                                    ->schema([
+                                        FileUpload::make('store_logo')
+                                            ->label('Store logo')
+                                            ->image()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->maxSize(2048)
+                                            ->disk('public')
+                                            ->directory('settings/brand')
+                                            ->visibility('public')
+                                            ->imageResizeMode('contain')
+                                            ->imageResizeTargetWidth('800')
+                                            ->imageResizeTargetHeight('800')
+                                            ->imageResizeUpscale(false)
+                                            ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                                                ->storeAsWebp($file->getRealPath(), 'public', 'settings/brand', 800, 800))
+                                            ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
+                                            ->helperText('JPG, PNG, or WebP up to 2 MB. Used for the storefront and admin brand mark.'),
+                                        FileUpload::make('store_favicon')
+                                            ->label('Favicon')
+                                            ->acceptedFileTypes(['image/png', 'image/x-icon', 'image/vnd.microsoft.icon', 'image/svg+xml', 'image/webp'])
+                                            ->maxSize(512)
+                                            ->disk('public')
+                                            ->directory('settings/brand')
+                                            ->visibility('public')
+                                            ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
+                                            ->helperText('PNG, ICO, SVG, or WebP up to 512 KB. A square 512 × 512 PNG is recommended.'),
+                                        FileUpload::make('store_og_image')
+                                            ->label('Open Graph image')
+                                            ->image()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->maxSize(3072)
+                                            ->disk('public')
+                                            ->directory('settings/brand')
+                                            ->visibility('public')
+                                            ->imageResizeMode('cover')
+                                            ->imageResizeTargetWidth('1200')
+                                            ->imageResizeTargetHeight('630')
+                                            ->imageResizeUpscale(false)
+                                            ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                                                ->storeAsWebp($file->getRealPath(), 'public', 'settings/brand', 1200, 630))
+                                            ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
+                                            ->helperText('JPG, PNG, or WebP up to 3 MB. Recommended size: 1200 × 630px.'),
+                                    ])->columns(3),
+
+                                Section::make('Search Engine Optimisation')
+                                    ->description('Default SEO values used when a page or product does not provide its own metadata.')
+                                    ->schema([
+                                        TextInput::make('seo_meta_title')
+                                            ->label('Default SEO title')
+                                            ->maxLength(60)
+                                            ->helperText('Recommended maximum: 60 characters.'),
+                                        Textarea::make('seo_meta_description')
+                                            ->label('Default SEO description')
+                                            ->rows(3)
+                                            ->maxLength(160)
+                                            ->helperText('Recommended maximum: 160 characters.'),
+                                        Textarea::make('seo_meta_keywords')
+                                            ->label('Default SEO keywords')
+                                            ->rows(3)
+                                            ->helperText('Optional comma-separated keywords.')
                                             ->columnSpanFull(),
                                     ])->columns(2),
 
@@ -186,47 +249,6 @@ class ManageSettings extends Page
                                             ->url()
                                             ->placeholder('https://twitter.com/username'),
                                     ])->columns(3),
-                            ]),
-
-                        Tabs\Tab::make('Services Page')
-                            ->icon('heroicon-o-sparkles')
-                            ->schema([
-                                Section::make('Hero & Catalog')
-                                    ->description('Content shown above the dynamic service cards.')
-                                    ->schema([
-                                        TextInput::make('services_hero_eyebrow')->label('Hero eyebrow')->required(),
-                                        TextInput::make('services_hero_title')->label('Hero title')->required(),
-                                        TextInput::make('services_hero_accent')->label('Hero accent text')->required(),
-                                        Textarea::make('services_hero_intro')->label('Hero introduction')->rows(3)->required()->columnSpanFull(),
-                                        TextInput::make('services_primary_cta_label')->label('Primary button label')->required(),
-                                        TextInput::make('services_catalog_eyebrow')->label('Catalog eyebrow')->required(),
-                                        TextInput::make('services_catalog_title')->label('Catalog heading')->required(),
-                                        Textarea::make('services_catalog_intro')->label('Catalog introduction')->rows(2)->required()->columnSpanFull(),
-                                    ])->columns(2),
-                                Section::make('Experience Promises')
-                                    ->schema([
-                                        TextInput::make('services_promise_eyebrow')->label('Section eyebrow')->required(),
-                                        TextInput::make('services_promise_title')->label('Section heading')->required(),
-                                        Repeater::make('services_promises')
-                                            ->label('Promise cards')
-                                            ->schema([
-                                                TextInput::make('title')->required(),
-                                                Textarea::make('description')->rows(2)->required(),
-                                            ])
-                                            ->minItems(1)
-                                            ->maxItems(6)
-                                            ->reorderable()
-                                            ->collapsible()
-                                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
-                                            ->columnSpanFull(),
-                                    ])->columns(2),
-                                Section::make('Booking Call to Action')
-                                    ->schema([
-                                        TextInput::make('services_cta_eyebrow')->label('Eyebrow')->required(),
-                                        TextInput::make('services_cta_title')->label('Heading')->required(),
-                                        Textarea::make('services_cta_text')->label('Supporting text')->rows(2)->required()->columnSpanFull(),
-                                        TextInput::make('services_cta_label')->label('Button label')->required(),
-                                    ])->columns(2),
                             ]),
 
                         Tabs\Tab::make('Gallery Banners')
@@ -343,6 +365,42 @@ class ManageSettings extends Page
                                             ->rows(4)
                                             ->columnSpanFull(),
                                     ]),
+                                Section::make('Coming Soon Page')
+                                    ->description('Content shown to public visitors when Maintenance Mode is enabled. Store contact details and Facebook URL are reused from the Store tab.')
+                                    ->schema([
+                                        TextInput::make('coming_soon_topline_left')->label('Top line — left')->required()->maxLength(80),
+                                        TextInput::make('coming_soon_topline_right')->label('Top line — right')->required()->maxLength(80),
+                                        FileUpload::make('coming_soon_logo')
+                                            ->label('Coming soon logo')
+                                            ->image()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->maxSize(2048)
+                                            ->disk('public')
+                                            ->directory('settings/coming-soon')
+                                            ->visibility('public')
+                                            ->imageResizeMode('contain')
+                                            ->imageResizeTargetWidth('600')
+                                            ->imageResizeTargetHeight('600')
+                                            ->imageResizeUpscale(false)
+                                            ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                                                ->storeAsWebp($file->getRealPath(), 'public', 'settings/coming-soon', 600, 600))
+                                            ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file))
+                                            ->helperText('Optional. Leave blank to use the standard Maitighar logo.'),
+                                        TextInput::make('coming_soon_eyebrow')->label('Red eyebrow text')->required()->maxLength(120),
+                                        TextInput::make('coming_soon_heading')->label('Main heading')->required()->maxLength(120),
+                                        TextInput::make('coming_soon_subheading')->label('Supporting heading')->required()->maxLength(180)->columnSpanFull(),
+                                        Textarea::make('coming_soon_description')->label('Description')->required()->rows(2)->columnSpanFull(),
+                                        TextInput::make('coming_soon_facebook_label')->label('Facebook button label')->required()->maxLength(80),
+                                        Repeater::make('coming_soon_values')
+                                            ->label('Heritage highlights')
+                                            ->simple(TextInput::make('value')->required()->maxLength(50))
+                                            ->defaultItems(3)
+                                            ->minItems(1)
+                                            ->maxItems(5)
+                                            ->reorderable(),
+                                        TextInput::make('coming_soon_footer_text')->label('Footer text')->required()->maxLength(180),
+                                        TextInput::make('coming_soon_footer_credit')->label('Footer credit')->required()->maxLength(120),
+                                    ])->columns(2),
                             ]),
 
                         Tabs\Tab::make('Integrations')

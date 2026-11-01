@@ -1,3 +1,8 @@
+@php
+    $storeLogoPath = (string) \App\Models\Setting::get('store_logo', '');
+    $storeLogoUrl = $storeLogoPath !== '' ? \Illuminate\Support\Facades\Storage::disk('public')->url($storeLogoPath) : asset('images/logo.webp');
+    $storeName = (string) \App\Models\Setting::get('store_name', 'Maitighar');
+@endphp
 <div class="kba-store-header w-full bg-white font-sans shadow-sm" data-kba-store-header>
     <!-- Top Header Bar (Dark Charcoal matching reference design) -->
     <div class="kba-store-utility bg-[#222222] text-white/90 border-b border-black/20 py-1 sm:py-1.5">
@@ -84,8 +89,8 @@
             
             <!-- Logo & Brand -->
             <div class="kba-store-logo flex items-center flex-shrink-0">
-                <a wire:navigate href="{{ route('index') }}" class="flex items-center" aria-label="Maitighar home">
-                    <img src="{{ asset('images/logo.webp') }}" alt="Maitighar" class="h-10 sm:h-11 md:h-12 lg:h-14 xl:h-16 w-auto object-contain transition-all hover:scale-105 duration-200">
+                <a wire:navigate href="{{ route('index') }}" class="flex items-center" aria-label="{{ $storeName }} home">
+                    <img src="{{ $storeLogoUrl }}" alt="{{ $storeName }}" class="h-10 sm:h-11 md:h-12 lg:h-14 xl:h-16 w-auto object-contain transition-all hover:scale-105 duration-200">
                 </a>
             </div>
 
@@ -226,7 +231,7 @@
     <aside class="kba-mobile-sidebar" id="kba-mobile-sidebar" data-kba-mobile-sidebar aria-hidden="true" aria-label="Mobile navigation" inert>
         <div class="kba-mobile-sidebar-head">
             <div class="kba-sidebar-brand">
-                <img src="{{ asset('images/logo.webp') }}" alt="Maitighar" width="130" height="129">
+                <img src="{{ $storeLogoUrl }}" alt="{{ $storeName }}" width="130" height="129">
                 <span><strong>Maitighar</strong> <small>Shop All In One</small></span>
             </div>
             <button type="button" data-kba-menu-close aria-label="Close navigation menu"><i class="bi bi-x-lg"></i></button>

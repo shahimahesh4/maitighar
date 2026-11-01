@@ -28,6 +28,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -543,17 +544,7 @@ class ProductResource extends Resource
                     ->getStateUsing(fn (Product $record): string => $record->getImageUrl())
                     ->square(),
 
-                Tables\Columns\TextColumn::make('product_type')
-                    ->label('Type')
-                    ->badge()
-                    ->formatStateUsing(fn ($state) => $state === 'variable' ? 'Variable' : 'Simple')
-                    ->color(fn ($state) => $state === 'variable' ? 'warning' : 'info')
-                    ->sortable(),
-
                 Tables\Columns\TextColumn::make('category.name')
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('brand.name')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('sale_price')
@@ -582,6 +573,9 @@ class ProductResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\TrashedFilter::make()
+                    ->label('Trash'),
+
                 SelectFilter::make('product_type')
                     ->options([
                         'simple' => 'Simple Product',
@@ -610,12 +604,38 @@ class ProductResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\DeleteAction::make()->requiresConfirmation(),
+                    Tables\Actions\Action::make('publish')
+                        ->label('Publish')
+                        ->icon('heroicon-o-eye')
+                        ->color('success')
+                        ->visible(fn (Product $record): bool => ! $record->trashed() && ! $record->is_active)
+                        ->action(fn (Product $record) => $record->update(['is_active' => true])),
+                    Tables\Actions\Action::make('unpublish')
+                        ->label('Unpublish')
+                        ->icon('heroicon-o-eye-slash')
+                        ->color('warning')
+                        ->requiresConfirmation()
+                        ->visible(fn (Product $record): bool => ! $record->trashed() && $record->is_active)
+                        ->action(fn (Product $record) => $record->update(['is_active' => false])),
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Move to Trash')
+                        ->requiresConfirmation()
+                        ->visible(fn (Product $record): bool => ! $record->trashed()),
+                    Tables\Actions\RestoreAction::make()
+                        ->label('Restore')
+                        ->visible(fn (Product $record): bool => $record->trashed()),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->label('Permanently Delete')
+                        ->requiresConfirmation()
+                        ->visible(fn (Product $record): bool => $record->trashed()),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Move to Trash'),
+                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label('Permanently Delete'),
                 ]),
             ])
             ->defaultPaginationPageOption(12)
@@ -635,7 +655,9 @@ class ProductResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with(['category', 'brand']);
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class])
+            ->with(['category', 'brand']);
     }
 
     public static function getPages(): array

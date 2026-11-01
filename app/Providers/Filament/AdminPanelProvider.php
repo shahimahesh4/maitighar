@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\EditProfile;
 use App\Filament\Resources\OrderResource\Widgets\OrderStats;
+use App\Models\Setting;
 use App\Services\CommunicationService;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -24,6 +25,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -38,11 +40,11 @@ class AdminPanelProvider extends PanelProvider
             ->emailVerification(
                 isRequired: app(CommunicationService::class)->emailVerificationEnabled(),
             )
-            ->brandName('Maitighar')
-            ->brandLogo(asset('images/logo.webp'))
-            ->darkModeBrandLogo(asset('images/logo.webp'))
+            ->brandName(fn (): string => (string) Setting::get('store_name', 'Maitighar'))
+            ->brandLogo(fn (): string => $this->brandAssetUrl('store_logo', 'images/logo.webp'))
+            ->darkModeBrandLogo(fn (): string => $this->brandAssetUrl('store_logo', 'images/logo.webp'))
             ->brandLogoHeight('3.5rem')
-            ->favicon(asset('favicon.ico'))
+            ->favicon(fn (): string => $this->brandAssetUrl('store_favicon', 'favicon-32x32.png'))
             ->userMenuItems([
                 'profile' => UserMenuItem::make()
                     ->url(fn (): string => EditProfile::getUrl()),
@@ -59,6 +61,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::hex('#EC0205'),
                 'info' => Color::hex('#0C1E8C'),
             ])
+            ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('User')
@@ -117,6 +120,17 @@ class AdminPanelProvider extends PanelProvider
                     .fi-body { background: #f8fafc; }
                     .fi-sidebar {
                         background: linear-gradient(180deg, #091b38 0%, #071355 100%);
+                    }
+                    @media (min-width: 1024px) {
+                        /* Filament disables the desktop sidebar transition by default. */
+                        .fi-sidebar {
+                            transition-property: width, transform, margin, padding, box-shadow !important;
+                            transition-duration: 650ms !important;
+                            transition-timing-function: cubic-bezier(.25, .1, .25, 1) !important;
+                        }
+                        .fi-main-ctn {
+                            transition: flex-basis 650ms cubic-bezier(.25, .1, .25, 1), width 650ms cubic-bezier(.25, .1, .25, 1) !important;
+                        }
                     }
                     .fi-sidebar-header {
                         background: #EB0302 !important;
@@ -223,5 +237,12 @@ class AdminPanelProvider extends PanelProvider
                 </style>
             '),
         );
+    }
+
+    private function brandAssetUrl(string $setting, string $fallback): string
+    {
+        $path = (string) Setting::get($setting, '');
+
+        return $path !== '' ? Storage::disk('public')->url($path) : asset($fallback);
     }
 }
