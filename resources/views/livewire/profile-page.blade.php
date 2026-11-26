@@ -67,34 +67,6 @@
                 </div>
             </section>
 
-            <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-                <div><h2 class="text-xl font-extrabold text-slate-900">Emergency contact</h2><p class="mt-1 text-sm text-slate-500">Someone we can contact if necessary.</p></div>
-                <div class="mt-6 grid gap-5 md:grid-cols-3">
-                    @foreach([
-                        ['emergency_contact_name', 'Contact name', 'Full name', 'person'],
-                        ['emergency_contact_relationship', 'Relationship', 'Parent, spouse…', 'people'],
-                        ['emergency_contact_phone', 'Phone number', '+977 9812345678', 'telephone'],
-                    ] as [$field, $label, $placeholder, $icon])
-                        <div><label for="profile-{{ $field }}" class="mb-2 block text-sm font-bold text-slate-700">{{ $label }}</label><div class="relative"><i class="bi bi-{{ $icon }} absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input id="profile-{{ $field }}" type="text" wire:model="{{ $field }}" placeholder="{{ $placeholder }}" class="h-12 w-full rounded-xl border border-slate-300 pl-11 pr-4 text-sm outline-none focus:border-[#0C1E8C] focus:ring-4 focus:ring-blue-100"></div>@error($field)<p class="mt-1.5 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror</div>
-                    @endforeach
-                </div>
-            </section>
-
-            @if($user->role === 'student')
-                <section class="rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-blue-50/20 p-5 shadow-sm sm:p-7">
-                    <div><p class="text-xs font-bold uppercase tracking-[.18em] text-[#0C1E8C]">Student details</p><h2 class="mt-2 text-xl font-extrabold text-slate-900">Guardian & education</h2></div>
-                    <div class="mt-6 grid gap-5 md:grid-cols-2">
-                        @foreach([
-                            ['guardian_name', 'Guardian name', 'Parent or guardian name'], ['guardian_phone', 'Guardian phone', '+977 9812345678'],
-                            ['education_level', 'Education level', 'Highest education completed'], ['institution', 'School / institution', 'Institution name'],
-                        ] as [$field, $label, $placeholder])
-                            <div><label for="profile-{{ $field }}" class="mb-2 block text-sm font-bold text-slate-700">{{ $label }}</label><input id="profile-{{ $field }}" type="text" wire:model="{{ $field }}" placeholder="{{ $placeholder }}" class="h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm outline-none focus:border-[#0C1E8C] focus:ring-4 focus:ring-blue-100">@error($field)<p class="mt-1.5 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror</div>
-                        @endforeach
-                    </div>
-                    @if($user->trainer)<p class="mt-5 rounded-2xl bg-white/80 p-4 text-sm text-slate-600"><i class="bi bi-person-badge mr-2 text-[#0C1E8C]"></i>Assigned trainer: <strong>{{ $user->trainer->name }}</strong></p>@endif
-                </section>
-            @endif
-
             @if(in_array($user->role, ['super_admin', 'admin', 'trainer', 'staff'], true))
                 <section class="rounded-3xl border border-[#d9dde5] bg-white p-5 shadow-sm sm:p-7">
                     <div><p class="text-xs font-bold uppercase tracking-[.18em] text-slate-500">Staff details</p><h2 class="mt-2 text-xl font-extrabold text-slate-900">Employment information</h2></div>

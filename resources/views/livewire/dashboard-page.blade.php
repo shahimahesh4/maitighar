@@ -9,7 +9,7 @@
                         {{ strtoupper(substr($user->name, 0, 1)) }}
                     </div>
                     <div>
-                        <p class="mb-1 text-xs font-bold uppercase tracking-[.22em] text-red-400">{{ $user->role === 'student' ? 'Student portal' : 'Customer Account' }}</p>
+                        <p class="mb-1 text-xs font-bold uppercase tracking-[.22em] text-red-400">Customer Account</p>
                         <h1 class="text-2xl font-extrabold sm:text-3xl">Welcome back, {{ Str::before($user->name, ' ') }}</h1>
                         <p class="mt-1 text-sm text-white/70">Here’s everything happening with your account.</p>
                     </div>
@@ -29,9 +29,6 @@
                     <a wire:navigate href="{{ route('my-orders') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-[#0C1E8C]"><i class="bi bi-box-seam"></i><span>My orders</span></a>
                     <a wire:navigate href="{{ route('wishlist') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-[#0C1E8C]"><i class="bi bi-heart"></i><span>Wishlist</span></a>
                     <a wire:navigate href="{{ route('support-tickets') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-[#0C1E8C]"><i class="bi bi-headset"></i><span>Support tickets</span></a>
-                    @if($user->role === 'student')
-                        <a href="#student" class="flex items-center gap-3 rounded-2xl px-4 py-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-[#0C1E8C]"><i class="bi bi-mortarboard"></i><span>My learning</span></a>
-                    @endif
                 </nav>
                 <div class="mt-3 space-y-3 border-t border-slate-100 px-2 py-4 text-left text-slate-500">
                     <div class="flex items-start gap-2">
@@ -64,24 +61,6 @@
                         </article>
                     @endforeach
                 </section>
-
-                @if($user->role === 'student')
-                    <section id="student" class="grid gap-5 md:grid-cols-2">
-                        <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                            <p class="text-xs font-bold uppercase tracking-[.18em] text-[#0C1E8C]">Learning support</p>
-                            <h2 class="mt-2 text-xl font-extrabold text-slate-900">Assigned trainer</h2>
-                            @if($trainer)
-                                <div class="mt-6 flex items-center gap-4">
-                                    <span class="grid h-14 w-14 place-items-center rounded-2xl bg-[#0C1E8C] text-lg font-bold text-white">{{ strtoupper(substr($trainer->name, 0, 1)) }}</span>
-                                    <div class="min-w-0"><p class="font-extrabold text-slate-900">{{ $trainer->name }}</p><p class="mt-1 break-all text-sm leading-6 text-slate-500">{{ $trainer->email }}</p></div>
-                                </div>
-                                <div class="mt-6 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600"><i class="bi bi-info-circle mr-2 text-[#0C1E8C]"></i>Contact the academy office to coordinate your class schedule.</div>
-                            @else
-                                <div class="mt-5 rounded-2xl bg-slate-50 p-5 text-sm leading-6 text-slate-500">A trainer has not been assigned yet. The academy team will update this dashboard after assignment.</div>
-                            @endif
-                        </article>
-                    </section>
-                @endif
 
                 <section class="rounded-3xl border border-slate-200 bg-white shadow-sm">
                     <div class="flex items-center justify-between border-b border-slate-100 px-5 py-5 sm:px-6">

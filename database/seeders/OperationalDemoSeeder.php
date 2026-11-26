@@ -31,29 +31,12 @@ class OperationalDemoSeeder extends Seeder
             'employment_type' => 'Full time', 'city' => 'Bhairahawa', 'state' => 'Lumbini Province',
         ]);
 
-        $trainer = User::updateOrCreate(['email' => 'trainer@maitighar.test'], [
-            'name' => 'Anisha Shrestha', 'phone' => '9800000002', 'password' => 'password',
-            'email_verified_at' => now(), 'role' => 'mentor', 'job_title' => 'Senior Heritage Mentor',
-            'department' => 'Heritage Experiences', 'employee_id' => 'MG-TRN-001', 'joining_date' => '2024-03-01',
-            'employment_type' => 'Full time', 'admin_permissions' => ['services', 'content'],
-            'city' => 'Bhairahawa', 'state' => 'Lumbini Province',
-        ]);
-
         $customer = User::updateOrCreate(['email' => 'customer@example.com'], [
             'name' => 'Demo Customer', 'phone' => '9800000003', 'password' => 'password',
             'email_verified_at' => now(), 'role' => 'customer', 'address' => 'Siddharthanagar-8',
             'city' => 'Bhairahawa', 'state' => 'Lumbini Province', 'postal_code' => '32900',
         ]);
 
-        $student = User::updateOrCreate(['email' => 'student@maitighar.test'], [
-            'name' => 'Sanjana Thapa', 'phone' => '9800000004', 'password' => 'password',
-            'email_verified_at' => now(), 'role' => 'student', 'trainer_id' => $trainer->id,
-            'date_of_birth' => '2002-05-18', 'gender' => 'female', 'address' => 'Devkota Chowk',
-            'city' => 'Bhairahawa', 'state' => 'Lumbini Province', 'guardian_name' => 'Maya Thapa',
-            'guardian_phone' => '9800000094', 'education_level' => 'Higher Secondary',
-        ]);
-
-        
         foreach ([
             ['WELCOME10', 'percent', 10, 50, now()->addMonths(6)],
             ['SAVE15', 'fixed', 15, 60, now()->addMonths(3)],

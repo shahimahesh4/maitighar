@@ -13,7 +13,7 @@ class DashboardPage extends Component
 {
     public function render(): View
     {
-        $user = auth()->user()->load('trainer');
+        $user = auth()->user();
         $orders = Order::query()
             ->where('user_id', $user->id)
             ->withCount('items')
@@ -24,7 +24,6 @@ class DashboardPage extends Component
         return view('livewire.dashboard-page', [
             'user' => $user,
             'orders' => $orders,
-            'trainer' => $user->trainer,
             'roleLabel' => User::roleOptions()[$user->role] ?? ucfirst($user->role),
             'stats' => [
                 'orders' => $user->orders()->count(),

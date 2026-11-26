@@ -37,20 +37,6 @@ class ProfilePage extends Component
 
     public string $postal_code = '';
 
-    public string $emergency_contact_name = '';
-
-    public string $emergency_contact_relationship = '';
-
-    public string $emergency_contact_phone = '';
-
-    public string $guardian_name = '';
-
-    public string $guardian_phone = '';
-
-    public string $education_level = '';
-
-    public string $institution = '';
-
     public string $employee_id = '';
 
     public string $job_title = '';
@@ -81,8 +67,6 @@ class ProfilePage extends Component
     {
         $user = auth()->user();
         $this->phone = $this->normalizePhone($this->phone);
-        $this->emergency_contact_phone = $this->normalizeOptionalPhone($this->emergency_contact_phone);
-        $this->guardian_phone = $this->normalizeOptionalPhone($this->guardian_phone);
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
@@ -94,20 +78,8 @@ class ProfilePage extends Component
             'city' => ['nullable', 'string', 'max:100'],
             'state' => ['nullable', 'string', 'max:100'],
             'postal_code' => ['nullable', 'string', 'max:20'],
-            'emergency_contact_name' => ['nullable', 'string', 'max:255'],
-            'emergency_contact_relationship' => ['nullable', 'string', 'max:60'],
-            'emergency_contact_phone' => ['nullable', 'regex:/^\+9779[78]\d{8}$/'],
             'avatarUpload' => ['nullable', 'image', 'max:2048'],
         ];
-
-        if ($user->role === 'student') {
-            $rules += [
-                'guardian_name' => ['nullable', 'string', 'max:255'],
-                'guardian_phone' => ['nullable', 'regex:/^\+9779[78]\d{8}$/'],
-                'education_level' => ['nullable', 'string', 'max:100'],
-                'institution' => ['nullable', 'string', 'max:255'],
-            ];
-        }
 
         if (in_array($user->role, ['super_admin', 'admin', 'trainer', 'staff'], true)) {
             $rules += [
@@ -121,8 +93,6 @@ class ProfilePage extends Component
 
         $validated = $this->validate($rules, [
             'phone.regex' => 'Enter a valid Nepal mobile number, for example +977 9812345678.',
-            'emergency_contact_phone.regex' => 'Enter a valid Nepal emergency phone number.',
-            'guardian_phone.regex' => 'Enter a valid Nepal guardian phone number.',
         ]);
 
         unset($validated['avatarUpload']);
@@ -174,7 +144,7 @@ class ProfilePage extends Component
 
     public function render(): View
     {
-        $user = auth()->user()->fresh(['trainer']);
+        $user = auth()->user()->fresh();
 
         return view('livewire.profile-page', [
             'user' => $user,
@@ -209,8 +179,7 @@ class ProfilePage extends Component
     {
         return [
             'name', 'email', 'phone', 'date_of_birth', 'gender', 'address', 'city', 'state', 'postal_code',
-            'emergency_contact_name', 'emergency_contact_relationship', 'emergency_contact_phone',
-            'guardian_name', 'guardian_phone', 'education_level', 'institution', 'employee_id', 'job_title',
+            'employee_id', 'job_title',
             'department', 'joining_date', 'employment_type',
         ];
     }

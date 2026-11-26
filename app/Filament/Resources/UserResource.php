@@ -81,9 +81,7 @@ class UserResource extends Resource
                     ->unique(ignoreRecord: true),
 
                 Forms\Components\Select::make('role')
-                    ->options(fn (): array => collect(User::roleOptions())
-                        ->except(['student', 'trainer'])
-                        ->all())
+                    ->options(User::roleOptions())
                     ->default('customer')
                     ->required()
                     ->live()
@@ -182,9 +180,7 @@ class UserResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('role')->options(fn (): array => collect(User::roleOptions())
-                    ->except(['student', 'trainer'])
-                    ->all()),
+                Tables\Filters\SelectFilter::make('role')->options(User::roleOptions()),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

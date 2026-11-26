@@ -26,7 +26,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'email_verified_at',
         'password',
         'role',
-        'trainer_id',
         'avatar',
         'date_of_birth',
         'gender',
@@ -34,13 +33,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'city',
         'state',
         'postal_code',
-        'emergency_contact_name',
-        'emergency_contact_relationship',
-        'emergency_contact_phone',
-        'guardian_name',
-        'guardian_phone',
-        'education_level',
-        'institution',
         'employee_id',
         'job_title',
         'department',
@@ -82,10 +74,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     protected static function booted(): void
     {
         static::saving(function (self $user): void {
-            if ($user->role !== 'student') {
-                $user->trainer_id = null;
-            }
-
             if (! in_array($user->role, ['trainer', 'staff'], true)) {
                 $user->admin_permissions = null;
             }
@@ -102,10 +90,8 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return [
             'super_admin' => 'Super Admin',
             'admin' => 'Admin',
-            'trainer' => 'Trainer',
             'staff' => 'Staff',
             'customer' => 'Customer',
-            'student' => 'Student',
         ];
     }
 
@@ -136,21 +122,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function canAccessPanel(Panel $panel): bool
     {
         return in_array($this->role, ['super_admin', 'admin', 'trainer', 'staff'], true);
-    }
-
-    public function trainer()
-    {
-        return $this->belongsTo(self::class, 'trainer_id');
-    }
-
-    public function students()
-    {
-        return $this->hasMany(self::class, 'trainer_id');
-    }
-
-    public function scopeTrainers($query)
-    {
-        return $query->where('role', 'trainer');
     }
 
     public function orders()
