@@ -81,7 +81,9 @@ class UserResource extends Resource
                     ->unique(ignoreRecord: true),
 
                 Forms\Components\Select::make('role')
-                    ->options(User::roleOptions())
+                    ->options(fn (): array => collect(User::roleOptions())
+                        ->except(['student', 'trainer'])
+                        ->all())
                     ->default('customer')
                     ->required()
                     ->live()
@@ -92,17 +94,6 @@ class UserResource extends Resource
                             ? 'Your own role is locked to prevent losing admin access.'
                             : null
                     ),
-
-                Forms\Components\Select::make('trainer_id')
-                    ->label('Assigned trainer')
-                    ->options(fn () => User::trainers()->orderBy('name')->pluck('name', 'id'))
-                    ->placeholder('No trainer assigned')
-                    ->helperText('Only users with the Trainer role appear here.')
-                    ->visible(fn (Forms\Get $get): bool => $get('role') === 'student')
-                    ->disabled(fn (?User $record): bool => auth()->user()?->role !== 'super_admin'
-                        || ($record !== null && auth()->id() === $record->getKey())
-                    )
-                    ->nullable(),
 
                 Forms\Components\FileUpload::make('avatar')
                     ->label('Profile photo')
@@ -131,26 +122,6 @@ class UserResource extends Resource
                 TextInput::make('city')->maxLength(100),
                 TextInput::make('state')->label('Province / State')->maxLength(100),
                 TextInput::make('postal_code')->label('Postal code')->maxLength(20),
-
-                Forms\Components\Fieldset::make('Emergency contact')
-                    ->schema([
-                        TextInput::make('emergency_contact_name')->label('Name')->maxLength(255),
-                        TextInput::make('emergency_contact_relationship')->label('Relationship')->maxLength(60),
-                        TextInput::make('emergency_contact_phone')->label('Phone')->tel()->maxLength(30),
-                    ])
-                    ->columns(3)
-                    ->columnSpanFull(),
-
-                Forms\Components\Fieldset::make('Student details')
-                    ->schema([
-                        TextInput::make('guardian_name')->label('Guardian name')->maxLength(255),
-                        TextInput::make('guardian_phone')->label('Guardian phone')->tel()->maxLength(30),
-                        TextInput::make('education_level')->label('Education level')->maxLength(100),
-                        TextInput::make('institution')->label('School / Institution')->maxLength(255),
-                    ])
-                    ->visible(fn (Forms\Get $get): bool => $get('role') === 'student')
-                    ->columns(2)
-                    ->columnSpanFull(),
 
                 Forms\Components\Fieldset::make('Employment details')
                     ->schema([
@@ -203,10 +174,6 @@ class UserResource extends Resource
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => User::roleOptions()[$state] ?? ucfirst($state))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('trainer.name')
-                    ->label('Assigned Trainer')
-                    ->placeholder('—')
-                    ->toggleable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->dateTime()
                     ->sortable(),
@@ -215,7 +182,9 @@ class UserResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('role')->options(User::roleOptions()),
+                Tables\Filters\SelectFilter::make('role')->options(fn (): array => collect(User::roleOptions())
+                    ->except(['student', 'trainer'])
+                    ->all()),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
