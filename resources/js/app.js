@@ -1,5 +1,3 @@
-import './slider-revolution.js';
-
 const showToast = (input = {}) => {
     const payload = Array.isArray(input) ? (input[0] ?? {}) : input;
     const message = payload.message ?? payload.text;
@@ -47,6 +45,16 @@ window.addEventListener('kba-toast', (event) => showToast(event.detail));
 
 let lastScrollY = window.scrollY;
 let scrollTicking = false;
+let storefrontEnhancementsPromise;
+
+// Swiper and GSAP are only used by the homepage carousels and hero. Loading
+// them on account, checkout, and product pages made the global app bundle much
+// larger than those pages need.
+const loadStorefrontEnhancements = () => {
+    if (!document.querySelector('.rev-slider-container, .kba-product-carousel')) return;
+
+    storefrontEnhancementsPromise ??= import('./slider-revolution.js');
+};
 
 const mobileShellElements = () => ({
     header: document.querySelector('[data-kba-mobile-header]'),
@@ -357,6 +365,7 @@ const initializePageUi = () => {
     initializeGalleries();
     initializeHomeSliders();
     initializeVideoGalleries();
+    loadStorefrontEnhancements();
 };
 
 document.addEventListener('DOMContentLoaded', initializePageUi);
