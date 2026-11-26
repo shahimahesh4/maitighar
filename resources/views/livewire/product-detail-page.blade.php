@@ -37,7 +37,7 @@
             <div class="kba-product-detail-gallery w-full lg:w-1/2 space-y-6">
                 <!-- Large Main Image View -->
                 <div class="kba-product-main-image relative bg-slate-50 dark:bg-slate-950/20 border border-gray-100 dark:border-slate-800/80 rounded-2xl aspect-square overflow-hidden flex items-center justify-center shadow-sm">
-                    <img x-bind:src="mainImage" alt="{{ $product->name }}" class="object-contain w-full h-full p-6 transition duration-300">
+                    <img x-bind:src="mainImage" alt="{{ $product->name }}" width="800" height="800" fetchpriority="high" decoding="async" class="object-contain w-full h-full p-6 transition duration-300">
                     
                     @if($product->on_sale)
                         <span class="absolute top-4 left-4 bg-red-500 text-white font-bold text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow">Sale</span>
@@ -56,7 +56,7 @@
                                 x-bind:class="mainImage === $el.dataset.image ? 'border-[#0C1E8C] ring-2 ring-blue-100' : 'border-slate-200'"
                                 aria-label="View product image {{ $index + 1 }}"
                             >
-                                <img src="{{ $image }}" alt="{{ $product->name }} gallery image {{ $index + 1 }}" class="h-full w-full object-contain">
+                                <img src="{{ $image }}" alt="{{ $product->name }} gallery image {{ $index + 1 }}" width="80" height="80" loading="lazy" decoding="async" class="h-full w-full object-contain">
                             </button>
                         @endforeach
                     </div>

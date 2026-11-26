@@ -10,6 +10,7 @@ use App\Models\MediaAsset;
 use App\Models\MediaFolder;
 use App\Models\Product;
 use App\Services\Ai\GeminiService;
+use App\Services\ImageOptimizationService;
 use App\Support\Money;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class ProductResource extends Resource
 {
@@ -175,6 +177,9 @@ class ProductResource extends Resource
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                             ->directory('products/main')
                             ->maxSize(5120)
+                            ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                                ->storeAsWebp($file->getRealPath(), 'public', 'products/main', 1600, 1600)
+                                ?? $file->store('products/main', 'public'))
                             ->openable()
                             ->downloadable()
                             ->helperText('Used on product cards, listings, and as the large primary image on the product page.'),
@@ -190,6 +195,9 @@ class ProductResource extends Resource
                             ->directory('products/gallery')
                             ->maxFiles(10)
                             ->maxSize(5120)
+                            ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                                ->storeAsWebp($file->getRealPath(), 'public', 'products/gallery', 1600, 1600)
+                                ?? $file->store('products/gallery', 'public'))
                             ->openable()
                             ->downloadable()
                             ->reorderable()
@@ -255,6 +263,9 @@ class ProductResource extends Resource
                                                         ->maxFiles(5)
                                                         ->maxSize(5120)
                                                         ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                                        ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                                                            ->storeAsWebp($file->getRealPath(), 'public', 'media', 1600, 1600)
+                                                            ?? $file->store('media', 'public'))
                                                         ->columnSpanFull(),
                                                     TextInput::make('media_alt_text')
                                                         ->label('Alternative text')

@@ -139,7 +139,7 @@ class ContactPage extends Component
         $contactPage = Page::query()->where('slug', 'contact-us')->first();
 
         return view('livewire.contact-page', [
-            'contactBannerUrl' => $contactPage?->getBannerUrl() ?? asset('images/kba/about-us-academy.png'),
+            'contactBannerUrl' => $contactPage?->getBannerUrl() ?? asset('images/kba/about-us-academy.webp'),
             'storeEmail' => Setting::get('store_email', 'maitigharaustralia@gmail.com'),
             'storePhone' => Setting::get('store_phone', '+61 432 685 546'),
             'storeAddress' => Setting::get('store_address', '2/75 Dartbrook Road, Auburn NSW, Sydney, NSW 2144'),

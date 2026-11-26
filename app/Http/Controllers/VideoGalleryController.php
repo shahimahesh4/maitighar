@@ -55,6 +55,6 @@ class VideoGalleryController extends Controller
                 : Storage::disk('public')->url($path);
         }
 
-        return $fallback ?: asset('images/kba/about-us-academy.png');
+        return $fallback ?: asset('images/kba/about-us-academy.webp');
     }
 }
