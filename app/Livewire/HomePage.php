@@ -165,16 +165,23 @@ class HomePage extends Component
             ? Wishlist::where('user_id', Auth::id())->pluck('product_id')->all()
             : [];
 
+        $defaultServicePromises = [
+            ['icon' => 'bi-truck', 'title' => 'Australia-Wide Delivery', 'description' => 'Reliable tracked delivery across Australia.'],
+            ['icon' => 'bi-box-seam', 'title' => '7-Day Returns', 'description' => 'Easy return and exchange assistance.'],
+            ['icon' => 'bi-credit-card-2-front', 'title' => 'Secure Payment', 'description' => 'Cash on delivery and bank transfer.'],
+            ['icon' => 'bi-patch-check', 'title' => 'Authentic Nepali Craft', 'description' => 'Genuine handcrafted heritage items.'],
+            ['icon' => 'bi-headset', 'title' => 'Dedicated Support', 'description' => 'Helpful assistance by phone and email.'],
+        ];
+        $servicePromises = Setting::get('home_service_promises', $defaultServicePromises);
+
+        if (! is_array($servicePromises)) {
+            $servicePromises = $defaultServicePromises;
+        }
+
         $home = [
             'show_slider' => (bool) Setting::get('home_show_slider', true),
             'show_service_promise' => (bool) Setting::get('home_show_service_promise', true),
-            'service_promises' => Setting::get('home_service_promises', [
-                ['icon' => 'bi-truck', 'title' => 'Australia-Wide Delivery', 'description' => 'Reliable tracked delivery across Australia.'],
-                ['icon' => 'bi-box-seam', 'title' => '7-Day Returns', 'description' => 'Easy return and exchange assistance.'],
-                ['icon' => 'bi-credit-card-2-front', 'title' => 'Secure Payment', 'description' => 'Cash on delivery and bank transfer.'],
-                ['icon' => 'bi-patch-check', 'title' => 'Authentic Nepali Craft', 'description' => 'Genuine handcrafted heritage items.'],
-                ['icon' => 'bi-headset', 'title' => 'Dedicated Support', 'description' => 'Helpful assistance by phone and email.'],
-            ]),
+            'service_promises' => $servicePromises,
             'show_new_arrivals' => (bool) Setting::get('home_show_new_arrivals', true),
             'new_arrivals_title' => Setting::get('home_new_arrivals_title', 'New Arrivals'),
             'show_women_collection' => (bool) Setting::get('home_show_women_collection', true),

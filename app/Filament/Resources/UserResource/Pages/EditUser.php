@@ -14,8 +14,7 @@ class EditUser extends EditRecord
     {
         return [
             Actions\DeleteAction::make()
-                ->visible(fn (): bool => auth()->user()?->role === 'super_admin'
-                    && auth()->id() !== $this->record->getKey()),
+                ->visible(fn (): bool => UserResource::canDelete($this->record)),
         ];
     }
 

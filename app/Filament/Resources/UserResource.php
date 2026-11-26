@@ -12,6 +12,7 @@ use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class UserResource extends Resource
 {
@@ -24,6 +25,41 @@ class UserResource extends Resource
     protected static ?int $navigationSort = 1;
 
     protected static ?string $navigationGroup = 'User';
+
+    protected static ?string $navigationLabel = 'Users & Roles';
+
+    protected static ?string $modelLabel = 'User';
+
+    protected static ?string $pluralModelLabel = 'Users & Roles';
+
+    /**
+     * User accounts and role assignment are reserved for Super Admins.
+     * We override Filament's policy fallback as the general admin gate grants
+     * normal administrators broad access to operational resources.
+     */
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->role === 'super_admin';
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return static::canViewAny()
+            && auth()->id() !== $record->getKey()
+            // Preserve Super Admin accounts so an administrator cannot lock the
+            // business out of the only role able to manage access.
+            && $record->role !== 'super_admin';
+    }
 
     public static function form(Form $form): Form
     {
@@ -186,9 +222,7 @@ class UserResource extends Resource
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make()
-                        ->visible(fn (User $record): bool => auth()->user()?->role === 'super_admin'
-                            && auth()->id() !== $record->getKey()
-                        )
+                        ->visible(fn (User $record): bool => static::canDelete($record))
                         ->requiresConfirmation(),
                 ]),
             ])

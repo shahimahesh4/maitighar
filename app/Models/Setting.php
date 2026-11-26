@@ -48,7 +48,12 @@ class Setting extends Model
 
             return $resolved;
         } catch (\Throwable $e) {
-            return $value;
+            // Older installations can contain unencrypted JSON settings. Decode
+            // them as well, so list/repeater settings remain arrays instead of
+            // breaking frontend foreach loops during an upgrade.
+            $decoded = json_decode($value, true);
+
+            return json_last_error() === JSON_ERROR_NONE ? $decoded : $value;
         }
     }
 
