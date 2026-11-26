@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Category extends Model
@@ -88,10 +89,16 @@ class Category extends Model
         }
 
         if (str_starts_with($this->image, 'images/')) {
-            return asset($this->image);
+            $webp = preg_replace('/\.(?:jpe?g|png)$/i', '.webp', $this->image);
+
+            return $webp && is_file(public_path($webp)) ? asset($webp) : asset($this->image);
         }
 
-        return url('storage/'.$this->image);
+        $webp = preg_replace('/\.(?:jpe?g|png)$/i', '.webp', $this->image);
+
+        return $webp && Storage::disk('public')->exists($webp)
+            ? Storage::disk('public')->url($webp)
+            : Storage::disk('public')->url($this->image);
     }
 
     public static function boot()
