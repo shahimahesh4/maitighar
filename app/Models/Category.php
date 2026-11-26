@@ -107,7 +107,13 @@ class Category extends Model
 
     protected static function booted(): void
     {
-        static::saved(fn () => Cache::forget('navigation.categories'));
-        static::deleted(fn () => Cache::forget('navigation.categories'));
+        static::saved(function (): void {
+            Cache::forget('navigation.categories');
+            Cache::forget('storefront.home.data');
+        });
+        static::deleted(function (): void {
+            Cache::forget('navigation.categories');
+            Cache::forget('storefront.home.data');
+        });
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class HomeSlider extends Model
 {
@@ -23,6 +24,12 @@ class HomeSlider extends Model
             'duration' => 'integer',
             'is_active' => 'boolean',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn (): bool => Cache::forget('storefront.home.data'));
+        static::deleted(fn (): bool => Cache::forget('storefront.home.data'));
     }
 
     public function scopeActive(Builder $query): Builder

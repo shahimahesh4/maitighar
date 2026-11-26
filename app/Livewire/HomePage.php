@@ -12,6 +12,7 @@ use App\Models\Setting;
 use App\Models\Wishlist;
 use App\Support\Storefront;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -80,9 +81,10 @@ class HomePage extends Component
 
     public function render(): View
     {
-        $sliders = HomeSlider::active()->get();
+        $homeData = Cache::remember('storefront.home.data', now()->addMinutes(5), function (): array {
+            $sliders = HomeSlider::active()->get();
 
-        $new_arrivals = Product::storefront()
+            $new_arrivals = Product::storefront()
             ->with(['brand', 'category'])
             ->withAvg('approvedReviews', 'rating')
             ->withCount('approvedReviews')
@@ -92,7 +94,7 @@ class HomePage extends Component
             ->take(16)
             ->get();
 
-        $featured_products = Product::storefront()
+            $featured_products = Product::storefront()
             ->with(['brand', 'category'])
             ->withAvg('approvedReviews', 'rating')
             ->withCount('approvedReviews')
@@ -101,7 +103,7 @@ class HomePage extends Component
             ->take(12)
             ->get();
 
-        $trending_products = Product::storefront()
+            $trending_products = Product::storefront()
             ->with(['brand', 'category'])
             ->withAvg('approvedReviews', 'rating')
             ->withCount('approvedReviews')
@@ -109,7 +111,7 @@ class HomePage extends Component
             ->take(3)
             ->get();
 
-        $top_selling_products = Product::storefront()
+            $top_selling_products = Product::storefront()
             ->with(['brand', 'category'])
             ->withAvg('approvedReviews', 'rating')
             ->withCount('approvedReviews')
@@ -117,7 +119,7 @@ class HomePage extends Component
             ->take(3)
             ->get();
 
-        $culturalClothing = Category::query()
+            $culturalClothing = Category::query()
             ->where(fn ($query) => $query
                 ->where('slug', 'cultural-clothing')
                 ->orWhere('name', 'Cultural Clothing'))
@@ -125,9 +127,12 @@ class HomePage extends Component
 
         // Keep the storefront available during a deployment where application
         // files arrive just before the accompanying database migration.
-        $hasAudienceColumn = Schema::hasColumn('categories', 'collection_audience');
+            $hasAudienceColumn = Cache::rememberForever(
+                'storefront.categories.has_collection_audience',
+                fn (): bool => Schema::hasColumn('categories', 'collection_audience'),
+            );
 
-        $culturalCollections = $culturalClothing && $hasAudienceColumn
+            $culturalCollections = $culturalClothing && $hasAudienceColumn
             ? $culturalClothing->children()
                 ->where('is_active', true)
                 ->whereIn('collection_audience', ['women', 'men', 'kids'])
@@ -136,31 +141,49 @@ class HomePage extends Component
                 ->keyBy('collection_audience')
             : collect();
 
-        $women_cultural_collection = $culturalCollections->get('women');
-        $men_cultural_collection = $culturalCollections->get('men');
-        $kids_cultural_collection = $culturalCollections->get('kids');
-        $women_cultural_subcategories = $women_cultural_collection?->children ?? collect();
-        $men_cultural_subcategories = $men_cultural_collection?->children ?? collect();
-        $kids_cultural_subcategories = $kids_cultural_collection?->children ?? collect();
+            $women_cultural_collection = $culturalCollections->get('women');
+            $men_cultural_collection = $culturalCollections->get('men');
+            $kids_cultural_collection = $culturalCollections->get('kids');
+            $women_cultural_subcategories = $women_cultural_collection?->children ?? collect();
+            $men_cultural_subcategories = $men_cultural_collection?->children ?? collect();
+            $kids_cultural_subcategories = $kids_cultural_collection?->children ?? collect();
 
         // Preserve the existing culture cards until the new taxonomy migration
         // has been applied on installations that already have live data.
-        $legacy_cultural_subcategories = $culturalClothing
+            $legacy_cultural_subcategories = $culturalClothing
             ? $culturalClothing->children()->where('is_active', true)->orderBy('name')->get()
             : collect();
 
-        $women_cultural_subcategories = $women_cultural_subcategories->isNotEmpty()
+            $women_cultural_subcategories = $women_cultural_subcategories->isNotEmpty()
             ? $women_cultural_subcategories
             : $legacy_cultural_subcategories;
-        $men_cultural_subcategories = $men_cultural_subcategories->isNotEmpty()
+            $men_cultural_subcategories = $men_cultural_subcategories->isNotEmpty()
             ? $men_cultural_subcategories
             : $legacy_cultural_subcategories;
 
-        $wearer_values = Attribute::query()
+            $wearer_values = Attribute::query()
             ->where('slug', 'wearer')
             ->where('is_active', true)
             ->first()?->values->keyBy('slug') ?? collect();
 
+            return compact(
+                'sliders',
+                'new_arrivals',
+                'featured_products',
+                'trending_products',
+                'top_selling_products',
+                'women_cultural_subcategories',
+                'men_cultural_subcategories',
+                'kids_cultural_subcategories',
+                'women_cultural_collection',
+                'men_cultural_collection',
+                'kids_cultural_collection',
+                'wearer_values',
+            );
+        });
+
+        // This remains request-specific: each signed-in customer sees their own
+        // saved products while the expensive catalog data above is shared.
         $wishlistProductIds = Auth::check()
             ? Wishlist::where('user_id', Auth::id())->pluck('product_id')->all()
             : [];
@@ -203,20 +226,16 @@ class HomePage extends Component
         $wishlistEnabled = Storefront::wishlistEnabled();
         $quickViewEnabled = Storefront::quickViewEnabled();
 
-        return view('livewire.home-page', compact(
-            'sliders',
-            'new_arrivals',
-            'featured_products',
-            'wishlistProductIds',
-            'trending_products',
-            'top_selling_products',
-            'women_cultural_subcategories',
-            'men_cultural_subcategories',
-            'kids_cultural_subcategories',
-            'women_cultural_collection',
-            'men_cultural_collection',
-            'kids_cultural_collection'
-            ,'wearer_values', 'home', 'commerceEnabled', 'showPrices', 'quoteLabel', 'reviewsEnabled', 'wishlistEnabled', 'quickViewEnabled'
-        ));
+        return view('livewire.home-page', [
+            ...$homeData,
+            'wishlistProductIds' => $wishlistProductIds,
+            'home' => $home,
+            'commerceEnabled' => $commerceEnabled,
+            'showPrices' => $showPrices,
+            'quoteLabel' => $quoteLabel,
+            'reviewsEnabled' => $reviewsEnabled,
+            'wishlistEnabled' => $wishlistEnabled,
+            'quickViewEnabled' => $quickViewEnabled,
+        ]);
     }
 }

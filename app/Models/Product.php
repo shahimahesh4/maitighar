@@ -152,6 +152,9 @@ class Product extends Model
 
     protected static function booted(): void
     {
+        static::saved(fn (): bool => Cache::forget('storefront.home.data'));
+        static::deleted(fn (): bool => Cache::forget('storefront.home.data'));
+
         static::creating(function (self $product): void {
             if (blank($product->sku)) {
                 $product->sku = static::generateNextSku();

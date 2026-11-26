@@ -11,6 +11,15 @@ class Setting extends Model
 {
     use HasFactory;
 
+    /**
+     * Reuse the settings map for the lifetime of an HTTP request. The homepage
+     * reads many settings and a database cache lookup for every call creates
+     * unnecessary MySQL work under traffic.
+     *
+     * @var array<string, mixed>|null
+     */
+    protected static ?array $resolvedValues = null;
+
     protected $fillable = [
         'key',
         'value',
@@ -22,7 +31,7 @@ class Setting extends Model
     public static function get(string $key, mixed $default = null): mixed
     {
         try {
-            $values = Cache::rememberForever(
+            $values = self::$resolvedValues ??= Cache::rememberForever(
                 'settings.values',
                 fn (): array => self::query()->pluck('value', 'key')->all(),
             );
@@ -76,12 +85,19 @@ class Setting extends Model
             ['value' => $encrypted]
         );
 
+        self::$resolvedValues = null;
         Cache::forget('settings.values');
     }
 
     protected static function booted(): void
     {
-        static::saved(fn () => Cache::forget('settings.values'));
-        static::deleted(fn () => Cache::forget('settings.values'));
+        static::saved(function (): void {
+            self::$resolvedValues = null;
+            Cache::forget('settings.values');
+        });
+        static::deleted(function (): void {
+            self::$resolvedValues = null;
+            Cache::forget('settings.values');
+        });
     }
 }
