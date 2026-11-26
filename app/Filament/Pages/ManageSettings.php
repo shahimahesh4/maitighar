@@ -76,7 +76,11 @@ class ManageSettings extends Page
             'coming_soon_subheading' => Setting::get('coming_soon_subheading', 'A beautiful new chapter is coming.'),
             'coming_soon_description' => Setting::get('coming_soon_description', 'Nepalese heritage, culture, and craftsmanship — soon at home in Australia.'),
             'coming_soon_facebook_label' => Setting::get('coming_soon_facebook_label', 'Follow us on Facebook'),
-            'coming_soon_values' => Setting::get('coming_soon_values', ['Nepalese Heritage', 'Culture', 'Craftsmanship']),
+            'coming_soon_values' => $this->repeaterSetting('coming_soon_values', [
+                'Nepalese Heritage',
+                'Culture',
+                'Craftsmanship',
+            ]),
             'coming_soon_footer_text' => Setting::get('coming_soon_footer_text', '© 2026 Maiti Ghar · Made with heritage and heart'),
             'coming_soon_footer_credit' => Setting::get('coming_soon_footer_credit', 'Crafted by Siddhi Tech Nepal'),
             'admin_notification_email' => Setting::get('admin_notification_email', 'maitigharaustralia@gmail.com'),
@@ -115,7 +119,7 @@ class ManageSettings extends Page
             'quote_button_label' => Setting::get('quote_button_label', 'Request a Quote'),
             'home_show_slider' => (bool) Setting::get('home_show_slider', true),
             'home_show_service_promise' => (bool) Setting::get('home_show_service_promise', true),
-            'home_service_promises' => Setting::get('home_service_promises', [
+            'home_service_promises' => $this->repeaterSetting('home_service_promises', [
                 ['icon' => 'bi-truck', 'title' => 'Australia-Wide Delivery', 'description' => 'Reliable tracked delivery across Australia.'],
                 ['icon' => 'bi-box-seam', 'title' => '7-Day Returns', 'description' => 'Easy return and exchange assistance.'],
                 ['icon' => 'bi-credit-card-2-front', 'title' => 'Secure Payment', 'description' => 'Cash on delivery and bank transfer.'],
@@ -659,5 +663,25 @@ class ManageSettings extends Page
             ->title('Store settings saved successfully!')
             ->success()
             ->send();
+    }
+
+    /**
+     * Repeaters cannot hydrate a scalar value. Older installations can have a
+     * legacy plain-text value in the settings table, so fall back safely until
+     * the administrator saves the setting again in its current array format.
+     *
+     * @param array<int, mixed> $default
+     * @return array<int, mixed>
+     */
+    private function repeaterSetting(string $key, array $default): array
+    {
+        $value = Setting::get($key, $default);
+
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            $value = json_last_error() === JSON_ERROR_NONE ? $decoded : null;
+        }
+
+        return is_array($value) ? array_values($value) : $default;
     }
 }
