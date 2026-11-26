@@ -1,2 +1,2 @@
-*
-!.gitignore
+# Temporary deployment strategy: track public uploads through Git.
+# Move this media to object storage before the upload library becomes large.
