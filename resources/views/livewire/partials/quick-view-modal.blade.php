@@ -94,6 +94,7 @@
                             </h2>
 
                             <!-- Star Rating -->
+                            @if(\App\Support\Storefront::reviewsEnabled())
                             <div class="flex items-center gap-2 mt-2 mb-3">
                                 <div class="flex items-center gap-0.5 text-amber-400 text-sm">
                                     @for($star = 1; $star <= 5; $star++)
@@ -105,8 +106,10 @@
                                     {{ $product->in_stock ? 'In Stock (' . $product->stock_quantity . ' available)' : 'Out of Stock' }}
                                 </span>
                             </div>
+                            @endif
 
                             <!-- Price Display -->
+                            @if(\App\Support\Storefront::pricesVisible())
                             <div class="flex items-baseline gap-3 pb-4 mb-4 border-b border-slate-100">
                                 <span class="text-2xl sm:text-3xl font-extrabold text-[#0C1E8C]">
                                     ${{ number_format($product->sale_price, 2) }}
@@ -120,6 +123,7 @@
                                     </span>
                                 @endif
                             </div>
+                            @endif
 
                             <!-- Short Description -->
                             @if($product->short_description)

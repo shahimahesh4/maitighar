@@ -66,6 +66,11 @@ class AttributeResource extends Resource
                             ->label('Sort Order')
                             ->numeric()
                             ->default(0),
+
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Published')
+                            ->default(true)
+                            ->helperText('Unpublished attributes are hidden from storefront filters.'),
                     ])
                     ->columns(2),
 
@@ -150,6 +155,16 @@ class AttributeResource extends Resource
                 TextColumn::make('sort_order')
                     ->label('Sort Order')
                     ->sortable(),
+
+                Tables\Columns\ToggleColumn::make('is_active')
+                    ->label('Published')
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->onIcon('heroicon-m-check')
+                    ->offIcon('heroicon-m-x-mark')
+                    ->tooltip(fn (Attribute $record): string => $record->is_active
+                        ? 'Published — click to unpublish'
+                        : 'Unpublished — click to publish'),
 
                 TextColumn::make('created_at')
                     ->dateTime()

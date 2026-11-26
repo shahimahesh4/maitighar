@@ -1,5 +1,5 @@
 import Swiper from 'swiper';
-import { Autoplay, Navigation, Pagination, EffectFade, Keyboard, A11y } from 'swiper/modules';
+import { Autoplay, Navigation, Pagination, EffectFade, Grid, Keyboard, A11y } from 'swiper/modules';
 import gsap from 'gsap';
 
 // Import core and module Swiper styles
@@ -7,6 +7,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
+import 'swiper/css/grid';
 
 /**
  * Animate individual layers of the active slide using GSAP
@@ -214,14 +215,16 @@ export function initProductCarousels() {
         container.classList.add('product-swiper-initialized');
 
         const region = container.closest('.kba-product-carousel');
+        const isNewArrivals = container.classList.contains('kba-new-arrivals-swiper');
         const shouldAutoSlide = slideCount > 4;
         const autoplayDelay = parseInt(container.dataset.autoplaySpeed, 10) || 4000;
         const transitionSpeed = parseInt(container.dataset.transitionSpeed, 10) || 800;
 
         container.__productSwiper = new Swiper(container, {
-            modules: [Autoplay, Navigation, Keyboard, A11y],
+            modules: [Autoplay, Navigation, Grid, Keyboard, A11y],
             slidesPerView: 4,
             spaceBetween: 24,
+            grid: isNewArrivals ? { rows: 2, fill: 'row' } : undefined,
             speed: transitionSpeed,
             // Product cards contain Livewire controls. Rewind keeps the continuous
             // carousel experience without cloning or moving those interactive nodes.
@@ -245,9 +248,18 @@ export function initProductCarousels() {
                 prevEl: region?.querySelector('.kba-product-carousel-nav--previous'),
             },
             breakpoints: {
-                0: { slidesPerView: 1.15, spaceBetween: 13 },
-                821: { slidesPerView: 3, spaceBetween: 24 },
-                1025: { slidesPerView: 4, spaceBetween: 24 },
+                // Keep the mobile/tablet layout as a normal single-row carousel.
+                // CSS then expands it into the intended two-column, all-products grid
+                // on phones. The two-row Swiper layout is desktop-only.
+                0: isNewArrivals
+                    ? { slidesPerView: 1.15, slidesPerGroup: 1, spaceBetween: 13, grid: { rows: 1, fill: 'row' } }
+                    : { slidesPerView: 1.15, spaceBetween: 13 },
+                821: isNewArrivals
+                    ? { slidesPerView: 3, slidesPerGroup: 1, spaceBetween: 24, grid: { rows: 1, fill: 'row' } }
+                    : { slidesPerView: 3, spaceBetween: 24 },
+                1025: isNewArrivals
+                    ? { slidesPerView: 4, slidesPerGroup: 4, spaceBetween: 24, grid: { rows: 2, fill: 'row' } }
+                    : { slidesPerView: 4, spaceBetween: 24 },
             },
         });
     });

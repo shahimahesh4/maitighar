@@ -117,17 +117,6 @@ class OperationalDemoSeeder extends Seeder
 
         SupportTicket::updateOrCreate(['user_id' => $customer->id, 'subject' => 'Order delivery update'], ['message' => 'Could you confirm when my processing order will be dispatched?', 'status' => 'in_progress', 'priority' => 'medium', 'admin_reply' => 'Your order is being packed and is expected to dispatch tomorrow.']);
 
-        $academyPage = Page::where('slug', 'academy-training')->first();
-        if ($academyPage) {
-            foreach ([
-                ['How long are academy courses?', 'Course duration varies by program. Contact our team for the current schedule and recommended learning path.'],
-                ['Are tools provided for learning sessions?', 'Core tools are available for guided academy practice. Your mentor will explain any personal kit requirements before the session begins.'],
-                ['Can beginners apply?', 'Yes. Several academy programs are designed specifically for beginners with no previous professional experience.'],
-            ] as $index => [$question, $answer]) {
-                $academyPage->faqs()->updateOrCreate(['question' => $question], ['answer' => '<p>'.$answer.'</p>', 'status' => 'published', 'sort_order' => $index + 1]);
-            }
-        }
-
         Setting::set('store_name', 'Maitighar');
         Setting::set('store_email', 'maitigharaustralia@gmail.com');
         Setting::set('store_phone', '+61 432 685 546');

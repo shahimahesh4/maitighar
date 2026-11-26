@@ -2,6 +2,12 @@
     $storeLogoPath = (string) \App\Models\Setting::get('store_logo', '');
     $storeLogoUrl = $storeLogoPath !== '' ? \Illuminate\Support\Facades\Storage::disk('public')->url($storeLogoPath) : asset('images/logo.webp');
     $storeName = (string) \App\Models\Setting::get('store_name', 'Maitighar');
+    $commerceEnabled = \App\Support\Storefront::commerceEnabled();
+    $wishlistEnabled = \App\Support\Storefront::wishlistEnabled();
+    $currencySwitcherEnabled = filter_var(\App\Models\Setting::get('currency_switcher_enabled', true), FILTER_VALIDATE_BOOL);
+    $accountSectionEnabled = \App\Support\Storefront::accountSectionEnabled();
+    $loginEnabled = \App\Support\Storefront::loginEnabled();
+    $registrationEnabled = \App\Support\Storefront::registrationEnabled();
 @endphp
 <div class="kba-store-header w-full bg-white font-sans shadow-sm" data-kba-store-header>
     <!-- Top Header Bar (Dark Charcoal matching reference design) -->
@@ -56,7 +62,7 @@
                     @endif
                 </div>
 
-                <span class="text-white/20 text-[11px]">|</span>
+                @if($currencySwitcherEnabled)<span class="text-white/20 text-[11px]">|</span>
 
                 <!-- Currency Switcher with Orange Accent (Defaults to AUD) -->
                 <div class="relative" x-data="{ open: false }">
@@ -79,6 +85,7 @@
                         </button>
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>
@@ -95,7 +102,7 @@
             </div>
 
             <!-- Central Navigation Menu (Moved into header) -->
-            <nav class="kba-store-nav hidden md:flex items-center gap-1 lg:gap-2.5 xl:gap-4 flex-1 justify-center mx-2 lg:mx-6 text-xs sm:text-sm">
+            <nav class="kba-store-nav hidden md:flex items-center gap-1 lg:gap-2.5 xl:gap-4 flex-1 {{ $accountSectionEnabled ? 'justify-center mx-2 lg:mx-6' : 'justify-end ml-auto mr-0' }} text-xs sm:text-sm">
                 <!-- Home Link -->
                 <a wire:navigate href="{{ route('index') }}" class="px-3 py-1 rounded-lg font-bold transition-all {{ request()->routeIs('index') ? 'bg-white text-[#EC0205] shadow-sm' : 'text-white/90 hover:text-white hover:bg-white/10' }}">
                     Home
@@ -141,10 +148,10 @@
             </nav>
 
             <!-- Right Actions: Wishlist, Your Cart, Account -->
-            <div class="kba-store-actions flex items-center gap-4 sm:gap-6 flex-shrink-0">
+            <div class="kba-store-actions {{ $accountSectionEnabled ? '' : 'kba-store-actions--without-account' }} flex items-center gap-4 sm:gap-6 flex-shrink-0">
                 
                 <!-- Wishlist -->
-                <a wire:navigate href="{{ route('wishlist') }}" class="flex flex-col items-center justify-center text-white hover:text-white/80 transition-colors group">
+                @if($wishlistEnabled)<a wire:navigate href="{{ route('wishlist') }}" class="flex flex-col items-center justify-center text-white hover:text-white/80 transition-colors group">
                     <div class="relative">
                         <i class="bi bi-heart text-lg sm:text-xl group-hover:scale-105 transition-transform text-white"></i>
                         @if($wishlist_count > 0)
@@ -153,8 +160,10 @@
                     </div>
                     <span class="text-[10px] font-semibold text-white/95 mt-0.5 transition-colors">Wishlist</span>
                 </a>
+                @endif
 
                 <!-- Your Cart -->
+                @if($commerceEnabled)
                 <a wire:navigate href="{{ route('cart-products') }}" class="flex flex-col items-center justify-center text-white hover:text-white/80 transition-colors group">
                     <div class="relative">
                         <i class="bi bi-cart3 text-lg sm:text-xl group-hover:scale-105 transition-transform text-white"></i>
@@ -162,8 +171,10 @@
                     </div>
                     <span class="text-[10px] font-semibold text-white/95 mt-0.5 transition-colors">Your Cart</span>
                 </a>
+                @endif
 
                 <!-- Account -->
+                @if($accountSectionEnabled && (auth()->check() || $loginEnabled || $registrationEnabled))
                 <div class="relative group" x-data="{ open: false, timeout: null }"
                      @mouseenter="clearTimeout(timeout); open = true"
                      @mouseleave="timeout = setTimeout(() => { open = false }, 250)"
@@ -205,16 +216,21 @@
                                     <i class="bi bi-box-arrow-right"></i> Log out
                                 </button>
                             @else
+                                @if($loginEnabled)
                                 <a wire:navigate href="{{ route('login') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-bold text-slate-700 hover:text-[#EA0202] hover:bg-slate-50 transition-colors">
                                     <i class="bi bi-box-arrow-in-right text-[#EA0202]"></i> Log In
                                 </a>
+                                @endif
+                                @if($registrationEnabled)
                                 <a wire:navigate href="{{ route('register') }}" class="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-700 hover:text-[#EA0202] hover:bg-slate-50 transition-colors">
                                     <i class="bi bi-person-plus text-slate-500"></i> Create Account
                                 </a>
+                                @endif
                             @endauth
                         </div>
                     </div>
                 </div>
+                @endif
 
                 <!-- Mobile menu toggle button -->
                 <button type="button" class="md:hidden flex items-center justify-center w-8 h-8 rounded-lg border border-white/40 text-white hover:bg-white/10" data-kba-menu-open aria-label="Open mobile menu">
@@ -237,6 +253,7 @@
             <button type="button" data-kba-menu-close aria-label="Close navigation menu"><i class="bi bi-x-lg"></i></button>
         </div>
 
+        @if($accountSectionEnabled && (auth()->check() || $loginEnabled || $registrationEnabled))
         @auth
             <div class="kba-mobile-user-card">
                 <span class="kba-mobile-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
@@ -245,9 +262,14 @@
         @else
             <div class="kba-mobile-guest-card">
                 <span><small>Welcome to Maitighar</small><strong>Sign in to your account</strong></span>
-                <a wire:navigate href="{{ route('login') }}" data-kba-menu-link>Sign In</a>
+                @if($loginEnabled)
+                    <a wire:navigate href="{{ route('login') }}" data-kba-menu-link>Sign In</a>
+                @elseif($registrationEnabled)
+                    <a wire:navigate href="{{ route('register') }}" data-kba-menu-link>Create Account</a>
+                @endif
             </div>
         @endauth
+        @endif
 
         <nav class="kba-mobile-sidebar-nav">
             <span class="kba-mobile-nav-label">Explore</span>
@@ -259,17 +281,22 @@
             <a wire:navigate href="{{ route('videos.index') }}" data-kba-menu-link><i class="bi bi-camera-video"></i><span>Video Gallery</span><i class="bi bi-chevron-right"></i></a>
             <a wire:navigate href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'is-active' : '' }}" data-kba-menu-link><i class="bi bi-chat-dots"></i><span>Contact Us</span><i class="bi bi-chevron-right"></i></a>
 
-            <span class="kba-mobile-nav-label kba-account-label">My Account</span>
-            <a wire:navigate href="{{ route('wishlist') }}" data-kba-menu-link><i class="bi bi-heart"></i><span>Wishlist</span><b>{{ $wishlist_count }}</b></a>
-            <a wire:navigate href="{{ route('cart-products') }}" data-kba-menu-link><i class="bi bi-bag"></i><span>Shopping Bag</span><b>{{ $total_count }}</b></a>
+            @if($accountSectionEnabled && (auth()->check() || $loginEnabled || $registrationEnabled))<span class="kba-mobile-nav-label kba-account-label">My Account</span>@endif
+            @if($wishlistEnabled)<a wire:navigate href="{{ route('wishlist') }}" data-kba-menu-link><i class="bi bi-heart"></i><span>Wishlist</span><b>{{ $wishlist_count }}</b></a>@endif
+            @if($commerceEnabled)<a wire:navigate href="{{ route('cart-products') }}" data-kba-menu-link><i class="bi bi-bag"></i><span>Shopping Bag</span><b>{{ $total_count }}</b></a>@endif
+            @if($accountSectionEnabled && (auth()->check() || $loginEnabled || $registrationEnabled))
             @auth
                 <a wire:navigate href="{{ route('dashboard') }}" data-kba-menu-link><i class="bi bi-grid-1x2"></i><span>Dashboard</span><i class="bi bi-chevron-right"></i></a>
                 <a wire:navigate href="{{ route('profile.edit') }}" data-kba-menu-link><i class="bi bi-person-gear"></i><span>Edit Profile</span><i class="bi bi-chevron-right"></i></a>
                 <a wire:navigate href="{{ route('my-orders') }}" data-kba-menu-link><i class="bi bi-box-seam"></i><span>My Orders</span><i class="bi bi-chevron-right"></i></a>
                 <button type="button" wire:click="logout" data-kba-menu-link><i class="bi bi-box-arrow-right"></i><span>Log Out</span><i class="bi bi-chevron-right"></i></button>
             @else
+                @if($loginEnabled)<a wire:navigate href="{{ route('login') }}" data-kba-menu-link><i class="bi bi-box-arrow-in-right"></i><span>Log In</span><i class="bi bi-chevron-right"></i></a>@endif
+                @if($registrationEnabled)
                 <a wire:navigate href="{{ route('register') }}" data-kba-menu-link><i class="bi bi-person-plus"></i><span>Create Account</span><i class="bi bi-chevron-right"></i></a>
+                @endif
             @endauth
+            @endif
         </nav>
 
         <div class="kba-mobile-sidebar-contact">
@@ -286,20 +313,30 @@
         <a wire:navigate href="{{ route('all-products') }}" class="{{ request()->routeIs('all-products', 'product-details') ? 'is-active' : '' }}">
             <span><i class="bi bi-grid"></i></span><small>Shop</small>
         </a>
-        <a wire:navigate href="{{ route('wishlist') }}" class="{{ request()->routeIs('wishlist') ? 'is-active' : '' }}">
+        @if($wishlistEnabled)<a wire:navigate href="{{ route('wishlist') }}" class="{{ request()->routeIs('wishlist') ? 'is-active' : '' }}">
             <span><i class="bi bi-heart{{ request()->routeIs('wishlist') ? '-fill' : '' }}"></i><b>{{ $wishlist_count }}</b></span><small>Wishlist</small>
         </a>
-        <a wire:navigate href="{{ route('cart-products') }}" class="{{ request()->routeIs('cart-products', 'checkout') ? 'is-active' : '' }}">
+        @endif
+        @if($commerceEnabled)<a wire:navigate href="{{ route('cart-products') }}" class="{{ request()->routeIs('cart-products', 'checkout') ? 'is-active' : '' }}">
             <span><i class="bi bi-bag{{ request()->routeIs('cart-products', 'checkout') ? '-fill' : '' }}"></i><b>{{ $total_count }}</b></span><small>Cart</small>
         </a>
+        @endif
+        @if($accountSectionEnabled && (auth()->check() || $loginEnabled || $registrationEnabled))
         @auth
             <a wire:navigate href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard', 'my-orders', 'my-order-details') ? 'is-active' : '' }}">
                 <span><i class="bi bi-person{{ request()->routeIs('dashboard', 'my-orders', 'my-order-details') ? '-fill' : '' }}"></i></span><small>Account</small>
             </a>
         @else
+            @if($loginEnabled)
             <a wire:navigate href="{{ route('login') }}" class="{{ request()->routeIs('login', 'register') ? 'is-active' : '' }}">
                 <span><i class="bi bi-person{{ request()->routeIs('login', 'register') ? '-fill' : '' }}"></i></span><small>Login</small>
             </a>
+            @elseif($registrationEnabled)
+            <a wire:navigate href="{{ route('register') }}" class="{{ request()->routeIs('register') ? 'is-active' : '' }}">
+                <span><i class="bi bi-person-plus{{ request()->routeIs('register') ? '-fill' : '' }}"></i></span><small>Register</small>
+            </a>
+            @endif
         @endauth
+        @endif
     </nav>
 </div>

@@ -19,10 +19,12 @@ class Attribute extends Model
         'slug',
         'type',
         'sort_order',
+        'is_active',
     ];
 
     protected $casts = [
         'sort_order' => 'integer',
+        'is_active' => 'boolean',
     ];
 
     protected static function booted(): void

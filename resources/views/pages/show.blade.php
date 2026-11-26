@@ -1,8 +1,8 @@
 @php
     $pageDesign = match ($page->slug) {
         'about-us' => ['eyebrow' => 'Our story & purpose', 'intro' => 'Celebrating authentic Nepalese heritage, culture, and craftsmanship with love.', 'icon' => 'bi-gem', 'stat' => 'Authentic & Handcrafted', 'cta' => ['Explore our collection', route('all-products')], 'secondary' => ['Contact us', route('contact')]],
-        'academy-training' => ['eyebrow' => 'Craftsmanship & Skill', 'intro' => 'Heritage experiences and artisan-led learning inspired by authentic tradition.', 'icon' => 'bi-mortarboard', 'stat' => 'Hands-on learning', 'cta' => ['Talk to our team', route('contact')], 'secondary' => ['Shop products', route('all-products')]],
         'contact-us' => ['eyebrow' => 'We would love to hear from you', 'intro' => 'Questions about products, orders, or custom requests? Our friendly team is ready to help.', 'icon' => 'bi-chat-heart', 'stat' => 'Let’s connect', 'cta' => ['Send us a message', route('contact')], 'secondary' => ['Shop products', route('all-products')]],
+        'refund-return-policy' => ['eyebrow' => 'Shop with confidence', 'intro' => 'A clear and caring guide to returns, exchanges, and refunds — so you always know what to expect.', 'icon' => 'bi-arrow-counterclockwise', 'stat' => 'Simple & transparent', 'cta' => ['Contact our team', route('contact')], 'secondary' => ['Shop products', route('all-products')]],
         default => ['eyebrow' => 'Maitighar', 'intro' => $page->meta_description ?: 'Discover more from Maitighar.', 'icon' => 'bi-gem', 'stat' => 'Heritage with love', 'cta' => ['Shop all products', route('all-products')], 'secondary' => ['Contact us', route('contact')]],
     };
     $faqs = $page->faqs()->published()->get();
@@ -147,11 +147,17 @@
                             <p>Explore helpful answers about our products, services, heritage experiences, and customer support.</p>
                         </header>
                         <div class="kba-about-faq-section__list">
-                            @foreach($faqs as $faq)
-                                <details class="kba-about-faq-section__item" @if($loop->first) open @endif>
-                                    <summary><span>{{ $faq->question }}</span><i class="bi bi-plus-lg" aria-hidden="true"></i></summary>
-                                    <div>{!! \App\Support\HtmlSanitizer::sanitize(preg_match('/<[^>]+>/', $faq->answer) ? $faq->answer : nl2br(e($faq->answer))) !!}</div>
-                                </details>
+                            @foreach([0, 1] as $column)
+                                <div class="kba-about-faq-section__column">
+                                    @foreach($faqs as $index => $faq)
+                                        @if($index % 2 === $column)
+                                            <details class="kba-about-faq-section__item" @if($faq->is($faqs->first())) open @endif>
+                                                <summary><span>{{ $faq->question }}</span><i class="bi bi-plus-lg" aria-hidden="true"></i></summary>
+                                                <div>{!! \App\Support\HtmlSanitizer::sanitize(preg_match('/<[^>]+>/', $faq->answer) ? $faq->answer : nl2br(e($faq->answer))) !!}</div>
+                                            </details>
+                                        @endif
+                                    @endforeach
+                                </div>
                             @endforeach
                         </div>
                     </section>
@@ -159,7 +165,7 @@
             @else
             <div class="kba-cms-content-grid">
                 <article class="kba-cms-article">
-                    <header class="kba-cms-section-heading"><span>Discover more</span><h2>{{ $page->slug === 'about-us' ? 'Authentic craft and cultural heritage' : ($page->slug === 'contact-us' ? 'Visit or contact our team' : $page->title) }}</h2></header>
+                    <header class="kba-cms-section-heading"><span>{{ $page->slug === 'refund-return-policy' ? 'Policy overview' : 'Discover more' }}</span><h2>{{ $page->slug === 'about-us' ? 'Authentic craft and cultural heritage' : ($page->slug === 'contact-us' ? 'Visit or contact our team' : ($page->slug === 'refund-return-policy' ? 'A simple guide to returns, exchanges & refunds' : $page->title)) }}</h2></header>
                     <div class="kba-cms-prose">{!! \App\Support\HtmlSanitizer::sanitize($page->content ?: '<p>More detail will be added soon.</p>') !!}</div>
 
                     @if($page->slug === 'about-us')
@@ -173,8 +179,6 @@
                             <div><span>02</span><strong>Thoughtfully made</strong><p>We choose meaningful pieces and services with care and purpose.</p></div>
                             <div><span>03</span><strong>Made to connect</strong><p>Every experience is designed to bring people closer to Nepalese culture.</p></div>
                         </section>
-                    @elseif($page->slug === 'academy-training')
-                        <div class="kba-cms-callout"><span><i class="bi bi-award"></i></span><div><small>Nepalese heritage with love</small><strong>Discover our authentic handcrafted collection</strong></div><a wire:navigate href="{{ route('all-products') }}">Explore shop <i class="bi bi-arrow-right"></i></a></div>
                     @elseif($page->slug === 'contact-us')
                         <div class="kba-contact-cards">
                             <a href="tel:{{ preg_replace('/[^+\d]/', '', \App\Models\Setting::get('store_phone', '+61 432 685 546')) }}"><i class="bi bi-telephone"></i><span><small>Call our team</small><strong>{{ \App\Models\Setting::get('store_phone', '+61 432 685 546') }}</strong></span></a>

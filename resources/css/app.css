@@ -61,7 +61,10 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 
 /* Premium desktop storefront header. Mobile continues to use its compact utility layout. */
 @media (min-width: 768px) {
-    .kba-store-header { box-shadow: 0 12px 28px rgba(15, 23, 42, .13); }
+    /* Use fixed positioning rather than sticky so the store header remains visible
+       even when page containers create their own scroll/overflow context. */
+    .kba-store-header { position: fixed; top: 0; right: 0; left: 0; z-index: 100; box-shadow: 0 12px 28px rgba(15, 23, 42, .13); }
+    .kba-site main { padding-top: 140px; }
     .kba-store-utility {
         position: relative;
         z-index: 3;
@@ -108,6 +111,7 @@ p { margin: 0 !important; line-height: 1.5 !important; }
     .kba-store-nav > .relative > div[x-show] > div { overflow: hidden; border-radius: 16px !important; border-color: rgba(226,232,240,.95) !important; box-shadow: 0 18px 34px rgba(33, 20, 22, .22) !important; }
     .kba-store-nav > .relative > div[x-show] a { padding-top: 10px !important; padding-bottom: 10px !important; }
     .kba-store-actions { min-height: 58px; padding-left: clamp(18px, 2vw, 32px); border-left: 1px solid rgba(255,255,255,.48); gap: clamp(18px, 1.75vw, 30px) !important; }
+    .kba-store-actions--without-account { padding-left: 0; border-left: 0; }
     .kba-store-actions > a, .kba-store-actions > .relative > button { min-width: 54px; }
     .kba-store-actions i { font-size: 25px !important; text-shadow: 0 2px 6px rgba(79,0,6,.2); }
     .kba-store-actions span { letter-spacing: .015em; }
@@ -409,13 +413,13 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 .kba-trust-panel { position: relative; overflow: hidden; padding: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .kba-trust-panel::before, .kba-trust-panel::after { content: none; }
 .kba-trust-grid { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: hidden; border-radius: 0; background: #fffdf8; box-shadow: inset 0 -1px 0 rgba(177,24,18,.12); }
-.kba-trust-item { position: relative; min-height: 238px; padding: 31px 15px 22px; text-align: center; transition: background .25s ease, transform .25s ease; }
+.kba-trust-item { position: relative; min-height: 238px; padding: 31px 15px 22px; display: flex; flex-direction: column; align-items: center; text-align: center; transition: background .25s ease, transform .25s ease; }
 .kba-trust-item + .kba-trust-item::before { content: ''; position: absolute; left: 0; top: 18%; bottom: 18%; width: 1px; background: #eaded0; }
 .kba-trust-item:hover { background: rgba(255,255,255,.7); transform: translateY(-3px); }
 .kba-trust-icon { width: 68px; height: 68px; margin: 0 auto 13px; display: grid; place-items: center; border: 2px solid #fff; border-radius: 50%; color: #fff; background: #ed0808; box-shadow: 0 7px 15px rgba(146,35,25,.22); font-size: 34px; transition: transform .25s ease, box-shadow .25s ease; }
 .kba-trust-item:hover .kba-trust-icon { transform: scale(1.06); box-shadow: inset 0 0 0 1px rgba(191,17,20,.18), 0 10px 20px rgba(146,35,25,.16); }
-.kba-trust-item h3 { margin: 0; color: #101f39; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(15px, 1.2vw, 19px); font-weight: 700; line-height: 1.17; letter-spacing: -.015em; white-space: nowrap; }
-.kba-trust-item p { margin: 7px auto 0; max-width: 225px; color: #475569; font-size: 15px; font-weight: 500; line-height: 1.45; }
+.kba-trust-item h3 { width: 100%; margin: 0; color: #101f39; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(15px, 1.2vw, 19px); font-weight: 700; line-height: 1.17; letter-spacing: -.015em; text-align: center; white-space: nowrap; }
+.kba-trust-item p { width: 100%; margin: 7px auto 0; max-width: 225px; color: #475569; font-size: 15px; font-weight: 500; line-height: 1.45; text-align: center; }
 .kba-trust-item::after { content: '◆'; display: block; margin: 12px auto 0; width: 134px; color: #d41419; font-size: 11px; letter-spacing: 11px; line-height: 1; text-indent: 11px; background: linear-gradient(#e94a4e,#e94a4e) left 50% / 47px 1px no-repeat, linear-gradient(#e94a4e,#e94a4e) right 50% / 47px 1px no-repeat; }
 
 /* Related-product campaign */
@@ -455,6 +459,8 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 .kba-related-price strong { color: #d7070b; font-size: 16px; }
 .kba-related-card__body > button { width: 100%; min-height: 40px; margin-top: 8px; border: 0; border-radius: 8px; color: #fff; background: linear-gradient(100deg, #b90008, #ed1113); cursor: pointer; font-size: 13px; font-weight: 800; box-shadow: 0 6px 12px rgba(181,0,7,.18); transition: transform .2s ease, box-shadow .2s ease; }
 .kba-related-card__body > button:hover { transform: translateY(-1px); box-shadow: 0 9px 16px rgba(181,0,7,.25); }
+.kba-related-card__body > .kba-related-quote { display: flex; width: 100%; min-height: 40px; margin-top: 8px; align-items: center; justify-content: center; gap: 7px; border-radius: 8px; color: #fff; background: linear-gradient(100deg, #b90008, #ed1113); font-family: inherit; font-size: 13px; font-weight: 800; line-height: 1; text-decoration: none; box-shadow: 0 6px 12px rgba(181,0,7,.18); transition: transform .2s ease, box-shadow .2s ease; }
+.kba-related-card__body > .kba-related-quote:hover { color: #fff; transform: translateY(-1px); box-shadow: 0 9px 16px rgba(181,0,7,.25); }
 
 /* Cultural Dress collection campaign */
 .kba-cultural-collection {
@@ -751,10 +757,19 @@ p { margin: 0 !important; line-height: 1.5 !important; }
     -webkit-overflow-scrolling: touch;
 }
 .kba-carousel-track::-webkit-scrollbar { display: none; }
-.kba-product-swiper { overflow: hidden; padding: 4px; }
+.kba-product-swiper {
+    /* Product cards lift by 5px on hover. Keep enough top clearance so their
+       border and shadow are not clipped by Swiper's viewport. */
+    overflow: hidden;
+    padding: 10px 4px 4px;
+}
 .kba-product-swiper .kba-carousel-track { display: flex; align-items: stretch; gap: 0; overflow: visible; padding: 0; scroll-snap-type: none; }
 .kba-product-swiper .kba-carousel-track .kba-product-card { flex: none; scroll-snap-align: none; }
-.kba-sale-product-swiper { overflow: hidden; padding: 4px; }
+/* New arrivals presents eight desktop products at once: four columns, two rows. */
+@media (min-width: 1025px) {
+    .kba-new-arrivals-swiper .kba-carousel-track { flex-wrap: wrap; row-gap: 24px; }
+}
+.kba-sale-product-swiper { overflow: hidden; padding: 10px 4px 4px; }
 .kba-sale-product-swiper .kba-carousel-track { display: flex; align-items: stretch; gap: 0; overflow: visible; padding: 0; scroll-snap-type: none; }
 .kba-sale-product-swiper .kba-carousel-track .kba-product-card { flex: none; scroll-snap-align: none; }
 .kba-carousel-track .kba-product-card {
@@ -797,6 +812,31 @@ p { margin: 0 !important; line-height: 1.5 !important; }
     .kba-product-carousel-nav { width: 36px; height: 36px; }
     .kba-product-carousel-nav--previous { left: -13px; }
     .kba-product-carousel-nav--next { right: -13px; }
+
+    /* On phones, show every loaded product in a two-column grid instead of
+       requiring visitors to scroll or swipe through a carousel. */
+    .kba-product-carousel .kba-product-carousel-nav { display: none; }
+    .kba-product-carousel .kba-product-swiper,
+    .kba-product-carousel .kba-sale-product-swiper { overflow: visible; padding: 0; }
+    .kba-product-carousel .kba-product-swiper .kba-carousel-track,
+    .kba-product-carousel .kba-sale-product-swiper .kba-carousel-track {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+        overflow: visible;
+        transform: none !important;
+    }
+    .kba-product-carousel .kba-product-swiper .kba-carousel-track .kba-product-card,
+    .kba-product-carousel .kba-sale-product-swiper .kba-carousel-track .kba-product-card {
+        width: auto !important;
+        margin: 0 !important;
+        flex: none !important;
+    }
+
+    /* Keep the New Arrivals mobile section compact: five rows of two products. */
+    .kba-new-arrivals-swiper .kba-carousel-track .kba-product-card:nth-child(n + 11) {
+        display: none !important;
+    }
 }
 .kba-catalog-product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (min-width: 821px) {
@@ -1182,6 +1222,34 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 .kba-cms-support-card h2 { color: white; }
 .kba-cms-support-card p { color: rgba(255,255,255,.78); font-size: .74rem; line-height: 1.7; }
 .kba-cms-support-card a { display: inline-flex; align-items: center; gap: 9px; margin-top: 8px; color: #fca5a5; font-size: .72rem; font-weight: 800; text-decoration: none; }
+
+/* Refund & return policy — designed for relaxed, easy reading. */
+.kba-cms-page--refund-return-policy { background: #fcfaf7; }
+.kba-cms-page--refund-return-policy .kba-cms-hero { padding: clamp(38px, 6vw, 72px) 16px; }
+.kba-cms-page--refund-return-policy .kba-cms-hero::before { background: radial-gradient(circle at 84% 12%, rgba(255,255,255,.17), transparent 24%), linear-gradient(125deg, #071b38 0%, #123260 55%, #bb121c 100%); }
+.kba-cms-page--refund-return-policy .kba-cms-hero-copy { max-width: 730px; }
+.kba-cms-page--refund-return-policy .kba-cms-hero-copy > .kba-cms-eyebrow { margin-bottom: 12px; color: #fecaca; letter-spacing: .1em; text-transform: none; }
+.kba-cms-page--refund-return-policy .kba-cms-hero-copy h1 { max-width: none; margin: 0 0 15px; font-size: clamp(2.25rem, 4.4vw, 4rem); font-weight: 750; line-height: 1.08; letter-spacing: -.045em; text-transform: none; }
+.kba-cms-page--refund-return-policy .kba-cms-hero-copy > p { max-width: 650px; color: rgba(255,255,255,.9); font-size: clamp(.98rem, 1.4vw, 1.1rem); line-height: 1.75; }
+.kba-cms-page--refund-return-policy .kba-cms-content { margin-top: clamp(32px, 5vw, 58px); margin-bottom: clamp(42px, 6vw, 76px); }
+.kba-cms-page--refund-return-policy .kba-cms-article { border-color: #eadfd4; border-radius: 24px; box-shadow: 0 18px 48px rgba(72, 43, 30, .07); }
+.kba-cms-page--refund-return-policy .kba-cms-section-heading { max-width: 760px; padding-bottom: 29px; border-bottom-color: #eadfd4; }
+.kba-cms-page--refund-return-policy .kba-cms-section-heading > span { color: #ba1019; letter-spacing: .13em; text-transform: none; }
+.kba-cms-page--refund-return-policy .kba-cms-section-heading h2 { margin-top: 10px; font-size: clamp(1.55rem, 2.65vw, 2.2rem); line-height: 1.22; letter-spacing: -.03em; text-transform: none; }
+.kba-cms-page--refund-return-policy .kba-cms-prose { max-width: 800px; padding-top: 32px; color: #46566b; font-size: clamp(.96rem, 1.2vw, 1.05rem); line-height: 1.82; }
+.kba-cms-page--refund-return-policy .kba-cms-prose h2,
+.kba-cms-page--refund-return-policy .kba-cms-prose h3 { margin: 35px 0 12px; color: #102445; font-size: clamp(1.15rem, 1.8vw, 1.38rem); font-weight: 750; line-height: 1.3; letter-spacing: -.018em; text-transform: none; }
+.kba-cms-page--refund-return-policy .kba-cms-prose p { margin: 0 0 20px; }
+.kba-cms-page--refund-return-policy .kba-cms-prose ul { grid-template-columns: 1fr; gap: 11px; margin: 22px 0 27px; }
+.kba-cms-page--refund-return-policy .kba-cms-prose li { min-height: 0; padding: 13px 16px 13px 45px; border: 1px solid #f0e8df; border-radius: 12px; background: #fffaf5; color: #3d4e63; font-size: .94em; line-height: 1.58; }
+.kba-cms-page--refund-return-policy .kba-cms-prose li::before { top: 14px; left: 15px; background: #fee2e2; color: #c31321; }
+.kba-cms-page--refund-return-policy .kba-cms-prose ol { margin: 22px 0 27px; padding-left: 1.45rem; }
+.kba-cms-page--refund-return-policy .kba-cms-prose ol li { min-height: auto; margin: 10px 0; padding: 0 0 0 6px; border: 0; border-radius: 0; background: transparent; color: #3d4e63; font-size: .96em; }
+.kba-cms-page--refund-return-policy .kba-cms-prose ol li::before { content: none; }
+.kba-cms-page--refund-return-policy .kba-cms-prose strong { color: #102445; }
+.kba-cms-page--refund-return-policy .kba-page-faq { border-color: #eadfd4; background: #fffdfb; box-shadow: 0 14px 36px rgba(72, 43, 30, .06); }
+.kba-cms-page--refund-return-policy .kba-page-faq-heading h2 { text-transform: none; }
+.kba-cms-page--refund-return-policy .kba-cms-aside { position: sticky; top: 118px; align-self: start; }
 .kba-cms-feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 30px; }
 .kba-cms-feature-grid > div { min-width: 0; padding: 20px; border: 1px solid #e2e8f0; border-radius: 18px; background: #f8fafc; }
 .kba-cms-feature-grid i { color: #EC0205; font-size: 1.15rem; }
@@ -1359,12 +1427,13 @@ p { margin: 0 !important; line-height: 1.5 !important; }
     .kba-about-information-card:last-child { grid-column: 1 / -1; }
 }
 .kba-about-faq-section { margin-top: clamp(52px, 7vw, 90px); padding: clamp(30px, 5vw, 68px); border: 1px solid #e8edf0; border-radius: 30px; background: #fff; box-shadow: 0 20px 45px rgba(32, 63, 96, .06); }
-.kba-about-faq-section__heading { max-width: 680px; margin-bottom: clamp(28px, 4vw, 46px); }
+.kba-about-faq-section__heading { width: 100%; max-width: none; margin-bottom: clamp(28px, 4vw, 46px); }
 .kba-about-faq-section__heading > span { display: inline-flex; align-items: center; gap: 8px; color: #d71930; font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .kba-about-faq-section__heading > span i { font-size: 1rem; }
 .kba-about-faq-section__heading h2 { margin: 13px 0 12px; color: #203f60; font-size: clamp(1.7rem, 3vw, 2.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -.045em; }
 .kba-about-faq-section__heading p { color: #64758b; font-size: .95rem; }
-.kba-about-faq-section__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.kba-about-faq-section__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 13px; }
+.kba-about-faq-section__column { display: grid; align-content: start; gap: 13px; }
 .kba-about-faq-section__item { border: 1px solid #e3e9ed; border-radius: 15px; background: #fbfcfc; transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
 .kba-about-faq-section__item[open] { border-color: #f0c4c9; background: #fff; box-shadow: 0 10px 22px rgba(32, 63, 96, .07); }
 .kba-about-faq-section__item summary { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 18px 19px; color: #294b6c; font-size: .91rem; font-weight: 750; line-height: 1.4; cursor: pointer; list-style: none; }
@@ -1479,6 +1548,9 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 @media (prefers-reduced-motion: reduce) { .kba-category-card, .kba-category-card__media img, .kba-category-card__arrow, .kba-category-card__body > span i { transition: none; } .kba-category-card:hover { transform: none; } }
 .kba-cms-footer-cta h2 { margin: 10px 0 7px; font-family: 'DM Sans', sans-serif; font-size: clamp(1.4rem, 2.7vw, 2.05rem); line-height: 1.08; text-transform: uppercase; }
 .kba-cms-footer-cta p { margin: 0; color: rgba(255,255,255,.8); font-size: .76rem; }
+.kba-cms-page--refund-return-policy .kba-cms-footer-cta .kba-cms-eyebrow { color: #dbeafe; letter-spacing: .08em; text-transform: none; }
+.kba-cms-page--refund-return-policy .kba-cms-footer-cta h2 { color: #ffffff; font-size: clamp(1.55rem, 2.85vw, 2.2rem); line-height: 1.2; letter-spacing: -.025em; text-transform: none; }
+.kba-cms-page--refund-return-policy .kba-cms-footer-cta p { max-width: 620px; color: rgba(255,255,255,.94); font-size: clamp(.92rem, 1.25vw, 1rem); line-height: 1.7; }
 .kba-cms-footer-cta .kba-cms-actions { flex-shrink: 0; }
 .kba-cms-button--light { background: white; color: #0C1E8C; font-weight: 800; }
 .kba-cms-button--light:hover { background: #fee2e2; color: #EC0205; }
@@ -1553,11 +1625,16 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 .kba-product-card:hover .kba-quick-cart,
 .kba-quick-cart:focus { opacity: 1; transform: translateY(0); }
 .kba-quick-cart:hover { background: #0C1E8C; color: white; }
-.kba-home .kba-product-info { min-height: 112px; padding: 15px 16px 17px; display: flex; flex-direction: column; }
+/* Do not reserve a rating/price row after those storefront options are disabled. */
+.kba-home .kba-product-info { min-height: 0; padding: 15px 16px 17px; display: flex; flex-direction: column; }
 .kba-product-title { display: block; overflow: hidden; color: #0f172a; font-size: 17px; font-weight: 500; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
 .kba-home .kba-product-title { color: #0f172a; font-size: 15px; font-weight: 650; }
 .kba-product-title:hover { color: #0C1E8C; }
 .kba-rating { display: flex; gap: 2px; margin: 7px 0 1px; color: #f59e0b; font-size: 13px; }
+/* This selector is deliberately more specific than the rating layout rule.
+   It lets the admin review setting remove stars completely. */
+.kba-rating.hidden,
+.kba-related-rating.hidden { display: none !important; }
 .kba-price { display: flex; align-items: baseline; gap: 6px; margin-top: auto; padding-top: 8px; font-size: 13px; white-space: nowrap; }
 .kba-price del, .kba-price strong { white-space: nowrap; }
 .kba-price del { color: #94a3b8 !important; font-size: 11.5px; }
@@ -1739,7 +1816,7 @@ p { margin: 0 !important; line-height: 1.5 !important; }
     .kba-section-heading h2 { font-size: 21px; }
     .kba-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
     .kba-home .kba-product-card { border-radius: 14px; }
-    .kba-home .kba-product-info { min-height: 104px; padding: 11px 11px 13px; }
+    .kba-home .kba-product-info { min-height: 0; padding: 11px 11px 13px; }
     .kba-product-title { font-size: 15px; }
     .kba-price { flex-wrap: wrap; gap: 4px 6px; font-size: 13px; }
     .kba-quick-cart { opacity: 1; transform: none; width: 31px; height: 31px; }
@@ -1752,7 +1829,7 @@ p { margin: 0 !important; line-height: 1.5 !important; }
     .kba-footer-bottom { padding: 24px 18px 94px; }
 }
 
-/* Kathmandu Academy authentication */
+/* Maitighar authentication */
 .kba-auth-page {
     min-height: 640px;
     padding: 70px 24px;

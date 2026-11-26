@@ -75,8 +75,8 @@ class AttributesRelationManager extends RelationManager
 
                 Forms\Components\Toggle::make('is_variation')
                     ->label('Used for Variations')
-                    ->helperText('Enable this attribute to generate purchasable variations (e.g. Size, Colour).')
-                    ->default(true),
+                    ->helperText('Enable only for purchasable options such as Size or Colour. Keep Wearer as a filter, not a variation.')
+                    ->default(false),
 
                 Forms\Components\TextInput::make('sort_order')
                     ->label('Sort Order')

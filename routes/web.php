@@ -24,11 +24,14 @@ use App\Livewire\MyOrdersPage;
 use App\Livewire\ProductDetailPage;
 use App\Livewire\ProductsPage;
 use App\Livewire\ProfilePage;
+use App\Livewire\QuoteRequestPage;
 use App\Livewire\SuccessPage;
 use App\Livewire\SupportTicketsPage;
 use App\Livewire\WishlistPage;
 use App\Models\Order;
 use App\Services\CommunicationService;
+use App\Http\Middleware\EnsureCommerceEnabled;
+use App\Http\Middleware\EnsureWishlistEnabled;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,18 +45,26 @@ Route::get('/categories', CategoriesPage::class)->name('product-categories');
 
 Route::get('/products', ProductsPage::class)->name('all-products');
 
+// Wearer collection URLs use the attribute value slug, e.g. /products/wearer/women.
+Route::get('/products/wearer/{wearer:slug}', ProductsPage::class)->name('product-wearer.products');
+
+// Category storefront URLs use the category slug, e.g. /product-categories/sarees.
+Route::get('/product-categories/{category:slug}/wearer/{wearer:slug}', ProductsPage::class)->name('product-category-wearer.products');
+Route::get('/product-categories/{category:slug}', ProductsPage::class)->name('product-category.products');
+
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
 Route::get('/gallery/{album}', [GalleryController::class, 'show'])->name('gallery.show');
 Route::get('/videos', [VideoGalleryController::class, 'index'])->name('videos.index');
 Route::get('/videos/{album}', [VideoGalleryController::class, 'show'])->name('videos.show');
 
 Route::get('/product/{slug}', ProductDetailPage::class)->name('product-details');
+Route::get('/request-quote/{product:slug}', QuoteRequestPage::class)->name('quote.request');
 
-Route::get('/cart', CartPage::class)->name('cart-products');
+Route::get('/cart', CartPage::class)->middleware(EnsureCommerceEnabled::class)->name('cart-products');
 
-Route::get('/checkout', CheckoutPage::class)->middleware('auth')->name('checkout');
+Route::get('/checkout', CheckoutPage::class)->middleware(['auth', EnsureCommerceEnabled::class])->name('checkout');
 
-Route::get('/wishlist', WishlistPage::class)->middleware('auth')->name('wishlist');
+Route::get('/wishlist', WishlistPage::class)->middleware(['auth', EnsureWishlistEnabled::class])->name('wishlist');
 
 Route::get('/contact', ContactPage::class)->name('contact');
 
@@ -125,6 +136,10 @@ Route::get('/currency/{currency}', function (string $currency) {
 
     return redirect()->back();
 })->name('currency.switch');
+
+// Retired public page: keep the URL unavailable even before a deployment's
+// database migration has removed the old CMS record.
+Route::get('/academy-training', fn () => abort(404));
 
 // Public pages by slug. Exclude common reserved prefixes so we don't
 // accidentally intercept Filament admin, Livewire, API, or other system routes.

@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Traits\GoogleRecaptcha;
+use App\Support\Storefront;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\Attributes\Title;
@@ -17,8 +18,14 @@ class LoginPage extends Component
 
     public $password;
 
+    public function mount(): void
+    {
+        abort_unless(Storefront::loginEnabled(), 404);
+    }
+
     public function save()
     {
+        abort_unless(Storefront::loginEnabled(), 404);
         $rules = array_merge($this->getRecaptchaRules(), [
             'email' => 'required|email|max:255|exists:users,email',
             'password' => 'required|min:6',

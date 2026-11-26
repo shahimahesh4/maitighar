@@ -37,7 +37,7 @@
                     x-show="!search || @js(strtolower($category->name)).includes(search.toLowerCase())"
                     x-transition.opacity.duration.150ms
                     class="kba-category-card group"
-                    href="{{ route('all-products', ['selected_categories' => [$category->id]]) }}"
+                    href="{{ route('product-category.products', $category) }}"
                     wire:key="cat-card-{{ $category->id }}"
                 >
                     <div class="kba-category-card__media">

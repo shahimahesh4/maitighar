@@ -28,7 +28,7 @@
                 </article>
                 @if($loop->last)</div>@endif
             @empty
-                <div class="kba-gallery-empty"><span><i class="bi bi-camera"></i></span><h2>Our first album is coming soon</h2><p>Beautiful academy moments are being prepared for this gallery.</p></div>
+                <div class="kba-gallery-empty"><span><i class="bi bi-camera"></i></span><h2>Our first album is coming soon</h2><p>Beautiful heritage moments are being prepared for this gallery.</p></div>
             @endforelse
 
             @if($albums->isNotEmpty())

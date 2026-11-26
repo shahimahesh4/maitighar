@@ -78,12 +78,6 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
                 'images/kba/beauty-girl.png',
             ],
             [
-                'Heritage Experiences',
-                'academy-training',
-                '<h2>Maitighar Experiences & Services</h2><ul><li>Professional heritage skill development</li><li>Safe and well-equipped arrangements for learners</li><li>Direct guidance from experienced mentors</li><li>Recognition of participation</li><li>Portfolio development</li><li>Career preparation and counselling</li></ul>',
-                'images/logo.png',
-            ],
-            [
                 'Videos',
                 'videos',
                 '<p>Heritage, personal care, and special moments from Maitighar will be published here.</p>',
@@ -108,7 +102,6 @@ class KathmanduBeautyWebsiteSeeder extends Seeder
                     'meta_title' => $title.' | Maitighar',
                     'meta_description' => match ($slug) {
                         'about-us' => 'Meet Maitighar—Nepalese Heritage with Love, professional services, authentic craftsmanship, and dedicated mentorship.',
-                        'academy-training' => 'Explore hands-on heritage learning with experienced mentors, recognition of participation, and career guidance at Maitighar.',
                         'videos' => 'Watch heritage, personal-care, and special event videos from Maitighar.',
                         'contact-us' => 'Contact Maitighar for courses, salon services, appointments, and product enquiries.',
                         default => Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($content))), 155),

@@ -59,7 +59,17 @@ class CategoryResource extends Resource
                         ->searchable()
                         ->preload()
                         ->nullable()
-                        ->helperText('Leave blank for a top-level category. Select a category here to create a subcategory.'),
+                        ->helperText("Cultural dress hierarchy: Cultural Clothing → Women's, Men's or Kids' Cultural Dresses → Tharu, Newari, Rai, Tamang, Magar or Gurung."),
+
+                    Select::make('collection_audience')
+                        ->label('Homepage Cultural Collection')
+                        ->options([
+                            'women' => "Women's cultural dresses",
+                            'men' => "Men's cultural dresses",
+                            'kids' => "Kids' cultural dresses",
+                        ])
+                        ->nullable()
+                        ->helperText('Assign this only to the category that should power the matching homepage collection. Its active children become the culture cards automatically.'),
 
                     FileUpload::make('image')
                         ->image()
@@ -91,7 +101,9 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->limit(20)
+                    ->tooltip(fn (Category $record): string => $record->name),
                 Tables\Columns\TextColumn::make('parent.name')
                     ->label('Parent Category')
                     ->placeholder('Top-level')
@@ -115,8 +127,13 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
 
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean(),
+                Tables\Columns\ToggleColumn::make('is_active')
+                    ->label('Published')
+                    ->onColor('success')
+                    ->offColor('danger')
+                    ->onIcon('heroicon-m-check')
+                    ->offIcon('heroicon-m-x-mark')
+                    ->tooltip(fn (Category $record): string => $record->is_active ? 'Published — click to unpublish' : 'Unpublished — click to publish'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

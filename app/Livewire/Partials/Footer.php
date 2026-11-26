@@ -4,6 +4,7 @@ namespace App\Livewire\Partials;
 
 use App\Models\Subscriber;
 use App\Models\Setting;
+use App\Support\Storefront;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -56,7 +57,6 @@ class Footer extends Component
     {
         return [
             ['label' => 'Shop products', 'url' => route('all-products')],
-            ['label' => 'Heritage Experiences', 'url' => route('pages.show', 'academy-training')],
             ['label' => 'Photo gallery', 'url' => route('gallery.index')],
             ['label' => 'Video gallery', 'url' => route('videos.index')],
             ['label' => 'About Maitighar', 'url' => route('pages.show', 'about-us')],
@@ -70,10 +70,10 @@ class Footer extends Component
                 ['label' => 'My dashboard', 'url' => route('dashboard')],
                 ['label' => 'Orders & tracking', 'url' => route('my-orders')],
             ]
-            : [
-                ['label' => 'Sign in to account', 'url' => route('login')],
-                ['label' => 'Create an account', 'url' => route('register')],
-            ];
+            : array_values(array_filter([
+                Storefront::loginEnabled() ? ['label' => 'Sign in to account', 'url' => route('login')] : null,
+                Storefront::registrationEnabled() ? ['label' => 'Create an account', 'url' => route('register')] : null,
+            ]));
 
         return [
             ...$accountLinks,

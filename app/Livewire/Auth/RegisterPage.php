@@ -5,6 +5,7 @@ namespace App\Livewire\Auth;
 use App\Models\User;
 use App\Services\CommunicationService;
 use App\Services\EmailOtpService;
+use App\Support\Storefront;
 use App\Traits\GoogleRecaptcha;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -28,8 +29,14 @@ class RegisterPage extends Component
 
     public string $password_confirmation = '';
 
+    public function mount(): void
+    {
+        abort_unless(Storefront::registrationEnabled(), 404);
+    }
+
     public function save()
     {
+        abort_unless(Storefront::registrationEnabled(), 404);
         $this->phone = $this->normalizePhone($this->phone);
 
         $rules = array_merge($this->getRecaptchaRules(), [

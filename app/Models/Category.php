@@ -15,11 +15,17 @@ class Category extends Model
 
     protected $fillable = [
         'parent_id',
+        'collection_audience',
         'name',
         'slug',
         'image',
         'is_active',
     ];
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 
     public function products()
     {
@@ -34,6 +40,41 @@ class Category extends Model
     public function children()
     {
         return $this->hasMany(self::class, 'parent_id');
+    }
+
+    /**
+     * Expand selected category IDs to include every nested child category.
+     *
+     * This keeps a collection link such as "Women's Cultural Dresses" useful:
+     * visitors see products assigned to any of its cultural subcategories.
+     */
+    public static function idsIncludingDescendants(array $categoryIds): array
+    {
+        $ids = collect($categoryIds)
+            ->filter(fn ($id) => filled($id))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        $frontier = $ids;
+
+        while ($frontier->isNotEmpty()) {
+            $children = static::query()
+                ->whereIn('parent_id', $frontier)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->reject(fn ($id) => $ids->contains($id))
+                ->values();
+
+            if ($children->isEmpty()) {
+                break;
+            }
+
+            $ids = $ids->merge($children)->unique()->values();
+            $frontier = $children;
+        }
+
+        return $ids->all();
     }
 
     public function getImageUrl()

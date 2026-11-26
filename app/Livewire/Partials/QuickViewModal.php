@@ -5,6 +5,7 @@ namespace App\Livewire\Partials;
 use App\Helpers\CartManagement;
 use App\Models\Product;
 use App\Models\Wishlist;
+use App\Support\Storefront;
 use Illuminate\View\View;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\On;
@@ -27,6 +28,10 @@ class QuickViewModal extends Component
     #[On('open-quick-view')]
     public function openModal(int $productId): void
     {
+        if (! Storefront::quickViewEnabled()) {
+            return;
+        }
+
         $product = Product::storefront()
             ->with(['category', 'brand'])
             ->withAvg('approvedReviews', 'rating')
@@ -89,6 +94,10 @@ class QuickViewModal extends Component
 
     public function toggleWishlist(): void
     {
+        if (! Storefront::wishlistEnabled()) {
+            return;
+        }
+
         if (! $this->product) {
             return;
         }

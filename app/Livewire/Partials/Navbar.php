@@ -66,7 +66,10 @@ class Navbar extends Component
             $params['search'] = trim($this->search);
         }
         if (filled($this->selectedCategory)) {
-            $params['selected_categories'] = [$this->selectedCategory];
+            return redirect()->route('product-category.products', [
+                'category' => $this->selectedCategory,
+                ...$params,
+            ]);
         }
 
         return redirect()->route('all-products', $params);

@@ -6,6 +6,7 @@ use App\Filament\Pages\EditProfile;
 use App\Filament\Resources\OrderResource\Widgets\OrderStats;
 use App\Models\Setting;
 use App\Services\CommunicationService;
+use Filament\Forms\Components\Toggle;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -16,6 +17,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentView;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -101,9 +103,28 @@ class AdminPanelProvider extends PanelProvider
 
     public function boot(): void
     {
+        // Keep every boolean control consistent throughout the admin panel:
+        // enabled/published is green and disabled/unpublished is red.
+        Toggle::configureUsing(fn (Toggle $toggle): Toggle => $toggle
+            ->onColor('success')
+            ->offColor('danger')
+            ->onIcon('heroicon-m-check')
+            ->offIcon('heroicon-m-x-mark'));
+
+        ToggleColumn::configureUsing(fn (ToggleColumn $column): ToggleColumn => $column
+            ->onColor('success')
+            ->offColor('danger')
+            ->onIcon('heroicon-m-check')
+            ->offIcon('heroicon-m-x-mark'));
+
         FilamentView::registerRenderHook(
             PanelsRenderHook::USER_MENU_BEFORE,
             fn () => view('filament.components.topbar-website-link'),
+        );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
+            fn () => view('filament.components.topbar-date'),
         );
 
         FilamentView::registerRenderHook(
@@ -122,6 +143,15 @@ class AdminPanelProvider extends PanelProvider
                         background: linear-gradient(180deg, #091b38 0%, #071355 100%);
                     }
                     @media (min-width: 1024px) {
+                        /* Keep the desktop admin header visible while records scroll. */
+                        .fi-topbar {
+                            position: sticky !important;
+                            top: 0;
+                            z-index: 50;
+                        }
+                        .fi-topbar nav {
+                            box-shadow: 0 5px 16px rgba(15, 23, 42, .10);
+                        }
                         /* Filament disables the desktop sidebar transition by default. */
                         .fi-sidebar {
                             transition-property: width, transform, margin, padding, box-shadow !important;
@@ -169,6 +199,21 @@ class AdminPanelProvider extends PanelProvider
                     .fi-btn-color-primary {
                         background: linear-gradient(135deg, var(--maitighar-red), var(--maitighar-red-dark));
                     }
+                    .fi-topbar-date {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: .45rem;
+                        padding: .55rem .8rem;
+                        border: 1px solid #e2e8f0;
+                        border-radius: .65rem;
+                        color: #334155;
+                        background: #f8fafc;
+                        font-size: .78rem;
+                        font-weight: 700;
+                        white-space: nowrap;
+                    }
+                    .fi-topbar-date svg { width: 1rem; height: 1rem; color: #EC0205; }
+                    @media (max-width: 900px) { .fi-topbar-date { display: none; } }
                     /* Website link button in topbar */
                     .fi-topbar-website-btn {
                         display: inline-flex;

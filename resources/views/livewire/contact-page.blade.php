@@ -56,6 +56,9 @@
                     <span>{{ session('contact_success') }}</span>
                 </div>
             @endif
+            @if(session()->has('contact_notice'))
+                <div class="kba-contact-success" role="status"><i class="bi bi-info-circle-fill"></i><span>{{ session('contact_notice') }}</span></div>
+            @endif
 
             <form wire:submit.prevent="submit" class="kba-contact-form" data-kba-recaptcha-form>
                 <div class="kba-contact-honeypot" aria-hidden="true">

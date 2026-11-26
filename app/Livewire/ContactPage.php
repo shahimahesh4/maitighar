@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\ContactMessage;
 use App\Models\Page;
 use App\Models\Setting;
+use App\Models\Product;
 use App\Services\CommunicationService;
 use App\Traits\GoogleRecaptcha;
 use Illuminate\Support\Facades\RateLimiter;
@@ -37,6 +38,15 @@ class ContactPage extends Component
             $this->full_name = (string) auth()->user()->name;
             $this->email = (string) auth()->user()->email;
             $this->phone = (string) (auth()->user()->phone ?? '');
+        }
+
+        if ($slug = request()->string('product')->trim()->toString()) {
+            $product = Product::storefront()->where('slug', $slug)->first();
+
+            if ($product) {
+                $this->subject = 'Quote request: '.$product->name;
+                $this->message = "Please send me a price quote for {$product->name}.\n\nQuantity required: ";
+            }
         }
     }
 

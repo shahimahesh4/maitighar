@@ -49,4 +49,15 @@ class CommunicationService
         $email = Setting::get('admin_notification_email', $this->store()['email']);
         $this->send($email, $subject, $heading, $intro, $details, $actionUrl ? 'Open admin panel' : null, $actionUrl);
     }
+
+    public function notifyQuoteAdmins(string $subject, string $heading, string $intro, array $details = [], ?string $actionUrl = null): void
+    {
+        $additional = Setting::get('quote_notification_emails', []);
+        $recipients = is_array($additional) ? $additional : [$additional];
+        $recipients[] = Setting::get('admin_notification_email', $this->store()['email']);
+
+        foreach (array_unique(array_filter($recipients, fn (mixed $email): bool => filter_var($email, FILTER_VALIDATE_EMAIL) !== false)) as $email) {
+            $this->send($email, $subject, $heading, $intro, $details, $actionUrl ? 'Open admin panel' : null, $actionUrl);
+        }
+    }
 }

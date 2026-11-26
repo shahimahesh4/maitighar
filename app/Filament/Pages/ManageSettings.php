@@ -6,6 +6,7 @@ use App\Models\Setting;
 use App\Services\Ai\GeminiService;
 use App\Services\ImageOptimizationService;
 use Filament\Actions\Action;
+use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -79,6 +80,7 @@ class ManageSettings extends Page
             'coming_soon_footer_text' => Setting::get('coming_soon_footer_text', '© 2026 Maiti Ghar · Made with heritage and heart'),
             'coming_soon_footer_credit' => Setting::get('coming_soon_footer_credit', 'Crafted by Siddhi Tech Nepal'),
             'admin_notification_email' => Setting::get('admin_notification_email', 'maitigharaustralia@gmail.com'),
+            'quote_notification_emails' => array_values(array_filter((array) Setting::get('quote_notification_emails', []))),
             'email_from_name' => Setting::get('email_from_name', 'Maitighar'),
             'email_footer' => Setting::get('email_footer', 'Maitighar - Nepalese Heritage with Love.'),
             'send_customer_receipts' => (bool) Setting::get('send_customer_receipts', true),
@@ -101,6 +103,38 @@ class ManageSettings extends Page
             'google_analytics_id' => Setting::get('google_analytics_id', ''),
             'photo_gallery_banner_image' => Setting::get('photo_gallery_banner_image', ''),
             'video_gallery_banner_image' => Setting::get('video_gallery_banner_image', ''),
+            'storefront_mode' => Setting::get('storefront_mode', 'quote_only'),
+            'show_product_prices' => (bool) Setting::get('show_product_prices', true),
+            'reviews_enabled' => (bool) Setting::get('reviews_enabled', true),
+            'wishlist_enabled' => (bool) Setting::get('wishlist_enabled', true),
+            'quick_view_enabled' => (bool) Setting::get('quick_view_enabled', true),
+            'currency_switcher_enabled' => (bool) Setting::get('currency_switcher_enabled', true),
+            'account_section_enabled' => (bool) Setting::get('account_section_enabled', true),
+            'login_enabled' => (bool) Setting::get('login_enabled', true),
+            'registration_enabled' => (bool) Setting::get('registration_enabled', true),
+            'quote_button_label' => Setting::get('quote_button_label', 'Request a Quote'),
+            'home_show_slider' => (bool) Setting::get('home_show_slider', true),
+            'home_show_service_promise' => (bool) Setting::get('home_show_service_promise', true),
+            'home_service_promises' => Setting::get('home_service_promises', [
+                ['icon' => 'bi-truck', 'title' => 'Australia-Wide Delivery', 'description' => 'Reliable tracked delivery across Australia.'],
+                ['icon' => 'bi-box-seam', 'title' => '7-Day Returns', 'description' => 'Easy return and exchange assistance.'],
+                ['icon' => 'bi-credit-card-2-front', 'title' => 'Secure Payment', 'description' => 'Cash on delivery and bank transfer.'],
+                ['icon' => 'bi-patch-check', 'title' => 'Authentic Nepali Craft', 'description' => 'Genuine handcrafted heritage items.'],
+                ['icon' => 'bi-headset', 'title' => 'Dedicated Support', 'description' => 'Helpful assistance by phone and email.'],
+            ]),
+            'home_show_new_arrivals' => (bool) Setting::get('home_show_new_arrivals', true),
+            'home_new_arrivals_title' => Setting::get('home_new_arrivals_title', 'New Arrivals'),
+            'home_show_women_collection' => (bool) Setting::get('home_show_women_collection', true),
+            'home_women_collection_description' => Setting::get('home_women_collection_description', 'Designed to celebrate heritage with modern grace, each piece is finished with the care of Nepali artisans.'),
+            'home_show_featured_products' => (bool) Setting::get('home_show_featured_products', true),
+            'home_featured_products_title' => Setting::get('home_featured_products_title', 'Featured Products'),
+            'home_show_men_collection' => (bool) Setting::get('home_show_men_collection', true),
+            'home_men_collection_description' => Setting::get('home_men_collection_description', 'Crafted for timeless presence, each piece carries the distinction of Nepali tradition and the confidence of modern style.'),
+            'home_show_related_products' => (bool) Setting::get('home_show_related_products', true),
+            'home_related_products_description' => Setting::get('home_related_products_description', 'Explore more handcrafted treasures from our Nepali collection.'),
+            'home_show_highlights' => (bool) Setting::get('home_show_highlights', true),
+            'home_essentials_banner_image' => Setting::get('home_essentials_banner_image', ''),
+            'home_essentials_banner_link' => Setting::get('home_essentials_banner_link', '/products'),
         ]);
     }
 
@@ -251,6 +285,101 @@ class ManageSettings extends Page
                                     ])->columns(3),
                             ]),
 
+                        Tabs\Tab::make('Storefront & Home Page')
+                            ->icon('heroicon-o-home')
+                            ->schema([
+                                Section::make('Selling mode')
+                                    ->description('Quote-only mode removes buying controls and sends customers to the quote form. You can switch back to e-commerce at any time.')
+                                    ->schema([
+                                        Select::make('storefront_mode')
+                                            ->label('Storefront mode')
+                                            ->options([
+                                                'ecommerce' => 'E-commerce — cart, checkout, and payments enabled',
+                                                'quote_only' => 'Quote only — customers request a price',
+                                            ])
+                                            ->required()
+                                            ->live(),
+                                        Toggle::make('show_product_prices')
+                                            ->label('Show product prices')
+                                            ->default(true),
+                                        Toggle::make('reviews_enabled')
+                                            ->label('Enable customer reviews')
+                                            ->helperText('Hides product ratings and prevents new customer reviews when disabled.')
+                                            ->default(true),
+                                        Toggle::make('wishlist_enabled')->label('Enable wishlist')->default(true),
+                                        Toggle::make('quick_view_enabled')->label('Enable quick view')->default(true),
+                                        Toggle::make('currency_switcher_enabled')->label('Show currency switcher in header')->default(true),
+                                        Toggle::make('account_section_enabled')
+                                            ->label('Show account section in header')
+                                            ->helperText('Hides the account icon, profile menu, and mobile account links when disabled.')
+                                            ->default(true),
+                                        Toggle::make('login_enabled')
+                                            ->label('Enable login form')
+                                            ->helperText('Hides and blocks the customer login form. Admin panel login is unaffected.')
+                                            ->default(true),
+                                        Toggle::make('registration_enabled')
+                                            ->label('Enable registration form')
+                                            ->helperText('Hides and blocks new customer account registration.')
+                                            ->default(true),
+                                        TextInput::make('quote_button_label')
+                                            ->label('Quote button label')
+                                            ->default('Request a Quote')
+                                            ->maxLength(60),
+                                    ])->columns(2),
+
+                                Section::make('Homepage section visibility')
+                                    ->description('Turn each homepage block on or off without changing the layout or deleting its content.')
+                                    ->schema([
+                                        Toggle::make('home_show_slider')->label('Hero slider')->default(true),
+                                        Toggle::make('home_show_service_promise')->label('Service promise')->default(true),
+                                        Toggle::make('home_show_new_arrivals')->label('New arrivals')->default(true),
+                                        Toggle::make('home_show_women_collection')->label("Women's collection")->default(true),
+                                        Toggle::make('home_show_featured_products')->label('Featured products')->default(true),
+                                        Toggle::make('home_show_men_collection')->label("Men's collection")->default(true),
+                                        Toggle::make('home_show_related_products')->label('You may also like')->default(true),
+                                        Toggle::make('home_show_highlights')->label('Trending, essentials, and top selling')->default(true),
+                                    ])->columns(2),
+
+                                Section::make('Homepage text & feature banner')
+                                    ->schema([
+                                        TextInput::make('home_new_arrivals_title')->label('New arrivals heading')->maxLength(100),
+                                        TextInput::make('home_featured_products_title')->label('Featured products heading')->maxLength(100),
+                                        Textarea::make('home_women_collection_description')->label("Women's collection description")->rows(3),
+                                        Textarea::make('home_men_collection_description')->label("Men's collection description")->rows(3),
+                                        Textarea::make('home_related_products_description')->label('Related products description')->rows(3),
+                                        FileUpload::make('home_essentials_banner_image')
+                                            ->label('Essentials banner image')
+                                            ->image()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->maxSize(3072)
+                                            ->disk('public')
+                                            ->directory('settings/homepage')
+                                            ->visibility('public')
+                                            ->imageResizeMode('cover')
+                                            ->imageResizeTargetWidth('1600')
+                                            ->imageResizeTargetHeight('900')
+                                            ->imageResizeUpscale(false)
+                                            ->saveUploadedFileUsing(static fn (TemporaryUploadedFile $file): ?string => app(ImageOptimizationService::class)
+                                                ->storeAsWebp($file->getRealPath(), 'public', 'settings/homepage', 1600, 900))
+                                            ->deleteUploadedFileUsing(static fn (string $file): bool => Storage::disk('public')->delete($file)),
+                                        TextInput::make('home_essentials_banner_link')->label('Essentials banner link')->maxLength(255),
+                                    ])->columns(2),
+
+                                Section::make('Service promise cards')
+                                    ->description('Edit, reorder, add, or remove the cards displayed below the hero slider.')
+                                    ->schema([
+                                        Repeater::make('home_service_promises')
+                                            ->schema([
+                                                TextInput::make('icon')->required()->helperText('Bootstrap icon class, e.g. bi-truck.'),
+                                                TextInput::make('title')->required()->maxLength(80),
+                                                TextInput::make('description')->required()->maxLength(160),
+                                            ])
+                                            ->columns(3)
+                                            ->defaultItems(0)
+                                            ->columnSpanFull(),
+                                    ]),
+                            ]),
+
                         Tabs\Tab::make('Gallery Banners')
                             ->icon('heroicon-o-photo')
                             ->schema([
@@ -299,6 +428,11 @@ class ManageSettings extends Page
                                     ->description('Control branded customer emails, administrator notifications, and account verification requirements.')
                                     ->schema([
                                         TextInput::make('admin_notification_email')->label('Admin notification email')->email()->required(),
+                                        Forms\Components\TagsInput::make('quote_notification_emails')
+                                            ->label('Additional quote notification emails')
+                                            ->placeholder('Type an email and press Enter')
+                                            ->nestedRecursiveRules(['email'])
+                                            ->helperText('Each address receives a copy of every new product quote request.'),
                                         TextInput::make('email_from_name')->label('Email sender name')->required(),
                                         Textarea::make('email_footer')->label('Email footer message')->rows(2)->columnSpanFull(),
                                         Toggle::make('send_customer_receipts')

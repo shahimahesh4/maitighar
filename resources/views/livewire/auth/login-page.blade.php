@@ -4,7 +4,9 @@
             <div class="kba-login-form-heading">
                 <span>Welcome back</span>
                 <h2>Sign in to your account</h2>
-                <p>New to Maitighar? <a wire:navigate href="{{ route('register') }}">Create an account</a></p>
+                @if(\App\Support\Storefront::registrationEnabled())
+                    <p>New to Maitighar? <a wire:navigate href="{{ route('register') }}">Create an account</a></p>
+                @endif
             </div>
 
             @if (session()->has('error'))

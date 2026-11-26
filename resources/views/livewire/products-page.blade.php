@@ -1,3 +1,9 @@
+@php($commerceEnabled = \App\Support\Storefront::commerceEnabled())
+@php($quoteLabel = \App\Support\Storefront::quoteLabel())
+@php($showPrices = \App\Support\Storefront::pricesVisible())
+@php($reviewsEnabled = \App\Support\Storefront::reviewsEnabled())
+@php($wishlistEnabled = \App\Support\Storefront::wishlistEnabled())
+@php($quickViewEnabled = \App\Support\Storefront::quickViewEnabled())
 <div
     x-data="{ filtersOpen: false }"
     x-on:keydown.escape.window="filtersOpen = false"
@@ -38,23 +44,67 @@
             <!-- Categories Filter -->
             <div class="kba-filter-card bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm">
                 <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-slate-800/80 pb-2">Categories</h3>
-                <div class="space-y-3 max-h-48 overflow-y-auto scrollbar-none pr-2">
+                <div class="max-h-72 space-y-1 overflow-y-auto scrollbar-none pr-2">
                     @foreach ($categories as $category)
-                        <label for="cat-{{ $category->id }}" class="flex items-center text-xs text-gray-600 dark:text-slate-300 cursor-pointer select-none">
-                            <input type="checkbox" wire:model.live="selected_categories" id="cat-{{ $category->id }}" value="{{ $category->id }}" class="w-4 h-4 text-[#0C1E8C] border-gray-300 rounded focus:ring-[#0C1E8C] mr-3">
-                            <span>{{ $category->name }}</span>
-                        </label>
+                        <div
+                            x-data="{ open: @js(collect($selected_categories)->intersect($category->children->pluck('slug')->push($category->slug))->isNotEmpty()) }"
+                            class="rounded-lg"
+                        >
+                            <div class="flex items-center gap-1">
+                                <label for="cat-{{ $category->slug }}" class="flex min-w-0 flex-1 items-center py-2 text-xs font-semibold text-gray-700 dark:text-slate-200 cursor-pointer select-none">
+                                    <input type="checkbox" wire:model.live="selected_categories" id="cat-{{ $category->slug }}" value="{{ $category->slug }}" class="mr-3 h-4 w-4 rounded border-gray-300 text-[#0C1E8C] focus:ring-[#0C1E8C]">
+                                    <span class="truncate">{{ $category->name }}</span>
+                                </label>
+
+                                @if ($category->children->isNotEmpty())
+                                    <button
+                                        type="button"
+                                        x-on:click="open = ! open"
+                                        x-bind:aria-expanded="open"
+                                        aria-label="Toggle {{ $category->name }} subcategories"
+                                        class="grid h-8 w-8 shrink-0 place-items-center rounded-md text-[#0C1E8C] transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-[#0C1E8C]/30"
+                                    >
+                                        <i class="bi bi-chevron-down text-xs transition-transform duration-200" x-bind:class="open && 'rotate-180'" aria-hidden="true"></i>
+                                    </button>
+                                @endif
+                            </div>
+
+                            @if ($category->children->isNotEmpty())
+                                <div x-cloak x-show="open" x-transition.opacity.duration.150ms class="ml-4 border-l border-blue-100 pl-3">
+                                    @foreach ($category->children as $child)
+                                        <label for="cat-{{ $child->slug }}" class="flex items-center py-2 text-xs text-gray-600 dark:text-slate-300 cursor-pointer select-none">
+                                            <input type="checkbox" wire:model.live="selected_categories" id="cat-{{ $child->slug }}" value="{{ $child->slug }}" class="mr-3 h-4 w-4 rounded border-gray-300 text-[#0C1E8C] focus:ring-[#0C1E8C]">
+                                            <span class="truncate">{{ $child->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
                     @endforeach
                 </div>
             </div>
+
+            @if ($wearerAttribute?->values->isNotEmpty())
+                <div class="kba-filter-card bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm">
+                    <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-slate-800/80 pb-2">Shop by wearer</h3>
+                    <div class="space-y-3">
+                        @foreach ($wearerAttribute->values as $value)
+                            <label for="wearer-{{ $value->id }}" class="flex items-center text-xs text-gray-600 dark:text-slate-300 cursor-pointer select-none">
+                                <input type="checkbox" wire:model.live="selected_wearers" id="wearer-{{ $value->slug }}" value="{{ $value->slug }}" class="w-4 h-4 text-[#0C1E8C] border-gray-300 rounded focus:ring-[#0C1E8C] mr-3">
+                                <span>{{ $value->value }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             <!-- Brands Filter -->
             <div class="kba-filter-card bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm">
                 <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-slate-800/80 pb-2">Brands</h3>
                 <div class="space-y-3 max-h-48 overflow-y-auto scrollbar-none pr-2">
                     @foreach ($brands as $brand)
-                        <label for="brand-{{ $brand->id }}" class="flex items-center text-xs text-gray-600 dark:text-slate-300 cursor-pointer select-none">
-                            <input type="checkbox" wire:model.live="selected_brands" id="brand-{{ $brand->id }}" value="{{ $brand->id }}" class="w-4 h-4 text-[#0C1E8C] border-gray-300 rounded focus:ring-[#0C1E8C] mr-3">
+                        <label for="brand-{{ $brand->slug }}" class="flex items-center text-xs text-gray-600 dark:text-slate-300 cursor-pointer select-none">
+                            <input type="checkbox" wire:model.live="selected_brands" id="brand-{{ $brand->slug }}" value="{{ $brand->slug }}" class="w-4 h-4 text-[#0C1E8C] border-gray-300 rounded focus:ring-[#0C1E8C] mr-3">
                             <span>{{ $brand->name }}</span>
                         </label>
                     @endforeach
@@ -77,6 +127,7 @@
             </div>
 
             <!-- Price Filter -->
+            @if($showPrices)
             <div class="kba-filter-card bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800/80 rounded-2xl p-5 shadow-sm">
                 <h3 class="font-bold text-gray-800 dark:text-gray-200 text-sm uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-slate-800/80 pb-2">Price Limit</h3>
                 <div class="space-y-4">
@@ -91,6 +142,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <div class="sticky bottom-0 -mx-4 border-t border-stone-200 bg-white px-4 py-4 lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0">
                 <button type="button" wire:click="clearFilters" class="w-full rounded-xl border border-[#0C1E8C] bg-white px-4 py-3 text-sm font-bold text-[#0C1E8C] transition hover:bg-blue-50">
@@ -114,7 +166,7 @@
                     <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Sort by:</span>
                     <select wire:model.live="sort" aria-label="Sort products" class="h-10 min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-700 outline-none focus:border-[#0C1E8C] focus:ring-4 focus:ring-blue-100 md:min-w-[168px]">
                         <option value="latest">Latest Arrivals</option>
-                        <option value="price">Price (Low to High)</option>
+                        @if($showPrices)<option value="price">Price (Low to High)</option>@endif
                     </select>
                 </div>
             </div>
@@ -142,14 +194,15 @@
                                 </a>
 
                                 <div class="kba-product-action-bar">
-                                    <button type="button" 
+                                    @if($wishlistEnabled)<button type="button"
                                             wire:click.prevent="toggleWishlist({{ $product->id }})" 
                                             class="kba-action-btn kba-action-wishlist {{ in_array($product->id, $wishlistProductIds ?? []) ? 'is-active' : '' }}" 
                                             title="Add to Wishlist" 
                                             aria-label="Wishlist {{ $product->name }}">
                                         <i class="bi {{ in_array($product->id, $wishlistProductIds ?? []) ? 'bi-heart-fill text-red-500' : 'bi-heart' }}"></i>
                                     </button>
-                                    <button type="button" 
+                                    @endif
+                                    @if($commerceEnabled)<button type="button"
                                             wire:click.prevent="addToCart({{ $product->id }})" 
                                             class="kba-action-btn kba-action-cart" 
                                             title="Add to Bag" 
@@ -157,29 +210,32 @@
                                         <i wire:loading.remove wire:target="addToCart({{ $product->id }})" class="bi bi-bag"></i>
                                         <i wire:loading wire:target="addToCart({{ $product->id }})" class="bi bi-arrow-repeat kba-spin"></i>
                                     </button>
-                                    <button type="button" 
+                                    @endif
+                                    @if($quickViewEnabled)<button type="button"
                                             @click.prevent="$dispatch('open-quick-view', { productId: {{ $product->id }} })" 
                                             class="kba-action-btn kba-action-quickview" 
                                             title="Quick View" 
                                             aria-label="Quick view {{ $product->name }}">
                                         <i class="bi bi-eye"></i>
                                     </button>
+                                    @endif
                                 </div>
-                                <button type="button" wire:click.prevent="addToCart({{ $product->id }})" class="kba-hover-add-to-cart" aria-label="Add {{ $product->name }} to cart">
+                                @if($commerceEnabled)<button type="button" wire:click.prevent="addToCart({{ $product->id }})" class="kba-hover-add-to-cart" aria-label="Add {{ $product->name }} to cart">
                                     <i wire:loading.remove wire:target="addToCart({{ $product->id }})" class="bi bi-cart3"></i>
                                     <i wire:loading wire:target="addToCart({{ $product->id }})" class="bi bi-arrow-repeat kba-spin"></i>
                                     Add to Cart
                                 </button>
+                                @else<a wire:navigate href="{{ route('quote.request', ['product' => $product->slug]) }}" class="kba-hover-add-to-cart" aria-label="{{ $quoteLabel }} for {{ $product->name }}"><i class="bi bi-chat-quote"></i> {{ $quoteLabel }}</a>@endif
                             </div>
 
                             <div class="kba-product-info">
                                 <a wire:navigate href="{{ route('product-details', $product->slug) }}" class="kba-product-title">{{ $product->name }}</a>
-                                <div class="kba-rating" role="img" aria-label="Rated {{ $product->average_rating ?: 5 }} out of 5">
+                                @if($reviewsEnabled)<div class="kba-rating" role="img" aria-label="Rated {{ $product->average_rating ?: 5 }} out of 5">
                                     @for($star = 1; $star <= 5; $star++)
                                         <i class="bi {{ $star <= round((float) ($product->average_rating ?: 5)) ? 'bi-star-fill' : 'bi-star' }}" aria-hidden="true"></i>
                                     @endfor
-                                </div>
-                                <div class="kba-price">
+                                </div>@endif
+                                @if($showPrices)<div class="kba-price">
                                     @if($product->isVariable())
                                         <strong>{{ $product->getFormattedPriceRange() }}</strong>
                                     @elseif($product->on_sale && $product->discount_percentage)
@@ -188,7 +244,7 @@
                                     @else
                                         <strong class="regular">{{ \App\Support\Money::format($product->sale_price) }}</strong>
                                     @endif
-                                </div>
+                                </div>@endif
                             </div>
                         </article>
                     @endforeach

@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Support\Storefront;
 use Illuminate\Support\Facades\Cookie;
 
 class CartManagement
@@ -21,6 +22,10 @@ class CartManagement
      */
     public static function addItemToCart($product_id, $qty = 1, $variation_id = null): int
     {
+        if (! Storefront::commerceEnabled()) {
+            return self::getTotalQuantity();
+        }
+
         $cart_items = self::getCartItemsFromCookie();
         $itemKey = self::buildItemKey($product_id, $variation_id);
 

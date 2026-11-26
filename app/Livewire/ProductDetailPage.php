@@ -7,6 +7,7 @@ use App\Livewire\Partials\Navbar;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\Wishlist;
+use App\Support\Storefront;
 use App\Traits\GoogleRecaptcha;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -261,6 +262,9 @@ class ProductDetailPage extends Component
 
     public function submitReview(): void
     {
+        if (! Storefront::reviewsEnabled()) {
+            abort(404);
+        }
         if (! auth()->check()) {
             $this->alert('error', 'Please login to leave a review.', [
                 'position' => 'top-end',
@@ -314,6 +318,10 @@ class ProductDetailPage extends Component
 
     public function toggleWishlist(): void
     {
+        if (! Storefront::wishlistEnabled()) {
+            return;
+        }
+
         if (! auth()->check()) {
             $this->alert('error', 'Please login to manage your wishlist.', [
                 'position' => 'top-end',

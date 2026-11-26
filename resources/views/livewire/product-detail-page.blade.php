@@ -18,14 +18,14 @@
             <li>
                 <div class="flex items-center">
                     <i class="bi bi-chevron-right mx-1 text-gray-400 dark:text-slate-650 text-[10px]"></i>
-                    <a wire:navigate href="/products?selected_categories[0]={{ $product->category->id }}" class="hover:text-[#EC0205]">{{ $product->category->name }}</a>
+                    <a wire:navigate href="{{ route('product-category.products', $product->category) }}" class="hover:text-[#EC0205]">{{ $product->category->name }}</a>
                 </div>
             </li>
             @endif
             <li>
                 <div class="flex items-center">
                     <i class="bi bi-chevron-right mx-1 text-gray-400 dark:text-slate-650 text-[10px]"></i>
-                    <span class="text-gray-800 dark:text-white font-semibold truncate max-w-[150px]">{{ $product->name }}</span>
+                    <span class="text-gray-800 dark:text-white font-semibold">{{ $product->name }}</span>
                 </div>
             </li>
         </ol>
@@ -83,6 +83,7 @@
                     </h1>
                     
                     <!-- Ratings summary -->
+                    @if(\App\Support\Storefront::reviewsEnabled())
                     <div class="flex items-center space-x-2 pt-1">
                         <div class="flex text-yellow-400">
                             @for ($i = 0; $i < $fullStars; $i++)
@@ -99,6 +100,7 @@
                             {{ $product->average_rating }} ({{ $product->approvedReviews->count() }} {{ Str::plural('review', $product->approvedReviews->count()) }})
                         </span>
                     </div>
+                    @endif
                     
                     <!-- Stock Badge -->
                     <div class="pt-2">
@@ -139,6 +141,7 @@
 
                 <!-- Price and Info -->
                 <div class="kba-product-detail-price py-4 border-y border-gray-100 dark:border-slate-800/80">
+                    @if(\App\Support\Storefront::pricesVisible())
                     <div class="flex flex-wrap items-end gap-x-3 gap-y-1">
                         @if($isVariable)
                             @if($displayPrice !== null)
@@ -171,6 +174,7 @@
                             @endif
                         @endif
                     </div>
+                    @endif
                     @php
                         $activeSku = $isVariable ? ($selectedVariationSku ?: $product->sku) : $product->sku;
                     @endphp
@@ -259,6 +263,7 @@
                 @endif
 
                 <!-- Actions -->
+                @if(\App\Support\Storefront::commerceEnabled())
                 <div class="kba-product-actions space-y-4 pt-4">
                     <div class="kba-product-actions-row flex items-center gap-4">
                         <div class="kba-product-quantity w-32">
@@ -311,16 +316,24 @@
                                 @endif
                             @endif
 
-                            <button type="button" wire:click="toggleWishlist" class="kba-product-wishlist-button p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700/60 transition shadow-sm" title="Add to Wishlist">
+                            @if(\App\Support\Storefront::wishlistEnabled())<button type="button" wire:click="toggleWishlist" class="kba-product-wishlist-button p-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-700/60 transition shadow-sm" title="Add to Wishlist">
                                 @if($isWishlisted)
                                     <i class="bi bi-heart-fill text-red-500 text-lg"></i>
                                 @else
                                     <i class="bi bi-heart text-gray-500 dark:text-slate-400 text-lg"></i>
                                 @endif
                             </button>
+                            @endif
                         </div>
                     </div>
                 </div>
+                @else
+                    <div class="kba-product-actions pt-4">
+                        <a wire:navigate href="{{ route('quote.request', ['product' => $product->slug]) }}" class="kba-product-add-button w-full py-3 px-6 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-xl border border-transparent bg-[#EC0205] text-white hover:bg-[#C90204] shadow-md transition hover-lift">
+                            <i class="bi bi-chat-quote"></i>{{ \App\Support\Storefront::quoteLabel() }}
+                        </a>
+                    </div>
+                @endif
 </div>
         </div>
     </div>
@@ -368,6 +381,7 @@
         </section>
     @endif
     <!-- Reviews and Feedback Section -->
+    @if(\App\Support\Storefront::reviewsEnabled())
     <div class="kba-product-reviews bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800/80 rounded-3xl p-6 sm:p-10 shadow-sm mt-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <!-- Left: Ratings Stats -->
@@ -437,7 +451,9 @@
                     @else
                         <div class="p-4 bg-gray-50 dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700 rounded-2xl text-center">
                             <p class="text-xs text-gray-400">Please login to write a product review.</p>
-                            <a wire:navigate href="{{ route('login') }}" class="inline-block mt-3 text-xs font-semibold text-[#0C1E8C] hover:text-amber-500">Log In &rarr;</a>
+                            @if(\App\Support\Storefront::loginEnabled())
+                                <a wire:navigate href="{{ route('login') }}" class="inline-block mt-3 text-xs font-semibold text-[#0C1E8C] hover:text-amber-500">Log In &rarr;</a>
+                            @endif
                         </div>
                     @endauth
                 </div>
@@ -489,4 +505,5 @@
             </div>
         </div>
     </div>
+    @endif
 </div>

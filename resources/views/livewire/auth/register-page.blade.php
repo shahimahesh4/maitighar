@@ -4,7 +4,9 @@
             <div class="kba-login-form-heading">
                 <span>Become a member</span>
                 <h2>Create your account</h2>
-                <p>Already registered? <a wire:navigate href="{{ route('login') }}">Sign in instead</a></p>
+                @if(\App\Support\Storefront::loginEnabled())
+                    <p>Already registered? <a wire:navigate href="{{ route('login') }}">Sign in instead</a></p>
+                @endif
             </div>
 
             <form wire:submit.prevent="save" class="kba-login-form kba-register-form" data-kba-recaptcha-form>
