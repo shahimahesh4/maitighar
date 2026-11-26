@@ -1670,9 +1670,9 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 .kba-footer-logo strong { font-size: 1.55rem; font-weight: 800; line-height: 1.15; letter-spacing: -.02em; color: #0F172A; font-family: 'DM Sans', sans-serif; }
 .kba-footer-logo small { margin-top: 4px; color: #EA0202; font-size: .675rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .kba-footer-brand > p { max-width: 320px; margin: 15px 0 0; color: #475569; font-size: .785rem; line-height: 1.62; }
-.kba-footer-cta { min-height: 38px; display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; padding: 0 18px; border: 1px solid #EA0202; border-radius: 999px; color: #ffffff; background: #EA0202; font-size: .725rem; font-weight: 700; text-decoration: none; transition: all .2s ease; box-shadow: 0 4px 12px rgba(234, 2, 2, .2); }
-.kba-footer-cta:hover { color: #ffffff; background: #C90204; border-color: #C90204; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(234, 2, 2, .32); }
-.kba-footer-label { color: #EA0202; font-size: .625rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.kba-footer-cta { min-height: 38px; display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; padding: 0 18px; border: 1px solid #B91C1C; border-radius: 999px; color: #ffffff; background: #B91C1C; font-size: .725rem; font-weight: 700; text-decoration: none; transition: all .2s ease; box-shadow: 0 4px 12px rgba(185, 28, 28, .2); }
+.kba-footer-cta:hover { color: #ffffff; background: #991B1B; border-color: #991B1B; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(153, 27, 27, .32); }
+.kba-footer-label { color: #B91C1C; font-size: .625rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .kba-footer h3 { margin: 5px 0 14px; color: #0F172A; font-size: .925rem; font-weight: 700; }
 .kba-footer-links nav { display: grid; gap: 9px; }
 .kba-footer-links nav a { position: relative; width: fit-content; padding-left: 14px; color: #475569; font-size: .785rem; font-weight: 400; line-height: 1.4; text-decoration: none; transition: color .2s ease, transform .2s ease; }
@@ -1700,12 +1700,13 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 .kba-footer-newsletter button:disabled { cursor: wait; opacity: .65; }
 .kba-footer-form-message { position: absolute; right: 27px; bottom: -21px; margin: 0; display: flex !important; align-items: center; gap: 5px; color: #16A34A; font-size: .675rem; }
 .kba-footer-form-message.is-error { color: #DC2626; }
-.kba-footer-bottom { padding: 18px 24px; color: #64748B; background: #E5E7EB; border-top: 1px solid #D1D5DB; }
+.kba-footer-bottom { padding: 18px 24px; color: #475569; background: #E5E7EB; border-top: 1px solid #CBD5E1; }
 .kba-footer-bottom-grid { width: min(1320px, 100%); margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr .7fr; align-items: center; gap: 28px; }
-.kba-copyright p { margin: 2px 0; color: #64748B; font-size: .675rem; line-height: 1.5; }
-.kba-copyright a { color: #64748B; font-weight: 500; text-decoration: none; transition: color .15s ease, text-decoration .15s ease; }
-.kba-copyright a:hover { color: #EA0202; text-decoration: underline; }
-.kba-payment-methods { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #64748B; font-size: .675rem; font-weight: 600; }
+.kba-copyright p { margin: 2px 0; color: #475569; font-size: .675rem; line-height: 1.5; }
+.kba-copyright .text-slate-400 { color: #475569 !important; }
+.kba-copyright a { color: #334155; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; transition: color .15s ease, text-decoration .15s ease; }
+.kba-copyright a:hover { color: #991B1B; }
+.kba-payment-methods { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #475569; font-size: .675rem; font-weight: 600; }
 .kba-payment-badges { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .kba-pay-badge { height: 32px; min-width: 52px; padding: 3px 9px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid #CBD5E1; border-radius: 7px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,.05); transition: transform .15s ease, border-color .15s ease; }
 .kba-pay-badge:hover { transform: translateY(-1px); border-color: #94A3B8; }
@@ -1714,7 +1715,7 @@ p { margin: 0 !important; line-height: 1.5 !important; }
 .kba-pay-cod i { font-size: 16px; line-height: 1; }
 .kba-pay-cod small { color: #1E293B; font-size: 11px; font-weight: 800; letter-spacing: -.02em; }
 .kba-socials { display: grid; justify-items: end; gap: 8px; }
-.kba-socials > span { color: #64748B; font-size: .675rem; font-weight: 600; }
+.kba-socials > span { color: #475569; font-size: .675rem; font-weight: 600; }
 .kba-socials div { display: flex; gap: 9px; }
 .kba-socials a { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid #CBD5E1; border-radius: 50%; color: #475569; background: #FFFFFF; font-size: 1.05rem; transition: .2s ease; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
 .kba-socials a:hover { background: #EA0202; color: white; border-color: #EA0202; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(234, 2, 2, .25); }
